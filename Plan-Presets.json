@@ -1,0 +1,17 @@
+[
+  {
+    "group": "Litigation",
+    "name": "Core Litigation Plan",
+    "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
+  },
+  {
+    "group": "Litigation",
+    "name": "Premium Litigation Plan",
+    "contents": "• Everything in Core\n• Lexis+ AI drafting\n• Litigation Analytics"
+  },
+  {
+    "group": "Solo/Small",
+    "name": "Solo Essentials",
+    "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
+  }
+]
