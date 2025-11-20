@@ -1,3 +1,4 @@
+[
   {
     "group": "Litigation",
     "name": "Core Litigation Plan",
@@ -13,7 +14,7 @@
     "name": "Solo Essentials",
     "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   },
-    {
+  {
     "group": "Litigation",
     "name": "Core Litigation Plan 1",
     "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
@@ -28,7 +29,7 @@
     "name": "Solo Essentials1",
     "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   },
-    {
+  {
     "group": "Litigation",
     "name": "Core Litigation Plan3",
     "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
@@ -43,3 +44,4 @@
     "name": "Solo Essentials3",
     "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   },
+]
