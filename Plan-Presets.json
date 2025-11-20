@@ -16,32 +16,32 @@
   }
     {
     "group": "Litigation",
-    "name": "Core Litigation Plan",
+    "name": "Core Litigation Plan 1",
     "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
   },
   {
     "group": "Litigation",
-    "name": "Premium Litigation Plan",
+    "name": "Premium Litigation Plan1",
     "contents": "• Everything in Core\n• Lexis+ AI drafting\n• Litigation Analytics"
   },
   {
     "group": "Solo/Small",
-    "name": "Solo Essentials",
+    "name": "Solo Essentials1",
     "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   }
     {
     "group": "Litigation",
-    "name": "Core Litigation Plan",
+    "name": "Core Litigation Plan3",
     "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
   },
   {
     "group": "Litigation",
-    "name": "Premium Litigation Plan",
+    "name": "Premium Litigation Plan3",
     "contents": "• Everything in Core\n• Lexis+ AI drafting\n• Litigation Analytics"
   },
   {
     "group": "Solo/Small",
-    "name": "Solo Essentials",
+    "name": "Solo Essentials3",
     "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   }
 ]
