@@ -1,32 +1,12 @@
 [
   {
-    "group": "Simplified Packaging",
-    "name": "Essentials",
-    "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
-  },
-  {
-    "group": "Simplified Packaging",
-    "name": "Enhanced",
-    "contents": "• Everything in Core\n• Lexis+ AI drafting\n• Litigation Analytics"
-  },
-  {
-    "group": "Simplified Packaging",
-    "name": "Professional",
-    "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
+    "group": "Litigation",
+    "name": "Core Litigation – State Plan",
+    "contents": "• Lexis+ {{STATE}} primary law\n• {{STATE}} jury verdicts & settlements\n• Brief analysis"
   },
   {
     "group": "Litigation",
-    "name": "Premier",
-    "contents": "• Lexis+ core content\n• Florida add-on\n• Brief analysis"
-  },
-  {
-    "group": "Transactional",
-    "name": "Premium Litigation Plan 2",
+    "name": "Premium Litigation Plan",
     "contents": "• Everything in Core\n• Lexis+ AI drafting\n• Litigation Analytics"
-  },
-  {
-    "group": "Solo/Small",
-    "name": "Solo Essentials 3",
-    "contents": "• Lexis+ state library\n• Practical Guidance\n• Forms & checklists"
   }
 ]
