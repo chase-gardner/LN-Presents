@@ -18,5 +18,25 @@
     "group": "Simplified Packaging",
     "name": "Premier",
     "contents": "• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• All Research Materials\n• All Forms\n• Practical Guidance\n• National Automated Templates\n• National Verdicts and Settlements"
+  },
+  {
+    "group": "Monthly Promotion",
+    "name": "Retention",
+    "contents": "• {{STATE}} Primary\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions"
+  },
+  {
+    "group": "Monthly Promotion",
+    "name": "New Business",
+    "contents": "• {{STATE}} Enhanced with Full Federal\n• {{STATE}} Jury Instuctions\n• {{STATE}} Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
+  },
+  {
+    "group": "New Release",
+    "name": "Transactional Package",
+    "contents": "• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
+  },
+  {
+    "group": "General",
+    "name": "Extended Layout",
+    "contents": "• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• All Research Materials\n• All Forms\n• Practical Guidance\n• National Automated Templates\n• National Verdicts and Settlements"
   }
 ]
