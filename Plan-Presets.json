@@ -2,26 +2,26 @@
   {
     "group": "Simplified Packaging",
     "name": "Essentials",
-    "contents": "• {{STATE}} Primary\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions"
+    "contents": "Essential Package Includes:\n• {{STATE}} Primary\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions"
   },
   {
     "group": "Simplified Packaging",
     "name": "Enhanced",
-    "contents": "• {{STATE}} Enhanced with Full Federal\n• {{STATE}} Jury Instuctions\n• {{STATE}} Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
+    "contents": "Enhanced Package Includes:\n• {{STATE}} Enhanced with Full Federal\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
   },
   {
     "group": "Simplified Packaging",
     "name": "Professional",
-    "contents": "• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
+    "contents": "Professional Package Includes:\n• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• National Verdicts and Settlements with Analyzer"
   },
   {
     "group": "Simplified Packaging",
     "name": "Premier",
-    "contents": "• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• All Research Materials\n• All Forms\n• Practical Guidance\n• National Automated Templates\n• National Verdicts and Settlements"
+    "contents": "Premier Package Includes:\n• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• All Research Materials\n• All Forms\n• Practical Guidance\n• National Automated Templates\n• National Verdicts and Settlements with Analyzer\n• Context"
   },
   {
   "group": "Simplified Packaging Expanded",
   "name": "Enhanced",
-  "contents": "• {{STATE}} Enhanced with Full Federal — Comprehensive {{STATE}} primary law paired with full federal coverage, including statutes, case law, regulations, court rules, and legislative materials. Provides advanced annotations, Shepard’s® citators, and deep research functionality across both {{STATE}} and federal jurisdictions.\n• {{STATE}} Jury Instructions — Official and model New York jury instructions with commentary, variations, use notes, and pattern language. Helps litigators craft precise, court-ready jury instructions aligned with {{STATE}} standards.\n• {{STATE}} Briefs, Pleadings, and Motions — A large database of {{STATE}} litigation documents, including filed briefs, motions, pleadings, and supporting papers. Ideal for strategy development, motion drafting, and understanding how top litigators frame arguments.\n• {{STATE}} Practice Library — Authoritative New York treatises and practice guides across civil, criminal, business, real estate, and procedural areas. Includes expert analysis, checklists, forms, and step-by-step practice guidance specific to {{STATE}} courts.\n• All Forms — A comprehensive library of federal, state, and practice-specific forms across {{STATE}} and nationwide. Includes editable templates, procedural forms, transactional forms, and litigation drafting tools.\n• Practical Guidance — Expert-written guidance across more than 20 practice areas, offering step-by-step instructions, drafting notes, checklists, practice tips, and model documents designed to speed up daily legal work.\n• {{STATE}} Automated Templates — Automated document-assembly templates for New York practitioners, enabling quick creation of court filings, letters, and transactional documents through guided workflows.\n• {{STATE}} Verdicts and Settlements — Detailed summaries of {{STATE}} jury verdicts, settlements, damages data, and litigation outcomes. Useful for valuation, risk assessment, and building negotiation strategies."
+  "contents": "Enhanced Package Includes:\n• {{STATE}} Enhanced with Full Federal — Comprehensive {{STATE}} primary law paired with full federal coverage, including statutes, case law, regulations, court rules, and legislative materials. Provides advanced annotations, Shepard’s® citators, and deep research functionality across both {{STATE}} and federal jurisdictions.\n• {{STATE}} Jury Instructions — Official and model New York jury instructions with commentary, variations, use notes, and pattern language. Helps litigators craft precise, court-ready jury instructions aligned with {{STATE}} standards.\n• {{STATE}} Briefs, Pleadings, and Motions — A large database of {{STATE}} litigation documents, including filed briefs, motions, pleadings, and supporting papers. Ideal for strategy development, motion drafting, and understanding how top litigators frame arguments.\n• {{STATE}} Practice Library — Authoritative New York treatises and practice guides across civil, criminal, business, real estate, and procedural areas. Includes expert analysis, checklists, forms, and step-by-step practice guidance specific to {{STATE}} courts.\n• All Forms — A comprehensive library of federal, state, and practice-specific forms across {{STATE}} and nationwide. Includes editable templates, procedural forms, transactional forms, and litigation drafting tools.\n• Practical Guidance — Expert-written guidance across more than 20 practice areas, offering step-by-step instructions, drafting notes, checklists, practice tips, and model documents designed to speed up daily legal work.\n• {{STATE}} Automated Templates — Automated document-assembly templates for New York practitioners, enabling quick creation of court filings, letters, and transactional documents through guided workflows.\n• {{STATE}} Verdicts and Settlements — Detailed summaries of {{STATE}} jury verdicts, settlements, damages data, and litigation outcomes. Useful for valuation, risk assessment, and building negotiation strategies."
   }
 ]
