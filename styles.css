@@ -1,0 +1,616 @@
+/* =============== 1) Theming tokens (no external assets) =============== */
+:root{
+  --bg: linear-gradient(90deg,#191970,#4b0082); /* default “indigo” hero */
+  --surface: #0f172a;         /* page chrome (used behind cards on dark themes) */
+  --card-bg: #ffffff;         /* card body */
+  --card-muted: #f8fafc;      /* subtle rows / headers */
+  --text: #0b0f19;            /* body text */
+  --ink: #5b6470;             /* secondary text */
+  --border: rgba(0,0,0,.08);  /* hairline */
+  --accent: #cc0000;          /* LN red by default for CTAs */
+  --accent-ink: #fff;         /* CTA text */
+  --chip-bg: #eef2ff;         /* term chip */
+  --chip-ink:#1e1b4b;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.08);
+  --shadow-md: 0 10px 24px rgba(0,0,0,.12);
+  --shadow-lg: 0 18px 40px rgba(0,0,0,.18);
+}
+
+/* =========================================================
+   THEME TOKENS (Default + Variants)
+   - Default: Midnight Indigo (your current scheme)
+   - Light:   Soft light UI used previously
+   - LN Red:  LexisNexis red gradient
+   ========================================================= */
+
+/* ---------- Base (default) ---------- */
+:root{
+  /* Core palette */
+  --bg: linear-gradient(to right, #191970, #4b0082); /* background (page / hero) */
+  --card-bg: #ffffff;          /* surfaces/cards */
+  --input-bg: #f1f3f5;         /* inputs */
+  --text: #050301;             /* body text */
+  --accent: #191970;           /* primary accent (buttons, links) */
+  --purple: #4b0082;           /* secondary accent */
+  --green: #16a34a;            /* success/positive */
+  --ink:#96a8a1;               /* subtle text */
+  --slate:#96a8a1;             /* neutral */
+  --blank:#ffffff;
+  --muted:#f8fafc;
+  --border: rgba(0,0,0,.06);
+
+  /* Elevation & effects */
+  --ring: rgba(25,25,112,.25);
+  --shadow: 0 8px 24px rgba(0,0,0,.12);
+
+  /* Component helpers (optional) */
+  --btn-fg: #ffffff;
+  --btn-bg: var(--accent);
+  --chip-bg: #eef2ff;
+  --chip-text: #1e293b;
+
+  /* Transition for smooth theme swap */
+  --theme-transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+html, body {
+  transition: var(--theme-transition);
+}
+
+/* ---------- Theme: Light ---------- */
+:root[data-theme="light"]{
+  --bg: #f7f8fc;               /* flat light backdrop */
+  --card-bg: #ffffff;
+  --input-bg: #f3f4f6;
+  --text: #0b0b0f;
+  --accent: #1f3a8a;           /* deep indigo for contrast */
+  --purple:#4338ca;            /* vivid indigo */
+  --green:#16a34a;
+  --ink:#6b7280;
+  --slate:#94a3b8;
+  --blank:#ffffff;
+  --muted:#f8fafc;
+  --border: rgba(2,6,23,.10);
+
+  --ring: rgba(31,58,138,.22);
+  --shadow: 0 8px 24px rgba(2,6,23,.06);
+
+  --btn-fg: #ffffff;
+  --btn-bg: var(--accent);
+  --chip-bg: #e2e8f0;
+  --chip-text: #0f172a;
+}
+
+/* ---------- Theme: LexisNexis Red ---------- */
+:root[data-theme="ln-red"]{
+  --bg: linear-gradient(90deg,#8b0000,#cc0000);
+  --card-bg: #ffffff;
+  --input-bg: #fbf2f2;         /* lightly-tinted red input */
+  --text: #0a0a0a;
+  --accent: #b30000;           /* primary red */
+  --purple:#8b0000;            /* deeper red for secondary */
+  --green:#16a34a;
+  --ink:#7a7a7a;
+  --slate:#8b8b8b;
+  --blank:#ffffff;
+  --muted:#fff5f5;
+  --border: rgba(139,0,0,.14);
+
+  --ring: rgba(204,0,0,.24);
+  --shadow: 0 8px 24px rgba(139,0,0,.18);
+
+  --btn-fg: #ffffff;
+  --btn-bg: var(--accent);
+  --chip-bg: #ffe4e6;
+  --chip-text: #7f1d1d;
+}
+
+/* ---------- App wide basics using tokens (keeps your layout/logic) ---------- */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  transition: var(--theme-transition);
+}
+
+input, textarea, select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: var(--theme-transition);
+}
+
+.button, button, .btn {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: .6rem .9rem;
+  cursor: pointer;
+  transition: var(--theme-transition);
+}
+.button:hover, button:hover, .btn:hover { filter: brightness(1.05); }
+
+/* ---------- Tiny Theme Panel styles ---------- */
+.theme-panel {
+  display: grid;
+  gap: .75rem;
+  padding: 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.theme-option {
+  display: grid;
+  gap: .5rem;
+  padding: .75rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  align-content: start;
+}
+
+.theme-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .25rem;
+}
+.theme-swatch {
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+
+/* =============== 2) Global/base =============== */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+main { flex: 1 0 auto; }
+a { color: inherit; text-decoration: none; }
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* =============== 3) Top chrome (logo/header + drawer) =============== */
+.ln-header{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* left image / center spacer / right logo */
+  align-items: center;
+  column-gap: 1rem;
+  padding: 8px 20px;
+  background: var(--bg);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+/* left / center / right header regions */
+.ln-header-left,
+.ln-header-center,
+.ln-header-right{
+  display: flex;
+  align-items: center;
+}
+
+.ln-header-left{
+  justify-content: flex-start;
+}
+
+/* this is now just a spacer column; actual centering happens via .drawer */
+.ln-header-center{
+  justify-content: center;
+}
+
+.ln-header-right{
+  justify-content: flex-end;
+}
+
+/* left header image */
+.ln-header-image{
+  display: block;
+  height: auto;
+  max-height: 70px;
+  border-radius: 10px;
+}
+
+/* right-side logo(s) */
+.ln-logo img,
+.ln-logo-company img {
+  display:block;
+  height:auto;
+  max-height:110px;
+  border-radius: 10px;
+}
+
+/* Drawer CTA — truly centered on the screen */
+.drawer{
+  position: absolute;          /* anchor to full header, not just center column */
+  left: 50%;
+  transform: translateX(-50%); /* horizontally center in viewport */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: .75rem;
+  padding: 0;                   /* no extra offset */
+}
+
+/* Keep it more forgiving on narrow screens */
+@media (max-width: 640px){
+  .drawer{
+    position: dynamic;          /* revert to normal flow on small screens */
+    transform: none;
+    justify-content: center;
+  }
+}
+
+.drawer-button{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background: linear-gradient(180deg, #ffffff, #f6f8fb);
+  color:#111;
+  border:1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 17px;
+  font-weight:600;
+  font-size: clamp(.9rem, 1.1vw, 1rem);
+  box-shadow: var(--shadow-sm);
+}
+
+.drawer-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 45%, white);
+  outline-offset: 3px;
+}
+
+
+/* =============== 4) Hero =============== */
+.hero{
+  width: 100%;
+  display: grid;             /* robust centering across OS/browsers */
+  place-items: center;       /* centers both axes */
+  text-align: center;
+  max-width: 1120px;
+  margin: 8px auto 0;
+  padding: 16px 20px 8px;
+  text-align:left;
+  color:#fff;
+}
+.hero h1{
+  margin: 6px 0 4px;
+  text-align: center;
+  line-height:1.08;
+  font-size: clamp(1.6rem, 3.4vw, 2.5rem);
+  text-shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+
+/* Subhead highlighted slightly more, but still compact */
+.subhead{
+  max-width: 70ch;           /* readable line length */
+  margin: 0 auto;            /* centers the block */
+  text-align: center;
+  margin: 15px 0px 0px 0px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background:
+    radial-gradient(140% 180% at 0% 0%, rgba(15,23,42,.85), rgba(15,23,42,.55));
+  border: 1px solid rgba(148,163,184,.65);
+  color: rgba(248,250,252,.98);
+  font-size: clamp(.95rem, 1.6vw, 1.1rem);
+  line-height: 1.75;
+  box-shadow: 0 10px 28px rgba(15,23,42,.55);
+}
+
+/* =============== 5) Term selector (radio chips) =============== */
+/* =============== 5) Term selector (radio chips) =============== */
+.selector{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 14px;
+  width: 100%;
+  display: grid;             /* robust centering across OS/browsers */
+  place-items: center;       /* centers both axes */
+  text-align: center;
+  align-items:center;
+  justify-content:center;
+  padding: 12px 20px 10px;
+  margin: 6px auto 0;
+  max-width: 1120px;
+  border-top: 1px solid rgba(148,163,184,.55);
+}
+
+.selector-label{
+  width: 110%;
+  display: grid;             /* robust centering across OS/browsers */
+  place-items: center;       /* centers both axes */
+  text-align: center;
+  align-items:center;
+  font-weight:700;
+  color: rgba(248,250,252,.96);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-size:.78rem;
+}
+
+/* PRINT SAFETY: prevent stacked/overlapping letters in PDF on Windows */
+@media print {
+  .selector-label{
+    display: block !important;          /* simpler layout for print */
+    text-align: center !important;
+    letter-spacing: 1 !important;       /* remove spacing that causes stacking */
+    word-spacing: 0 !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    font-size: 11pt !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+}
+
+#termRadios{
+  display:flex;             /* inline-flex won’t center across full row */
+  width:100%;               /* lets justify-content center the row */
+  flex-wrap:wrap;
+  gap:8px 10px;
+  justify-content:center;   /* was flex-start */
+}
+#termRadios .radio-chip{         /* robust centering across OS/browsers */
+  display:inline-grid;      /* enables place-items on the chip */
+  place-items:center;
+  text-align:center;
+  align-items:center;
+  gap:15px 10px;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  min-height: 34px;
+  border-radius: 999px;
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    border-color .15s ease,
+    background-color .15s ease;
+}
+#termRadios .radio-chip:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+#termRadios .radio-chip:has(input:checked){
+}
+#termRadios .radio-chip input[type="radio"]{
+  appearance:none;
+  width:0;
+  height:0;
+  position:absolute;
+  opacity:0;
+}
+
+/* =============== 6) Plans grid =============== */
+.plans{
+  padding: 18px 20px 48px;
+}
+.plans-grid{
+  display:grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* =============== 7) Plan card =============== */
+.plan-card{
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display:flex;
+  flex-direction:column;
+  min-height: 280px;
+  box-shadow: var(--shadow-sm);
+  overflow:hidden;
+  transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+}
+.plan-card:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(0,0,0,.12);
+}
+.plan-card__header{
+  background: var(--card-muted);
+  border-bottom: 4px solid var(--border);
+  padding: 16px 16px 14px;
+}
+.plan-card__title{
+  margin: 0 0 2px 0;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  color: var(--text);
+}
+.plan-card__desc{
+  margin: 0;
+  color: var(--bg);
+  font-size: .95rem;
+}
+
+/* Rich text features area (fed by your builder). Keep lists “real only”. */
+.plan-card__features{
+  flex:1;
+  margin: 12px 16px;
+  padding-left: 1.1rem;
+}
+.plan-card__features :where(p,div,span){
+  display:block;
+  margin:.35rem 0;
+  padding:0;
+  list-style:none;
+}
+.plan-card__features :where(p,div,span)::marker,
+.plan-card__features :where(p,div,span)::before{
+  content:none;
+}
+.plan-card__features ul,
+.plan-card__features ol{
+  list-style: revert;
+  margin:.35rem 0 .35rem 1.1rem;
+  padding:0;
+}
+.rte-html a { text-decoration: underline; }
+
+/* Footer / CTA */
+.plan-card__footer{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.02));
+}
+.btn-primary,
+.plan-card__cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  font-weight:700;
+  letter-spacing:.01em;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--bg) 40%, black 0%);
+  background: #191970;
+  color: var(--accent-ink);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--bg) 25%, transparent);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.btn-primary:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+  box-shadow: var(--shadow-lg);
+}
+.btn-primary:active{
+  transform: translateY(0);
+}
+
+/* Optional “Most Popular” badge (purely visual) */
+.plan-card.is-popular{
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.plan-card.is-popular::before{
+  content:"Most Popular";
+  position:absolute;
+  inset:auto 16px 100% auto;
+  transform: translateY(14px);
+  background: linear-gradient(180deg, #fff, #f7f8fb);
+  color:#111;
+  border:1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight:700;
+  font-size:.8rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* =============== 8) Footer & utility =============== */
+.site-footer{
+  margin-top: auto;
+  text-align:center;
+  color: rgba(255,255,255,.85);
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,.15);
+}
+.no-print button{
+  padding:.6rem .8rem;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.15);
+  color:#fff;
+  backdrop-filter: blur(6px);
+}
+
+/* =============== 9) Responsive polish =============== */
+@media (min-width: 1200px){
+  .plans{ padding-bottom: 64px; }
+  .plans-grid{ gap: 18px; }
+}
+@media (max-width: 480px){
+  .ln-header{ padding: 8px 12px; }
+  .ln-logo img,
+  .ln-logo-company img{ max-height:44px; }
+  .drawer{ padding: 8px 12px; }
+  .plan-card__features{ margin: 12px; }
+}
+
+/* =============== 10) Print (A3 landscape) =============== */
+@page{
+  size: A3 landscape;
+  margin: 3mm;
+}
+@media print{
+  html, body{
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: #fff;
+    width: 420mm;
+    height: 297mm;
+    overflow: visible !important;
+  }
+  .no-print{ display:none !important; }
+  .plan-card,
+  .plan-card__features,
+  .plans-grid,
+  .plan-card__header{
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .plans{ padding: 0 0 6mm; }
+}
+
+/* Hide export buttons in print/PDF */
+  .btn-export,
+  .exportPdfBtn,
+  .export-pdf,
+  [data-print-hidden] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Prevent empty space left behind */
+  .btn-export *,
+  .exportPdfBtn *,
+  .export-pdf * {
+    display: none !important;
+  }
+}
