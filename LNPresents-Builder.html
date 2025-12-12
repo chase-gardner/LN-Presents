@@ -554,6 +554,80 @@ input:focus, select:focus, textarea:focus{
 }
   </style>
 </head>
+<!-- PASSCODE GATE (front-end only) -->
+<div id="gate" style="
+  position:fixed; inset:0; z-index:99999;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg); padding:24px;
+">
+  <div style="
+    width:min(420px, 92vw);
+    background:#fff; border-radius:16px; padding:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  ">
+    <div style="font-weight:800; font-size:1.05rem; margin-bottom:6px;">LNPresents Builder</div>
+    <div style="color:#5b6470; font-size:.9rem; margin-bottom:12px;">Enter passcode to continue.</div>
+
+    <div style="display:flex; gap:8px;">
+      <input id="gateCode" type="password" placeholder="Passcode"
+        style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,.15); outline:none;">
+      <button id="gateBtn"
+        style="padding:10px 12px; border-radius:10px; border:0; cursor:pointer; color:#fff; background:#4b0082;">
+        Unlock
+      </button>
+    </div>
+
+    <div id="gateErr" style="display:none; color:#b91c1c; font-size:.85rem; margin-top:10px;">
+      Incorrect passcode.
+    </div>
+
+    <label style="display:flex; gap:8px; align-items:center; margin-top:12px; color:#334155; font-size:.85rem;">
+      <input id="gateRemember" type="checkbox">
+      Remember on this device
+    </label>
+  </div>
+</div>
+
+<script>
+(function(){
+  // CHANGE THIS:
+  const PASSCODE = "LN2026";
+
+  const gate = document.getElementById("gate");
+  const input = document.getElementById("gateCode");
+  const btn = document.getElementById("gateBtn");
+  const err = document.getElementById("gateErr");
+  const remember = document.getElementById("gateRemember");
+
+  // if remembered, skip gate
+  try{
+    if (localStorage.getItem("LNP_BUILDER_UNLOCKED") === "1") {
+      gate.remove();
+      return;
+    }
+  } catch(e){}
+
+  function unlock(){
+    if (input.value === PASSCODE) {
+      err.style.display = "none";
+      if (remember.checked) {
+        try{ localStorage.setItem("LNP_BUILDER_UNLOCKED", "1"); } catch(e){}
+      }
+      gate.remove();
+    } else {
+      err.style.display = "block";
+      input.select();
+    }
+  }
+
+  btn.addEventListener("click", unlock);
+  input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") unlock(); });
+
+  // autofocus
+  setTimeout(()=>input.focus(), 50);
+})();
+</script>
 <body>
   <!-- ========== HEADER ========== -->
   <header class="page-header">
