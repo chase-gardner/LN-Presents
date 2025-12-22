@@ -369,7 +369,7 @@
     headerRow.style.width = '100%';
 
     const title = document.createElement('div');
-    title.textContent = 'Proposals';
+    title.textContent = 'Proposal';
     title.style.fontSize = '16px';
     title.style.fontWeight = '700';
     title.style.letterSpacing = '.12em';
