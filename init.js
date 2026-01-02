@@ -439,7 +439,7 @@
     selector = '#presenter',            // presenter root
     filename,
     page = { format: 'a3', orientation: 'landscape' }, // A3 landscape
-    margin = [2, 5, 0, 5],          // mm — tweak if you need more room
+    margin = [5, 5, 0, 10],          // mm — tweak if you need more room
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
