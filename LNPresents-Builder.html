@@ -3,42 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <title>LNPresents - Builder</title>
-  <style>
+<style>
 /* ===============================
-   LNPresents — Builder Rich CSS
-   (UI polish only; no layout/JS changes)
+   LNPresents — Builder REVIVED UI + COLLAPSIBLE SIDEBAR
+   - Desktop: sticky sidebar (same layout)
+   - Small screens: sidebar becomes off-canvas panel with overlay + toggle button
    =============================== */
 
-/* 1) Design tokens (aligned to Presenter) */
+/* 1) Tokens */
 :root{
   --bg: linear-gradient(90deg,#191970,#4b0082);
-  --surface: #0f172a;
+  --surface: #0b1222;
   --card-bg: #ffffff;
-  --card-muted:#f8fafc;
-  --input-bg:#f1f3f5;
+  --card-muted:#f7f8fb;
+  --input-bg:#ffffff;
+
   --text:#0b0f19;
   --ink:#5b6470;
-  --border: rgba(0,0,0,.08);
-  --accent:linear-gradient(90deg,#191970,#4b0082);          /* LN red for actions */
-  --accent-ink:#fff;
-  --green:#16a34a;
+  --border: rgba(15,23,42,.10);
 
-  --radius-lg:16px;
-  --radius-md:12px;
-  --radius-sm:10px;
-  --shadow-sm:0 2px 10px rgba(0,0,0,.08);
-  --shadow-md:0 10px 24px rgba(0,0,0,.12);
-  --shadow-lg:0 18px 40px rgba(0,0,0,.18);
+  --accent: linear-gradient(90deg,#191970,#4b0082);
+  --accent-solid:#4b0082;
+  --accent-ink:#fff;
+
+  --radius-xl:22px;
+  --radius-lg:18px;
+  --radius-md:14px;
+  --radius-sm:12px;
+
+  --shadow-1: 0 10px 30px rgba(2,6,23,.10);
+  --shadow-2: 0 18px 50px rgba(2,6,23,.16);
+  --shadow-3: 0 26px 80px rgba(2,6,23,.22);
+
+  --ring: 0 0 0 4px rgba(99,102,241,.25);
+
+  --maxw: 1280px;
+  --pad: clamp(14px, 2.2vw, 24px);
+
+  /* Off-canvas */
+  --panel-w: min(380px, 92vw);
+  --panel-z: 99990;
 }
 
-/* Optional themes (toggle via data-theme) */
-[data-theme="indigo"]{ --accent:#4b0082; }
-[data-theme="ln-red"]{ --bg:linear-gradient(90deg,#8b0000,#cc0000); --accent:#cc0000; }
-[data-theme="emerald"]{ --bg:linear-gradient(90deg,#065f46,#059669); --accent:#059669; }
-[data-theme="slate"]{ --bg:linear-gradient(90deg,#334155,#0f172a); --accent:#334155; }
+/* Optional themes */
+[data-theme="indigo"]{ --accent-solid:#4b0082; }
+[data-theme="ln-red"]{ --bg:linear-gradient(90deg,#8b0000,#cc0000); --accent:linear-gradient(90deg,#8b0000,#cc0000); --accent-solid:#cc0000; }
+[data-theme="emerald"]{ --bg:linear-gradient(90deg,#065f46,#059669); --accent:linear-gradient(90deg,#065f46,#059669); --accent-solid:#059669; }
+[data-theme="slate"]{ --bg:linear-gradient(90deg,#334155,#0f172a); --accent:linear-gradient(90deg,#334155,#0f172a); --accent-solid:#334155; }
 [data-theme="midnight"]{
-  --card-bg:#0f172a; --card-muted:#0b1320; --text:#e5e7eb; --ink:#b8c0cc;
-  --border:rgba(255,255,255,.08); --accent:#7c3aed;
+  --surface:#070b14;
+  --card-bg:#0f172a;
+  --card-muted:#0b1320;
+  --text:#e5e7eb;
+  --ink:#b8c0cc;
+  --border:rgba(255,255,255,.10);
+  --accent-solid:#7c3aed;
+  --accent: linear-gradient(90deg,#4c1d95,#7c3aed);
 }
 
 /* 2) Base */
@@ -48,178 +68,396 @@ body{
   margin:0;
   background: var(--bg);
   color:var(--text);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
 }
+
+/* Dramatic stage lighting */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-2px;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 380px at 16% 6%, rgba(255,255,255,.18), transparent 62%),
+    radial-gradient(900px 420px at 86% 8%, rgba(255,255,255,.12), transparent 60%),
+    radial-gradient(700px 520px at 70% 88%, rgba(255,255,255,.10), transparent 62%),
+    linear-gradient(180deg, rgba(2,6,23,.40), rgba(2,6,23,.08));
+  mix-blend-mode: overlay;
+  opacity:.95;
+}
+
 a{ color:inherit; text-decoration:none; }
-h1,h2{ margin:0; }
+h1,h2,h3{ margin:0; }
 
 @media (prefers-reduced-motion: reduce){
   *{ animation:none !important; transition:none !important; }
 }
 
-/* 3) Page header */
+/* 3) Header */
 .page-header{
-  max-width:1280px;
-  margin: 30px auto 10px;
-  padding: 0 24px;
+  max-width:var(--maxw);
+  margin: 26px auto 12px;
+  padding: 0 var(--pad);
   color:#fff;
-  display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
-}
-.page-header-left{ flex:1 1 600px; min-width:0; }
-.page-header h1{ font-size: clamp(1.15rem,2.6vw,1.5rem); font-weight:700; letter-spacing:.01em; }
-.page-header p{ font-size: clamp(.8rem,1.2vw,.95rem); line-height:1.4; opacity:.92; max-width:75ch; margin-top:2px; }
-.page-header-actions{ display:flex; gap:8px; align-items:left; margin-top:0; }
-@media (max-width:640px){ .page-header{ align-items:flex-start; } .page-header-actions{ margin-top:8px; width:100%; } }
-
-/* 4) Top action row (Save/Export/etc.) */
-.form-top-actions{
-  max-width:1280px; margin: 0 auto 8px; padding: 0 24px;
-  display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;
-}
-
-/* Buttons */
-.ln-btn{
-  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-  padding:.65rem .95rem; border-radius:999px; font-weight:700;
-  color:var(--bg);
-  background: #fff;
-  border:1px solid rgba(0,0,0,.12);
-  box-shadow: 0 6px 22px rgba(0,0,0,.25);
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-}
-.ln-btn:hover{ transform: translateY(-1px); filter: brightness(1.02); box-shadow: var(--shadow-lg); }
-.ln-btn:active{ transform: translateY(0); }
-.ln-btn:focus-visible{ outline:3px solid #fff; outline-offset:2px; }
-.btn-open{
-  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-  padding:.65rem .95rem; border-radius:6px; font-weight:700;
-  color:var(--bg);
-  background: #fff;
-  border:1px solid rgba(0,0,0,.12);
-  box-shadow: 0 6px 22px rgba(0,0,0,.25);
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-  }
-
-/* small variant (keeps link inline) */
-.ln-btn--sm{ font-size:.86rem; padding:.45rem .8rem; }
-
-/* 5) Form shell + panel row */
-.form-shell{ max-width:1280px; margin: 0 auto; padding: 0 24px 24px; }
-.form-panel-row{ display:flex; flex-wrap:wrap; gap:.6rem; width:100%; align-items:stretch; }
-
-/* 6) Cards (panels) */
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.86));
-  border:1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 14px;
-  margin-bottom: 10px;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(6px);
-}
-.form-panel-row .card{ flex:1 1 300px; display:flex; flex-direction:column; gap:.5rem; min-height:120px; }
-@media (max-width:1100px){ .form-panel-row .card{ flex:1 1 70%; } }
-
-.card h2{ font-size:1.05rem; margin: 0 0 8px; }
-.lede{ margin:0 0 8px; color:#334155; font-weight:600; }
-.card-info{ background: var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow: var(--shadow-sm); }
-
-/* Profile save/load card */
-.profile-card-controls{
   display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
   flex-wrap:wrap;
-  gap:8px;
+}
+.page-header-left{ flex:1 1 620px; min-width:0; }
+.page-header h1{
+  font-size: clamp(1.2rem, 2.8vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing:.01em;
+  text-shadow: 0 18px 40px rgba(0,0,0,.30);
+}
+.page-header p{
+  font-size: clamp(.85rem, 1.25vw, 1rem);
+  line-height:1.55;
+  opacity:.93;
+  max-width: 78ch;
+  margin-top:8px;
+  text-shadow: 0 14px 26px rgba(0,0,0,.22);
+}
+
+/* 4) Top action row */
+.form-top-actions{
+  max-width:var(--maxw);
+  margin: 0 auto 12px;
+  padding: 0 var(--pad);
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
   align-items:center;
 }
-.profile-upload{
+
+/* 5) Shell */
+.form-shell{
+  max-width:var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--pad) 26px;
+}
+
+/* stage wrapper */
+.builder-layout{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+
+  background: rgba(2,6,23,.42);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: var(--radius-xl);
+  padding: 14px;
+  box-shadow: var(--shadow-3);
+  backdrop-filter: blur(12px);
+}
+
+/* Desktop sidebar + main */
+.builder-sidebar{
+  flex: 0 0 320px;
+  min-width: 280px;
+  position: sticky;
+  top: 16px;
+}
+.builder-main{ flex: 1 1 auto; min-width:0; }
+
+/* 6) Cards */
+.card{
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: var(--radius-lg);
+  padding: 14px 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-1);
   position:relative;
-  border:1px dashed var(--border);
-  border-radius:10px;
-  padding:8px 10px;
-  background:rgba(148,163,184,.08);
-  font-size:.8rem;
-  color:#334155;
-  cursor:pointer;
+  overflow:hidden;
 }
-.profile-upload span{
-  pointer-events:none;
-}
-.profile-upload input[type="file"]{
+.card::before{
+  content:"";
   position:absolute;
   inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 160px at 15% 0%, rgba(99,102,241,.18), transparent 60%),
+    radial-gradient(900px 140px at 85% 0%, rgba(255,255,255,.20), transparent 58%);
+  opacity:.65;
+}
+.card h2{
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing:.01em;
+  margin: 0 0 10px;
+}
+.lede{
+  margin:0 0 10px;
+  color:#334155;
+  font-weight:650;
+  line-height:1.5;
+}
+.card-info{
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(15,23,42,.08);
+  border-radius: var(--radius-md);
+  padding: 14px 14px;
+  box-shadow: 0 14px 30px rgba(2,6,23,.06);
+}
+
+/* =========================================
+   Profile Upload — Revived Drop Zone
+   ========================================= */
+
+.profile-upload{
+  /* layout */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  /* spacing */
+  margin-top:14px;              /* ⬅ ensures padding from content above */
+  padding:14px 16px;
+
+  /* visuals */
+  background: linear-gradient(
+    180deg,
+    rgba(248,250,252,.98),
+    rgba(241,245,249,.95)
+  );
+  border: 2px dashed rgba(99,102,241,.35);
+  border-radius: 16px;
+
+  /* text */
+  font-size:.85rem;
+  font-weight:800;
+  letter-spacing:.01em;
+  color:#1e293b;
+
+  /* interaction */
+  cursor:pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 10px 26px rgba(2,6,23,.08);
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease,
+    transform .12s ease;
+}
+
+/* Label text */
+.profile-upload span{
+  pointer-events:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* Optional icon (future-safe) */
+.profile-upload span::before{
+  content:"⬆";
+  font-size:.1.2rem;
+  opacity:.75;
+}
+
+/* Hover */
+.profile-upload:hover{
+  background: linear-gradient(
+    180deg,
+    rgba(238,242,255,.98),
+    rgba(224,231,255,.96)
+  );
+  border-color: rgba(99,102,241,.65);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 18px 44px rgba(2,6,23,.14);
+}
+
+/* Active press */
+.profile-upload:active{
+  transform: translateY(0);
+  box-shadow:
+    inset 0 2px 6px rgba(2,6,23,.18);
+}
+
+/* Keyboard accessibility */
+.profile-upload:focus-within{
+  outline:none;
+  border-color: rgba(99,102,241,.85);
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.35),
+    0 18px 44px rgba(2,6,23,.18);
+}
+
+.profile-upload{
+  position: relative; /* ensure proper containment */
+}
+
+/* Shrink clickable area to button interior */
+.profile-upload input[type="file"]{
+  position:absolute;
+  inset:8px;               /* ⬅ controls clickable area */
   opacity:0;
   cursor:pointer;
 }
-.muted-text{
-  margin-top:8px;
-  font-size:.8rem;
-  color:#64748b;
+
+.form-panel-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  width:100%;
+  align-items:stretch;
+}
+.form-panel-row .card{
+  flex: 1 1 340px;
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+  min-height: 130px;
 }
 
-/* NEW: profile filename input */
-.profile-filename-input {
-  max-width: 220px;
-  flex: 0 0 auto;
-}
+/* Sidebar “control panel” feel */
+.builder-sidebar .card{ background: rgba(255,255,255,.92); }
 
 /* 7) Tabs */
-.tab-row{ display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
-.tab-btn{
-  padding: 6px 12px; border-radius: 999px;
-  background: #eef2f7; border: 1px solid var(--border);
-  font-size:.8rem; cursor:pointer; font-weight:700; color:#0b0f19;
-  transition: filter .12s ease, transform .12s ease, box-shadow .12s ease;
+.tab-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(15,23,42,.06);
+  border: 1px solid rgba(15,23,42,.08);
 }
-.tab-btn:hover{ filter: brightness(1.02); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
-.tab-btn.active{ background: var(--accent); color:#fff; border-color: transparent; box-shadow: 0 8px 20px rgba(0,0,0,.18); }
+.tab-btn{
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  font-size:.82rem;
+  cursor:pointer;
+  font-weight: 950;
+  color:#0b0f19;
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.tab-btn:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.tab-btn.active{
+  background: var(--accent);
+  color:#fff;
+  box-shadow: 0 14px 30px rgba(2,6,23,.18);
+}
 .panel{ display:none; }
 .panel.active{ display:block; }
 
-/* 8) Top/simple grids and terms */
-.top-grid{ display:grid; gap:10px; }
-.top-simple{ display:grid; grid-template-columns: repeat(auto-fit,minmax(10px,1fr)); gap:8px 10px; }
-
-.top-term-row{
-  display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 300px));
-  column-gap:0; row-gap:0;
+/* 8) Grids */
+.top-grid{ display:grid; gap:12px; }
+.top-simple{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px 12px;
 }
-.top-field{ display:grid; gap:9px; min-width:150px; font-size:.95rem; }
-.top-field.term-style{ grid-template-columns: 20px 110px minmax(100px, 60px); align-items:center; font-size:.86rem; }
-.top-field.yoy-row{ grid-template-columns: 20px 123px minmax(50px,10px); font-size:.9rem; padding:6px 0; gap:3px; }
+.top-term-row{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px 12px;
+}
+.top-field{
+  display:grid;
+  gap:8px;
+  min-width: 180px;
+}
+.top-field label,
+.top-label{
+  font-size:.75rem;
+  font-weight: 950;
+  color:#0f172a;
+  letter-spacing:.02em;
+}
+.top-field.term-style{
+  grid-template-columns: 20px 1fr minmax(120px, 180px);
+  align-items:center;
+  gap:10px;
+}
+.top-field.yoy-row{
+  grid-template-columns: 20px 1fr minmax(120px, 180px);
+  align-items:center;
+  gap:10px;
+  padding: 4px 0;
+}
 
-/* 9) Inputs, selects, checkbox */
+/* 9) Inputs */
 .input-style,
 select, input[type="text"], input[type="number"], input[type="date"], textarea{
-  appearance: none;
-  width: 100%;
-  background: #fff;
-  border:1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size:.95rem; color: var(--text);
-  box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
-  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  appearance:none;
+  width:100%;
+  background: rgba(255,255,255,.98);
+  border: 1px solid rgba(15,23,42,.12);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: .95rem;
+  color: var(--text);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    0 12px 24px rgba(2,6,23,.06);
+  transition: border-color .14s ease, box-shadow .14s ease, transform .12s ease, background .14s ease;
 }
 input::placeholder, textarea::placeholder{ color:#9aa4b2; }
-
 input:focus, select:focus, textarea:focus{
   outline:none;
-  border-color:#94a3b8;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.25);
+  border-color: rgba(99,102,241,.55);
+  box-shadow: var(--ring), 0 18px 44px rgba(2,6,23,.12);
+  transform: translateY(-1px);
   background:#fff;
 }
 
+/* 10) Checkbox */
 .term-check{ width:16px; height:16px; display:flex; align-items:center; justify-content:center; position:relative; }
 .term-check input[type="checkbox"]{ position:absolute; opacity:0; inset:0; cursor:pointer; }
-.term-check .box{ width:16px; height:16px; border:1px solid rgba(0,0,0,.25); border-radius:4px; background:#fff; }
+.term-check .box{
+  width:16px; height:16px;
+  border:1px solid rgba(15,23,42,.28);
+  border-radius:5px;
+  background:#fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+}
 .term-check input[type="checkbox"]:checked + .box{
-  background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 1px rgba(25,25,112,.15);
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(2,6,23,.14);
 }
 
-/* =============== Small utility buttons — engaging & professional =============== */
+/* 11) Term rows */
+.term-row{
+  display:grid;
+  grid-template-columns: 10px minmax(110px, 150px) minmax(150px, 300px);
+  gap:10px;
+  align-items:center;
+  margin-bottom:8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  background: rgba(248,250,252,.92);
+  border: 1px solid rgba(15,23,42,.06);
+}
+.term-row:hover{
+  border-color: rgba(99,102,241,.20);
+  background: rgba(248,250,252,.98);
+}
+.term-label{
+  font-size:.82rem;
+  font-weight: 700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#0f172a;
+}
 
-/* shared base */
+/* 12) Buttons */
 .btn-clear,
 .btn-save,
 .btn-export,
@@ -228,332 +466,572 @@ input:focus, select:focus, textarea:focus{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:0.25rem;
-
-  padding:6px 12px;
-  font-size:.78rem;
-  font-weight:600;
-  letter-spacing:.02em;
-  border-radius:999px;
-  border:1px solid rgba(15,23,42,.16);
+  gap:.35rem;
+  padding: 8px 12px;
+  font-size:.80rem;
+  font-weight: 950;
+  letter-spacing:.01em;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
   cursor:pointer;
   line-height:1.1;
   white-space:nowrap;
-
-  transition:
-    background-color .18s ease,
-    box-shadow .18s ease,
-    transform .08s ease,
-    filter .18s ease,
-    border-color .18s ease;
-  box-shadow:0 1px 2px rgba(15,23,42,.18);
+  box-shadow: 0 18px 44px rgba(2,6,23,.18);
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
 }
-
-/* shared interactions */
 .btn-clear:hover,
 .btn-save:hover,
 .btn-export:hover,
 .btn-copy:hover,
 .btn-open:hover{
-  transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(15,23,42,.25);
-  filter:brightness(1.03);
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 26px 70px rgba(2,6,23,.22);
 }
-
 .btn-clear:active,
 .btn-save:active,
 .btn-export:active,
 .btn-copy:active,
 .btn-open:active{
-  transform:translateY(0);
-  box-shadow:0 1px 4px rgba(15,23,42,.45);
-  filter:brightness(.98);
+  transform: translateY(0);
+  filter: brightness(.99);
 }
 
-.btn-clear:focus-visible,
-.btn-save:focus-visible,
-.btn-export:focus-visible,
-.btn-copy:focus-visible,
-.btn-open:focus-visible{
-  outline:none;
-  box-shadow:
-    0 0 0 1px #0f172a,
-    0 0 0 3px rgba(59,130,246,.5);
-}
+.btn-clear{ background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; border-color:rgba(255,255,255,.12); }
+.btn-save{  background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; border-color:rgba(255,255,255,.12); }
+.btn-export{background:linear-gradient(135deg,#4f46e5,#4338ca); color:#fff; border-color:rgba(255,255,255,.12); }
+.btn-copy{  background:linear-gradient(135deg,#0f766e,#0e7490); color:#fff; border-color:rgba(255,255,255,.12); }
+.btn-open{  background:linear-gradient(135deg,#be123c,#9f1239); color:#fff; border-color:rgba(255,255,255,.12); padding:.72rem 1rem; }
 
-/* Individual button treatments */
+/* Add plan */
+.addPlanbtn{
+  background: var(--accent);
+  color:#fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 14px;
+  margin: 0, 0, 0, .5rem;
+  padding: 6px 10px;
+  font-size: .74rem;
+  font-weight: 950;
+  cursor:pointer;
+  box-shadow: 0 22px 60px rgba(2,6,23,.18);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.addPlanbtn:hover{ transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 30px 80px rgba(2,6,23,.22); }
+.addPlanbtn:active{ transform: translateY(0); }
 
-/* Clear / reset */
-.btn-clear{
-  background:linear-gradient(135deg,#ef4444,#b91c1c);
-  color:#f9fafb;
-  border-color:rgba(185,28,28,.9);
+/* Sidebar link button */
+.ln-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:.55rem .85rem;
+  border-radius:999px;
+  font-weight:950;
+  color:#0b0f19;
+  background: rgba(255,255,255,.92);
+  border:1px solid rgba(15,23,42,.10);
+  box-shadow: 0 14px 30px rgba(2,6,23,.10);
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
 }
-.btn-clear:hover{
-  background:linear-gradient(135deg,#f05252,#b91c1c);
-}
+.ln-btn:hover{ transform: translateY(-1px); filter: brightness(1.02); box-shadow: 0 20px 54px rgba(2,6,23,.14); }
+.ln-btn--sm{ font-size:.86rem; padding:.46rem .75rem; }
 
-/* Save */
-.btn-save{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  color:#f9fafb;
-  border-color:rgba(22,163,74,.9);
-}
-.btn-save:hover{
-  background:linear-gradient(135deg,#34d399,#16a34a);
-}
-
-/* Export */
-.btn-export{
-  background:linear-gradient(135deg,#4f46e5,#4338ca);
-  color:#f9fafb;
-  border-color:rgba(67,56,202,.95);
-}
-.btn-export:hover{
-  background:linear-gradient(135deg,#6366f1,#4338ca);
-}
-
-/* Add Plan */
-.addPlanbtn:hover{
-  background:var(--bg);
-}
-
-/* Copy */
-.btn-copy{
-  background:linear-gradient(135deg,#0f766e,#0e7490);
-  color:#f9fafb;
-  border-color:rgba(15,118,110,.95);
-}
-.btn-copy:hover{
-  background:linear-gradient(135deg,#14b8a6,#0e7490);
-}
-
-/* Open Presenter */
-.btn-open{
-  background:linear-gradient(135deg,#be123c,#9f1239);
-  color:#fdf2f8;
-  border-color:rgba(159,18,57,.95);
-  box-shadow:0 6px 22px rgba(24,24,27,.35);
-  padding:.65rem 1rem;
-  font-weight:700;
-}
-.btn-open:hover{
-  background:linear-gradient(135deg,#e11d48,#9f1239);
-}
-
-.addPlanbtn{ background: var(--accent); color:#fff; border:1px solid transparent; border-radius:8px; padding:6px 10px; font-size:.72rem; cursor:pointer; }
-
-/* 10) Term rows */
-.term-row{
-  display:grid; grid-template-columns: 20px 115px minmax(160px,1fr);
-  gap:2px; align-items:center; margin-bottom:6px;
-}
-.term-label{ font-size:.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-/* Preset panel (compact, now inside Plans card) */
+/* 13) Presets */
 .presets-panel{
-  margin: 6px 0 10px;
-  padding: 8px 10px;
-  background: var(--card-muted);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: none;
+  margin: 10px 0 12px;
+  padding: 12px 12px;
+  background: rgba(15,23,42,.04);
+  border: 1px solid rgba(15,23,42,.08);
+  border-radius: var(--radius-md);
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:10px;
+
+  /* IMPORTANT: not sticky anymore (sidecar handles “always available”) */
+  position: relative;
+  z-index: 1;
 }
 
 .presets-header{
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
-  gap:.75rem;
-  margin-bottom:4px;
+  gap:12px;
 }
-.presets-header h3{
-  margin:0;
-  font-size: .9rem;
-}
-.presets-header p{
-  margin:.15rem 0 0;
-  font-size:.78rem;
-  color: var(--ink);
-}
+.presets-header h3{ margin:0; font-size:.92rem; font-weight:950; }
+.presets-header p{ margin:.15rem 0 0; font-size:.82rem; color: var(--ink); line-height:1.35; }
 
-/* Small button */
-.btn-small{
-  padding:.35rem .3rem;
-  font-size:.8rem;
-  border-radius:999px;
-  background:linear-gradient(90deg,#191970,#4b0082);
-  color:#f9fafb;
-}
-
-/* Grouped list */
 .preset-list{
-  max-height: 140px;
+  max-height: 160px;
   overflow:auto;
   display:flex;
   flex-direction:column;
-  gap:.5rem;
+  gap:.6rem;
+  padding-right:4px;
 }
+.presets-empty{ margin:0; font-size:.84rem; color: var(--ink); }
 
-.presets-empty{
-  margin:0;
-  font-size:.82rem;
-  color: var(--ink);
-}
-
-/* Group container */
 .preset-group{
-  border-radius:8px;
-  border:1px solid var(--border);
-  padding:.4rem .5rem;
-  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(15,23,42,.10);
+  padding: .6rem .65rem;
+  background: rgba(255,255,255,.94);
 }
 .preset-group__label{
-  font-size:.72rem;
+  font-size:.70rem;
   text-transform:uppercase;
-  letter-spacing:.08em;
+  letter-spacing:.10em;
   color: var(--ink);
-  margin:0 0 .25rem;
+  margin:0 0 .4rem;
 }
-.preset-group__pills{
-  display:flex;
-  flex-wrap:wrap;
-  gap:.25rem;
-  padding: 0 0 0 24px;
-}
-
-/* Individual draggable preset “pill” */
 .preset-pill{
   display:inline-flex;
   align-items:center;
-  padding:.25rem .5rem;
+  padding:.30rem .62rem;
   border-radius:999px;
-  background:#eef2ff;
-  color:#111;
-  font-size:.75rem;
-  border:1px solid var(--border);
+  background: rgba(224,231,255,.92);
+  color:#0b0f19;
+  font-size:.78rem;
+  font-weight: 900;
+  border:1px solid rgba(15,23,42,.10);
   cursor:grab;
   user-select:none;
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin: 0 .35rem .35rem 0;
 }
 .preset-pill:hover{
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-  background:#e0e7ff;
+  box-shadow: 0 18px 44px rgba(2,6,23,.12);
+  filter: brightness(1.02);
 }
-.preset-pill:active{
-  cursor:grabbing;
-  transform: translateY(0);
-  box-shadow:none;
-}
-.preset-pill.is-dragging{
-  opacity:.8;
-  box-shadow: var(--shadow-md);
-}
+.preset-pill:active{ cursor:grabbing; transform: translateY(0); box-shadow:none; }
 
-/* Drop hint on plan contents */
 [data-plan-content="true"].preset-drop-target{
-  outline: 2px dashed var(--accent);
-  outline-offset: 2px;
+  outline: 2px dashed rgba(99,102,241,.9);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+/* ===============================
+   Presets Sidecar (appears on scroll)
+   =============================== */
+
+.presets-sidecar{
+  position: fixed;
+  right: 16px;
+  top: 300px;
+  bottom: 100px; /* <-- extend toward the bottom */
+  width: min(200px, calc(100vw - 32px));
+
+  /* viewport-fit height (no fixed 600px cap) */
+  height: auto;
+  max-height: calc(100vh - 400px); /* 300 top + 16 bottom */
+
+  z-index: 9999;
+
+  /* Hidden by default */
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+
+  transition: opacity .18s ease, transform .18s ease;
+
+  /* Match your panel styling */
+  padding: 12px 12px;
+  background: rgba(105,53,202,1);
+  border: 1px solid rgba(15,23,42,.08);
+  border-radius: var(--radius-md);
+
+  box-shadow: 0 18px 50px rgba(2,6,23,.18);
+  backdrop-filter: blur(8px);
+
+  /* header + body */
+  display: flex;
+  flex-direction: column;
+
+  /* never collapse too small */
+  min-height: 400px;
 }
 
-/* 11) Plans container grid */
+.presets-sidecar.is-open{
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.presets-sidecar__header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 10px;
+  flex: 0 0 auto;
+  color: var(--card-muted);
+}
+
+.presets-sidecar__header h3{
+  margin:0;
+  font-size:.82rem;
+  font-weight:950;
+}
+
+.presets-sidecar__header p{
+  margin:.15rem 0 0;
+  font-size:.82rem;
+  color: var(--card-muted);
+  line-height:1.35;
+}
+
+.presets-sidecar__close{
+  border: 1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.85);
+  border-radius: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 900;
+  color: #0b0f19;
+  line-height: 1;
+}
+
+/* The body should fill the rest of the sidecar */
+.presets-sidecar__body{
+  flex: 1 1 auto;
+  min-height: 0;          /* critical in flex layouts */
+  overflow: auto;         /* body scrolls ONLY if truly needed */
+  overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* IMPORTANT: neutralize any old list constraints coming from the main panel */
+.presets-sidecar__body #presetList,
+.presets-sidecar__body .presets-list{
+  flex: 0 0 auto;         /* let it be natural height */
+  height: auto !important;
+  max-height: none !important;   /* <-- this is usually the culprit */
+  overflow: visible !important;  /* <-- remove inner scrolling */
+}
+
+/* If your list wrapper is flex/grid, keep it packed to the top */
+.presets-sidecar__body #presetList,
+.presets-sidecar__body .presets-list{
+  align-content: flex-start;
+}
+
+/* 14) Plans grid */
 #plansContainer{
-  display:grid; gap:16px;
+  display:grid;
+  gap:14px;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   align-items:start;
 }
-@media (max-width:780px){ #plansContainer{ grid-template-columns: 1fr; } }
-@media (max-width:300px){ #plansContainer{ grid-template-columns: .98fr; } }
-
-/* 12) Plan card in Builder (editor) */
-.plan-card{
-  background: var(--card-bg);
-  border:1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 10px 12px;
-  display:flex; flex-direction:column; gap:8px;
-  min-height:190px; min-width:0;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+@media (max-width:820px){
+  #plansContainer{ grid-template-columns: 1fr; }
 }
-.plan-card:hover{ transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
-/* Header + fields */
-.plan-card-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
-.plan-card-title{ font-weight:700; font-size:.85rem; }
+/* 15) Plan cards */
+.plan-card{
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: var(--radius-lg);
+  padding: 12px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-height: 200px;
+  min-width:0;
+  box-shadow: var(--shadow-2);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.plan-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(99,102,241,.20);
+  box-shadow: 0 28px 80px rgba(2,6,23,.18);
+}
+.plan-card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(15,23,42,.06);
+}
+.plan-card-title{
+  font-weight: 950;
+  font-size:.90rem;
+  letter-spacing:.01em;
+}
+.plan-card button.secondary{
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(248,250,252,.95);
+  padding: 6px 10px;
+  font-size: .78rem;
+  font-weight: 950;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.plan-card button.secondary:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 18px 44px rgba(2,6,23,.10);
+  filter: brightness(1.02);
+}
+.plan-card button.secondary:active{ transform: translateY(0); }
 
-.plan-card-topfields{ display:grid; grid-template-columns: 1fr; gap:6px; margin-bottom:4px; }
-.plan-card .field{ display:grid; gap:4px; }
-.plan-card label{ font-size:.78rem; color:#334155; }
+.plan-card-topfields{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:8px;
+}
+.plan-card .field{ display:grid; gap:6px; }
+.plan-card label{
+  font-size:.78rem;
+  color:#334155;
+  font-weight: 950;
+}
 
-/* 13) Toolbar (RTE controls) */
+/* ===============================
+   Plan reorder (drag + drop)
+   =============================== */
+.plan-card{
+  position: relative;
+}
+.plan-card[draggable="true"]{
+  /* helps Safari show correct drag affordance */
+  -webkit-user-drag: element;
+}
+
+.plan-drag-handle{
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(248,250,252,.95);
+  padding: 6px 10px;
+  font-size: .78rem;
+  font-weight: 950;
+  cursor: grab;
+  user-select: none;
+  line-height: 1;
+}
+.plan-drag-handle:active{ cursor: grabbing; }
+
+.plan-card.is-dragging{
+  opacity: .55;
+  transform: scale(.995);
+}
+
+.plan-card.drop-target{
+  outline: 2px dashed rgba(99,102,241,.85);
+  outline-offset: 4px;
+}
+
+/* 16) Toolbar */
 .plan-toolbar{
-  display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin: 4px 0 8px;
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin: 6px 0 8px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(15,23,42,.04);
+  border: 1px solid rgba(15,23,42,.06);
 }
 .plan-toolbar button,
 .plan-toolbar select,
 .plan-toolbar input[type="color"]{
-  border:1px solid rgba(0,0,0,.15);
-  background:#fff;
-  border-radius:8px;
-  padding:6px 8px;
-  font-size:.8rem; cursor:pointer;
-  transition: background .12s ease, transform .12s ease, box-shadow .12s ease;
+  border:1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.98);
+  border-radius: 12px;
+  padding: 7px 9px;
+  font-size:.82rem;
+  cursor:pointer;
+  box-shadow: 0 14px 30px rgba(2,6,23,.06);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
-.plan-toolbar button:hover{ background:#f6f6f6; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.plan-toolbar input[type="color"].rte-color{ width:34px; height:28px; padding:0; border-radius:8px; }
+.plan-toolbar button:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 20px 54px rgba(2,6,23,.10);
+  border-color: rgba(99,102,241,.22);
+}
+.plan-toolbar input[type="color"].rte-color{ width:34px; height:28px; padding:0; border-radius:10px; }
 .plan-toolbar .rte-size-select{ display:none !important; }
 
-/* 14) Plan Contents (RTE area) */
+/* 17) RTE */
 .plan-contents.rte{
-  min-height: 120px; max-height: 260px; max-width:100%;
+  min-height: 140px;
+  max-height: 320px;
+  max-width:100%;
   overflow:auto;
-  background:#fff;
-  border:2px solid rgba(0,0,0,.08);
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:.95rem; line-height:1.5;
-  overflow-wrap:anywhere; word-break:break-word;
+  background: rgba(255,255,255,.98);
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: 16px;
+  padding: 12px 12px;
+  font-size: .97rem;
+  line-height: 1.6;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  box-shadow: 0 18px 50px rgba(2,6,23,.08);
 }
-.plan-contents.rte:focus{ outline:2px solid rgba(25,25,112,.25); }
-.plan-contents.rte p{ margin:.4rem 0; }
-.plan-contents.rte ul, .plan-contents.rte ol{ margin:.25rem 0 .25rem 1.1rem; padding:0; }
+.plan-contents.rte:focus{
+  outline:none;
+  border-color: rgba(99,102,241,.45);
+  box-shadow: var(--ring), 0 24px 70px rgba(2,6,23,.14);
+}
+.plan-contents.rte p{ margin:.45rem 0; }
+.plan-contents.rte ul, .plan-contents.rte ol{ margin:.3rem 0 .3rem 1.15rem; padding:0; }
 .plan-contents.rte li{ margin:3px 0; }
 .plan-contents.rte a{ text-decoration: underline; }
-
-/* Avoid extra space at edges */
 .plan-contents.rte > *:first-child{ margin-top:0 !important; }
-.plan-contents.rte > *:last-child{  margin-bottom:0 !important; }
+.plan-contents.rte > *:last-child{ margin-bottom:0 !important; }
 
-/* 15) Info panel bullets */
-.bullet-list{ margin:0; padding-left:1.2rem; list-style:disc; }
-.bullet-list li{ margin:6px 0; line-height:1.45; }
+/* 18) Bullets + footer */
+.bullet-list{ margin:0; padding-left:1.15rem; list-style:disc; }
+.bullet-list li{ margin:7px 0; line-height:1.5; }
 .bullet-list li::marker{ color:#e1251b; }
-.footnote{ margin-top:10px; font-size:.95rem; color:#475569; }
 
-/* 16) Footer */
 .site-footer{
-  border-top:1px solid var(--border);
-  padding:16px 24px; text-align:center; color:#e7ecf3;
+  border-top: 1px solid rgba(255,255,255,.18);
+  padding: 16px var(--pad);
+  text-align:center;
+  color:#e7ecf3;
+  opacity:.95;
 }
 
-/* 17) Print polish (builder exports/print dialog) */
+/* =========================================================
+   OFF-CANVAS SIDEBAR (small screens)
+   ========================================================= */
+
+.sidebar-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(2,6,23,.62);
+
+  /* IMPORTANT: remove blur so the menu stays crisp */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+  z-index: var(--panel-z);
+}
+
+/* Toggle button (shown only on small screens) */
+.sidebar-toggle{
+  display:none; /* shown in media query below */
+  background: rgba(255,255,255,.92);
+  color:#0b0f19;
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 18px 44px rgba(2,6,23,.18);
+}
+.sidebar-toggle:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+/* Close button inside panel */
+.sidebar-close{
+  display:none; /* shown on small screens */
+  width: 100%;
+  justify-content: center;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15,23,42,.10);
+  background: rgba(248,250,252,.98);
+  font-weight: 950;
+  cursor:pointer;
+  box-shadow: 0 14px 30px rgba(2,6,23,.08);
+}
+
+/* When small: main uses full width, sidebar becomes fixed panel */
+@media (max-width:1100px){
+
+  /* IMPORTANT: prevent parent stage blur from affecting the fixed panel (Safari/stacking context) */
+  .builder-layout{
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Make the sidebar panel itself crisp (optional but recommended) */
+  .builder-sidebar{
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255,255,255,.96);
+  }
+  /* The stage should not create a second "inset width" difference */
+  .builder-layout{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Main stays in the normal flow */
+  .builder-main{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+
+  /* Sidebar becomes an off-canvas panel */
+  .builder-sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: var(--panel-w);
+    max-width: var(--panel-w);
+    min-width: 0;
+    padding: 14px;
+    overflow: auto;
+
+    background: rgba(255,255,255,.86);
+    border-right: 1px solid rgba(255,255,255,.22);
+    box-shadow: 0 30px 90px rgba(2,6,23,.38);
+    backdrop-filter: blur(14px);
+
+    transform: translateX(calc(-1 * var(--panel-w) - 16px));
+    transition: transform .22s ease;
+    z-index: calc(var(--panel-z) + 1);
+  }
+
+  /* Show toggle + close */
+  .sidebar-toggle{ display:inline-flex; }
+  .sidebar-close{ display:inline-flex; }
+
+  /* Body lock when open */
+  body.sidebar-open{
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  body.sidebar-open .builder-sidebar{
+    transform: translateX(0);
+  }
+
+  body.sidebar-open .sidebar-overlay{
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* 19) Print */
 @page{ size: A3 portrait; margin: 10mm; }
 @media print{
   html, body{
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    background: #fff;
+    background:#fff !important;
   }
-  .page-header, .form-top-actions{ color:#000; }
-  .ln-btn, .btn-clear, .btn-save, .btn-export, .addPlanbtn{ filter: none !important; box-shadow:none !important; }
+  body::before{ display:none !important; }
+  .page-header, .form-top-actions{ color:#000 !important; text-shadow:none !important; }
+  .btn-clear, .btn-save, .btn-export, .btn-copy, .btn-open, .addPlanbtn, .ln-btn{ box-shadow:none !important; }
+  .builder-layout{ background:#fff !important; border:0 !important; box-shadow:none !important; }
+  .card{ background:#fff !important; box-shadow:none !important; }
+  .builder-sidebar,
+  .sidebar-overlay,
+  .sidebar-toggle,
+  .sidebar-close{ display:none !important; }
 }
-  </style>
+</style>
 </head>
+
 <!-- PASSCODE GATE (front-end only) -->
 <div id="gate" style="
   position:fixed; inset:0; z-index:99999;
@@ -628,6 +1106,7 @@ input:focus, select:focus, textarea:focus{
   setTimeout(()=>input.focus(), 50);
 })();
 </script>
+
 <body>
   <!-- ========== HEADER ========== -->
   <header class="page-header">
@@ -635,7 +1114,7 @@ input:focus, select:focus, textarea:focus{
       <h1>LNPresents - Builder</h1>
       <p>
         Welcome to the LexisNexis Proposal Builder for LNPresents.
-        Fill out this form and show up to four proposals with up to five term details selected to present on LNPresents.
+        Fill out this form and show up to four proposals with up to six term details selected to present on LNPresents.
         The plan contents support basic text formatting (bold, italic, underline, bulletpoint, and color).
       </p>
     </div>
@@ -643,6 +1122,7 @@ input:focus, select:focus, textarea:focus{
 
   <!-- ========== TOP ACTIONS ========== -->
   <div class="form-top-actions">
+    <button type="button" class="btn-export sidebar-toggle" id="sidebarToggle">Menu</button>
     <button type="button" id="clearBtn" class="btn-clear">Clear</button>
     <button type="submit" form="clgForm" id="saveBtn" class="btn-save">Save Details</button>
     <button id="openPresenterBtn" type="button" class="btn-open">Open Presenter</button>
@@ -669,132 +1149,172 @@ input:focus, select:focus, textarea:focus{
     <!-- Export button kept; placeholder keeps scripts happy -->
     <span id="exportEmailBtn" hidden aria-hidden="true"></span>
   </div>
-
-  <!-- ========== FORM ========== -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+  <!-- ========== FORM + LEFT SIDEBAR ========== -->
   <div class="form-shell">
-    <form id="clgForm">
-      <!-- 1) Firm Details -->
-      <div class="card">
-        <h2>Firm Details</h2>
-        <div class="top-grid">
-          <div class="top-simple">
-            <div class="top-field">
-              <label>Firm Name</label>
-              <input type="text" data-key="clgFirmName" placeholder="Law Office of LexisNexis" class="input-style">
-            </div>
-            <div class="top-field">
-              <label>Incentive</label>
-              <input type="text" data-key="clgIncentive" placeholder="Customers get more value than ever" class="input-style">
-            </div>
-          </div>
+    <div class="builder-layout">
 
-          <div class="top-term-row">
-            <div class="top-field term-style">
-              <div class="term-check">
-                <input type="checkbox" data-term-option="numAttorneys">
-                <span class="box"></span>
-              </div>
-              <div class="top-label">Attorney Count</div>
-              <div>
-                <select data-key="clgNumAttorneys">
-                  <option value="">Select…</option>
-                  <option>1</option><option>2</option><option>3</option><option>4</option>
-                  <option>5</option><option>6</option><option>7</option><option>8</option>
-                  <option>9</option><option>10</option>
-                </select>
-              </div>
-            </div>
+      <!-- LEFT: Add Your Header card -->
+      <aside class="builder-sidebar">
+        <button type="button" class="sidebar-close" id="sidebarClose">Close Menu</button>
+        <!-- Add Your Header (LEFT CARD) -->
+<div class="card" id="repHeaderCard">
+  <h2>Add Your Header</h2>
+  <p class="lede">
+    If you have already submitted your header, please search for your name. Otherwise, click the button below to submit your header for presentation.
+    <br><br>
+    <em>*Your header will only show in the presenter. It will not be present in the PDF export.</em>
+  </p>
 
-            <div class="top-field yoy-row">
-              <div class="term-check">
-                <input type="checkbox" data-term-option="yoyIncrease">
-                <span class="box"></span>
-              </div>
-              <div class="top-label">Year over Year increase</div>
-              <div><input type="text" data-key="clgYoyIncrease" placeholder="3%" class="input-style"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2) Side-by-side panels -->
-      <div class="form-panel-row">
-        <div class="card">
-          <h2>Terms</h2>
-          <div class="tab-row">
-            <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
-            <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
-          </div>
-          <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
-          <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
-        </div>
-
-        <!-- NEW: Save / Load Profiles card with filename input -->
-        <div class="card">
-  <h2>Save / Load Profiles</h2>
-  <p class="lede">Export or import full Builder details (firm, terms, and plans).</p>
   <div class="card-info">
-    <div class="profile-card-controls">
-      <button type="button" id="downloadProfileBtn" class="btn-export">
-        Download Profile
-      </button>
+    <label style="display:block; font-weight:700; margin-bottom:6px;">Search your name</label>
 
-      <label class="profile-upload">
-        <span>Load Profile JSON</span>
-        <input type="file" id="uploadProfileInput" accept="application/json">
-      </label>
-    </div>
-    <p class="muted-text">
-      When you download, you’ll be asked to name the file. If you leave it blank,
-      the Firm Name (or <strong>lnpresents-profile</strong>) will be used and
-      <strong>.json</strong> will be added.
+    <!-- INPUT + DATALIST (dropdown) -->
+    <input
+      id="repHeaderSearch"
+      type="text"
+      class="input-style"
+      placeholder="Start typing your name…"
+      list="repHeaderList"
+      autocomplete="off"
+    />
+    <datalist id="repHeaderList"></datalist>
+
+        <p class="muted-text" style="margin-top:15px;">
+      Click the button below to submit your header via email.
     </p>
+
+    <button type="button" id="submitHeaderBtn" class="btn-export" style="margin-top:10px;">
+      Submit your Header
+    </button>
   </div>
 </div>
+                    <!-- Save / Load Profiles card -->
+            <div class="card">
+              <h2>Save / Load Profiles</h2>
+              <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
+              <div class="card-info">
+                <div class="profile-card-controls">
+                  <button type="button" id="downloadProfileBtn" class="btn-export">
+                    Download Profile
+                  </button>
 
-
-        <div class="card">
-          <p class="lede">Quick tips for using LNPresents:</p>
-          <ul class="bullet-list">
-            <li>You may choose up to <strong>six</strong> terms to show above your plans.</li>
-            <li>You may show up to <strong>four</strong> plans at once.</li>
-            <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
-            <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
-          </ul>
-          <a
-            class="ln-btn ln-btn--sm"
-            role="button"
-            aria-label="Send LN Presents feedback email"
-            href="mailto:chase.lawarregardner@lexisnexis.com
-            ?subject=LN%20Presents%20Feedback
-            &amp;body=Hello,%0D%0A%0D%0AThanks%20for%20using%20LN%20Presents!%20Please%20answer%20these%20questions%20when%20sending%20feedback%20or%20reporting%20bugs.%0D%0A%0D%0AFeature%20Request%20or%20Bug%3F%0D%0A%0D%0ADescribe%20the%20idea%20or%20issue%3F%0D%0A%0D%0AIf%20bug,%20list%20steps%20to%20reproduce.%0D%0A%0D%0AOther%20Information%20or%20suggestions%3F%0D%0A%0D%0ADo%20I%20have%20your%20permission%20to%20reach%20out%20to%20you%20to%20seek%20more%20detail%20about%20your%20submission,%20if%20necessary%3F">
-            Send Feedback
-          </a>
-        </div>
-      </div>
-
-      <!-- 3) Plans -->
-      <div class="card" id="plansSection">
-        <h2>Plans</h2>
-
-        <!-- Plan content presets panel (JSON + drag & drop, compact, drag-only) -->
-        <div class="presets-panel">
-          <div class="presets-header">
-            <div>
-              <h3>Plan Content Presets</h3>
-              <p>Drag a preset into a plan's Contents area to start from a template.</p>
+                  <label class="profile-upload">
+                    <span>Load Profile</span>
+                    <input type="file" id="uploadProfileInput" accept="application/json">
+                  </label>
+                </div>
+                <p class="muted-text">
+                  When you download a profile, you’ll be asked to name the file. The default filename is
+                  the <strong>Firm Name</strong> .
+                </p>
+              </div>
             </div>
-            <span id="reloadPresetsBtn"  hidden aria-hidden="true"></span>
-          </div>
-          <div id="presetList" class="preset-list">
-            <p class="presets-empty">Loading presets…</p>
-          </div>
-        </div>
+                            <div class="card">
+              <p class="lede">Quick tips for using LNPresents:</p>
+              <ul class="bullet-list">
+                <li>You may choose up to <strong>six</strong> terms to show above your plans.</li>
+                <li>You may show up to <strong>four</strong> plans at once.</li>
+                <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
+                <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
+              </ul>
+              <a
+                class="ln-btn ln-btn--sm"
+                role="button"
+                aria-label="Send LN Presents feedback email"
+                href="mailto:chase.lawarregardner@lexisnexis.com
+                ?subject=LN%20Presents%20Feedback
+                &amp;body=Hello,%0D%0A%0D%0AThanks%20for%20using%20LN%20Presents!%20Please%20answer%20these%20questions%20when%20sending%20feedback%20or%20reporting%20bugs.%0D%0A%0D%0AFeature%20Request%20or%20Bug%3F%0D%0A%0D%0ADescribe%20the%20idea%20or%20issue%3F%0D%0A%0D%0AIf%20bug,%20list%20steps%20to%20reproduce.%0D%0A%0D%0AOther%20Information%20or%20suggestions%3F%0D%0A%0D%0ADo%20I%20have%20your%20permission%20to%20reach%20out%20to%20you%20to%20seek%20more%20detail%20about%20your%20submission,%20if%20necessary%3F">
+                Send Feedback
+              </a>
+            </div>
+      </aside>
 
-        <button type="button" id="addPlanBtn" class="addPlanbtn" style="addPlanbtn">+ Add Plan</button>
-        <div id="plansContainer"></div>
-      </div>
-    </form>
+      <!-- RIGHT: Existing Builder form -->
+      <main class="builder-main">
+        <form id="clgForm">
+          <!-- 1) Firm Details -->
+          <div class="card">
+            <h2>Firm Details</h2>
+            <div class="top-grid">
+              <div class="top-simple">
+                <div class="top-field">
+                  <label>Firm Name</label>
+                  <input type="text" data-key="clgFirmName" placeholder="Law Office of LexisNexis" class="input-style">
+                </div>
+                <div class="top-field">
+                  <label>Incentive</label>
+                  <input type="text" data-key="clgIncentive" placeholder="Customers get more value than ever" class="input-style">
+                </div>
+              </div>
+
+              <div class="top-term-row">
+                <div class="top-field term-style">
+                  <div class="term-check">
+                    <input type="checkbox" data-term-option="numAttorneys">
+                    <span class="box"></span>
+                  </div>
+                  <div class="top-label">Attorney Count</div>
+                  <div>
+                    <select data-key="clgNumAttorneys">
+                      <option value="">Select…</option>
+                      <option>1</option><option>2</option><option>3</option><option>4</option>
+                      <option>5</option><option>6</option><option>7</option><option>8</option>
+                      <option>9</option><option>10</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="top-field yoy-row">
+                  <div class="term-check">
+                    <input type="checkbox" data-term-option="yoyIncrease">
+                    <span class="box"></span>
+                  </div>
+                  <div class="top-label">Year over Year increase</div>
+                  <div><input type="text" data-key="clgYoyIncrease" placeholder="3%" class="input-style"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2) Side-by-side panels -->
+          <div class="form-panel-row">
+            <div class="card">
+              <h2>Terms</h2>
+              <div class="tab-row">
+                <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
+                <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
+              </div>
+              <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
+              <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
+            </div>
+          </div>
+
+          <!-- 3) Plans -->
+          <div class="card" id="plansSection">
+            <h2>Plans</h2>
+
+            <!-- Plan content presets panel (JSON + drag & drop, compact, drag-only) -->
+            <div class="presets-panel">
+              <div class="presets-header">
+                <div>
+                  <h3>Plan Content Presets</h3>
+                  <p>Drag a preset into a plan's Contents area to start from a template.</p>
+                </div>
+                <span id="reloadPresetsBtn"  hidden aria-hidden="true"></span>
+              </div>
+              <div id="presetList" class="preset-list">
+                <p class="presets-empty">Loading presets…</p>
+              </div>
+            </div>
+
+            <button type="button" id="addPlanBtn" class="addPlanbtn" style="addPlanbtn">+ Add Plan</button>
+            <div id="plansContainer"></div>
+          </div>
+        </form>
+      </main>
+
+    </div>
   </div>
 
   <footer class="site-footer">
@@ -827,12 +1347,217 @@ input:focus, select:focus, textarea:focus{
     const downloadProfileBtn = document.getElementById("downloadProfileBtn");
     const uploadProfileInput = document.getElementById("uploadProfileInput");
 
+    // Header selection controls (LN_Rep) — actual IDs used in your HTML
+    const repHeaderSearch = document.getElementById("repHeaderSearch");
+    const repHeaderList   = document.getElementById("repHeaderList");
+    const submitHeaderBtn = document.getElementById("submitHeaderBtn");
+
+
     /* =========================
      * B) CONSTANTS & FORMATTERS
      * ========================= */
     const MAX_PLANS = 4;
     const MAX_TERM_SELECTIONS = 6;
     const currencyFmt = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+
+    /* =========================
+     * B.1) LN REP (HEADER) STATE
+     * ========================= */
+/* =========================
+ * HEADER DROPDOWN (from repo /Header or /Headers)
+ * Store RAW filename for reliable lookups, display friendly label
+ * ========================= */
+
+// Keys:
+// - LN_REP_FILE_STORAGE_KEY: raw filename (e.g., "Gardner, Chase.png")
+// - LN_REP_LABEL_STORAGE_KEY: friendly label (e.g., "Chase, Gardner" or "Gardner, Chase" depending on your formatter)
+// - LN_REP_STORAGE_KEY: backward-compat "LN_Rep" value (we set this to RAW filename)
+let LN_RepFile = "";
+let LN_RepLabel = "";
+
+const LN_REP_STORAGE_KEY       = "LNP_LN_REP";        // legacy / compat
+const LN_REP_FILE_STORAGE_KEY  = "LNP_LN_REP_FILE";   // raw filename
+const LN_REP_LABEL_STORAGE_KEY = "LNP_LN_REP_LABEL";  // friendly display label
+
+// Repo + folder settings
+const HEADERS_REPO_OWNER = "chase-gardner";
+const HEADERS_REPO_NAME  = "LN-Presents";
+const HEADERS_BRANCH     = "main";
+const HEADERS_FOLDERS_TO_TRY = ["Header", "Headers", "headers", "header"];
+
+// In-memory options so we can map label <-> raw
+let headerOptions = []; // [{ raw, label }]
+
+function setLnRepSelection({ raw, label }) {
+  LN_RepFile  = (raw || "").trim();
+  LN_RepLabel = (label || "").trim();
+
+  // Persist
+  try {
+    if (LN_RepFile)  localStorage.setItem(LN_REP_FILE_STORAGE_KEY, LN_RepFile);
+    else             localStorage.removeItem(LN_REP_FILE_STORAGE_KEY);
+
+    if (LN_RepLabel) localStorage.setItem(LN_REP_LABEL_STORAGE_KEY, LN_RepLabel);
+    else             localStorage.removeItem(LN_REP_LABEL_STORAGE_KEY);
+
+    // Backward compatibility: keep LN_Rep as RAW filename for reliable Presenter lookup
+    if (LN_RepFile)  localStorage.setItem(LN_REP_STORAGE_KEY, LN_RepFile);
+    else             localStorage.removeItem(LN_REP_STORAGE_KEY);
+  } catch (e) {}
+
+  // Display friendly label in the input
+  if (repHeaderSearch && repHeaderSearch.value !== LN_RepLabel) {
+    repHeaderSearch.value = LN_RepLabel;
+  }
+}
+
+function displayNameFromFilename(filename) {
+  const base = String(filename || "").replace(/\.[^.]+$/, "");
+  const parts = base.split(",").map(s => s.trim()).filter(Boolean);
+  if (parts.length >= 2) return `${parts[1]}, ${parts[0]}`; // "First, Last" if filename is "Last, First"
+  return base.replace(/[_-]+/g, " ").trim() || filename;
+}
+
+function findOptionByLabel(label) {
+  const v = (label || "").trim();
+  return headerOptions.find(o => o.label === v) || null;
+}
+
+function findOptionByRaw(raw) {
+  const v = (raw || "").trim();
+  return headerOptions.find(o => o.raw === v) || null;
+}
+
+async function fetchFolderListing(folderName) {
+  const url =
+    `https://api.github.com/repos/${encodeURIComponent(HEADERS_REPO_OWNER)}/${encodeURIComponent(HEADERS_REPO_NAME)}` +
+    `/contents/${encodeURIComponent(folderName)}?ref=${encodeURIComponent(HEADERS_BRANCH)}`;
+
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`GitHub API ${res.status} for ${folderName}`);
+  return res.json();
+}
+
+async function loadHeaderFolderOptions() {
+  if (!repHeaderList) return;
+
+  // show loading
+  repHeaderList.innerHTML = "";
+  repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Loading…" }));
+
+  let items = null;
+  let lastErr = null;
+
+  for (const folder of HEADERS_FOLDERS_TO_TRY) {
+    try {
+      const data = await fetchFolderListing(folder);
+      if (Array.isArray(data)) { items = data; break; }
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  repHeaderList.innerHTML = "";
+  headerOptions = [];
+
+  if (!items) {
+    console.error("Header list load failed:", lastErr);
+    repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Could not load headers" }));
+    return;
+  }
+
+  headerOptions = items
+    .filter(x => x && x.type === "file" && typeof x.name === "string" && /\.(jpe?g|png)$/i.test(x.name))
+    .map(x => ({ raw: x.name, label: displayNameFromFilename(x.name) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  if (!headerOptions.length) {
+    repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "No headers found" }));
+    return;
+  }
+
+  // Populate datalist with FRIENDLY labels only (so the input shows label)
+  headerOptions.forEach(opt => {
+    const o = document.createElement("option");
+    o.value = opt.label;
+    repHeaderList.appendChild(o);
+  });
+
+  // After options load, restore any saved selection into the input (label),
+  // while keeping raw available in storage.
+  try {
+    const savedLabel = localStorage.getItem(LN_REP_LABEL_STORAGE_KEY) || "";
+    const savedRaw   = localStorage.getItem(LN_REP_FILE_STORAGE_KEY) || localStorage.getItem(LN_REP_STORAGE_KEY) || "";
+
+    // Prefer saved label if it still matches an option
+    if (savedLabel) {
+      const match = findOptionByLabel(savedLabel);
+      if (match) {
+        setLnRepSelection(match);
+        return;
+      }
+    }
+
+    // Otherwise, if we have a raw filename, derive label from it and restore if possible
+    if (savedRaw) {
+      const matchByRaw = findOptionByRaw(savedRaw);
+      if (matchByRaw) {
+        setLnRepSelection(matchByRaw);
+        return;
+      }
+
+      // Fallback: show derived label even if not in list (rare)
+      const derivedLabel = displayNameFromFilename(savedRaw);
+      setLnRepSelection({ raw: savedRaw, label: derivedLabel });
+    }
+  } catch (e) {}
+}
+
+// When user selects a real option (label), store BOTH label + raw
+function commitFromInputIfValid() {
+  const val = (repHeaderSearch?.value || "").trim();
+  if (!val) return;
+
+  const match = findOptionByLabel(val);
+  if (!match) return; // don’t persist arbitrary typing
+  setLnRepSelection(match);
+}
+
+if (repHeaderSearch) {
+  repHeaderSearch.addEventListener("change", commitFromInputIfValid);
+  repHeaderSearch.addEventListener("input", commitFromInputIfValid); // Safari-friendly
+}
+
+// Submit header email button (unchanged)
+if (submitHeaderBtn) {
+  submitHeaderBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const to = "chase.lawarregardner@lexisnexis.com";
+    const subject = "LNPresents Header Submission";
+    const body =
+`Hello,
+
+You have opted to submit your header to be displayed on LNPresents. This is a great way to personalize your presentations and maintain a consistent image across communication channels. To submit your header please:
+
+• Ensure your header is in JPG or PNG format.
+• Don’t worry about the file name; it will be renamed upon submission.
+• Attach your header to this email.
+
+Thanks,
+LNPresents Support`;
+
+    const mailto =
+      `mailto:${encodeURIComponent(to)}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+
+    window.location.assign(mailto);
+  });
+}
+
+// Load headers on boot
+loadHeaderFolderOptions();
 
     /* =========================
      * C) TERM DEFINITIONS
@@ -858,9 +1583,16 @@ input:focus, select:focus, textarea:focus{
      * ========================= */
     const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
 
-    function makeEmptyPlan() {
-      return { clgPlatform: "", clgPriceCents: null, clgPrice: "", clgContents: "" };
-    }
+   function makeEmptyPlan() {
+    return {
+      __id: "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8),
+      clgPlatform: "",
+      clgPriceCents: null,
+      clgPrice: "",
+      clgContents: ""
+    };
+   }
+
 
     const state = {
       clgFirmName: saved.clgFirmName || "",
@@ -870,6 +1602,16 @@ input:focus, select:focus, textarea:focus{
       clgSelectedTerms: Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [],
       clgPlans: Array.isArray(saved.clgPlans) && saved.clgPlans.length ? saved.clgPlans : [makeEmptyPlan()]
     };
+
+    function ensurePlanIds() {
+  if (!Array.isArray(state.clgPlans)) state.clgPlans = [makeEmptyPlan()];
+  state.clgPlans = state.clgPlans.map(p => {
+    if (!p || typeof p !== "object") p = {};
+    if (!p.__id) p.__id = "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+    return p;
+  });
+}
+ensurePlanIds();
 
     // NEW: snapshot -> used by Save & profile download
     function buildProfilePayload() {
@@ -936,6 +1678,7 @@ input:focus, select:focus, textarea:focus{
       state.clgTermStartDate = data.clgTermStartDate || "";
       state.clgPlans = Array.isArray(data.clgPlans) && data.clgPlans.length ? data.clgPlans : [makeEmptyPlan()];
 
+      ensurePlanIds();
       hydrateFormFromState();
       renderPlans();
 
@@ -972,22 +1715,17 @@ input:focus, select:focus, textarea:focus{
       let best = 'body', bestDiff = Infinity;
       for (const key of SIZE_PRESET_ORDER){
         const d = Math.abs(px - SIZE_PRESETS[key].px);
-        if (d < bestDiff){ bestDiff = d; best = key;
-        }
+        if (d < bestDiff){ bestDiff = d; best = key; }
       }
       return best;
     }
 
     /* ===== NEW HELPERS FOR MORE OUTLOOK-FRIENDLY COPY ===== */
-
-    // Grab just what's inside <body>…</body> so we paste only the email body
     function extractBodyHtmlFromEmail(fullHtml) {
       const match = fullHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       return match ? match[1] : fullHtml;
     }
 
-    // First try execCommand('copy') from a hidden contenteditable (better for Outlook),
-    // then fall back to modern Clipboard APIs.
     async function copyEmailHtmlWithFallback(fullHtml) {
       const fragmentHtml = extractBodyHtmlFromEmail(fullHtml);
       let success = false;
@@ -1019,18 +1757,11 @@ input:focus, select:focus, textarea:focus{
 
       if (success) return true;
 
-      // Fallback: modern clipboard APIs (great for Gmail, Apple Mail, etc.)
       try {
         if (navigator.clipboard && window.ClipboardItem) {
           const blobHtml = new Blob([fragmentHtml], { type: 'text/html' });
-          const blobText = new Blob(
-            [fragmentHtml.replace(/<[^>]+>/g, '')],
-            { type: 'text/plain' }
-          );
-          const item = new ClipboardItem({
-            'text/html': blobHtml,
-            'text/plain': blobText
-          });
+          const blobText = new Blob([fragmentHtml.replace(/<[^>]+>/g, '')], { type: 'text/plain' });
+          const item = new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText });
           await navigator.clipboard.write([item]);
           return true;
         } else if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1044,7 +1775,6 @@ input:focus, select:focus, textarea:focus{
       return false;
     }
 
-    /* ===== UPDATED COPY BUTTON HANDLER (Outlook-friendly) ===== */
     if (copyProposalBtn) {
       copyProposalBtn.addEventListener('click', async () => {
         const data = {
@@ -1128,7 +1858,6 @@ input:focus, select:focus, textarea:focus{
 
       applyTextPresetMapping(doc);
 
-      // Flatten lists ONLY on paste
       doc.querySelectorAll('ul, ol').forEach(list => {
         const frag = doc.createDocumentFragment();
         list.querySelectorAll('li').forEach(li => {
@@ -1250,7 +1979,6 @@ input:focus, select:focus, textarea:focus{
       const incentive = data && data.clgIncentive ? data.clgIncentive : "";
       const termsListHtml = buildSelectedTermsHtml(data);
 
-      // Chunk plans into rows of 2 for the inner table
       const planRows = (plans && plans.length ? plans : []).reduce((rows, plan, idx) => {
         if (idx % 2 === 0) rows.push([plan]);
         else rows[rows.length - 1].push(plan);
@@ -1321,14 +2049,11 @@ input:focus, select:focus, textarea:focus{
   <title>Proposal</title>
 </head>
 <body style="margin:0; padding:0; background:#ffffff;">
-  <!-- Single narrow card aligned left -->
   <table width="600" align="left" cellpadding="0" cellspacing="0" border="0" style="width:600px; margin:16px 0 16px 16px;">
     <tr>
       <td align="left" valign="top" style="padding:0;">
-        <!-- Card wrapper (header + details + plans + footer) -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0"
                style="border-collapse:separate; border-radius:8px; border:1px solid #e5e7eb; background-color:#ffffff; overflow:hidden;">
-          <!-- Header -->
           <tr>
             <td style="padding:16px 20px; background:linear-gradient(90deg,#191970,#4b0082); color:#ffffff; font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:.1em; opacity:.9;">LexisNexis</div>
@@ -1344,7 +2069,6 @@ input:focus, select:focus, textarea:focus{
             </td>
           </tr>
 
-          <!-- Selected Terms -->
           <tr>
             <td style="padding:14px 20px; border-bottom:1px solid #e5e7eb; font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
               <div style="font-size:13px; font-weight:600; color:#111827; margin-bottom:6px;">Proposal Details</div>
@@ -1356,7 +2080,6 @@ input:focus, select:focus, textarea:focus{
             </td>
           </tr>
 
-          <!-- Plans (2 per row) -->
           ${
             planTableHtml
               ? `
@@ -1370,7 +2093,6 @@ input:focus, select:focus, textarea:focus{
               : ""
           }
 
-          <!-- Footer -->
           <tr>
             <td style="padding:10px 20px 14px 20px; text-align:center; font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
               <p style="margin:0; font-size:11px; color:#9ca3af;">
@@ -1440,11 +2162,18 @@ input:focus, select:focus, textarea:focus{
       state.clgPlans.forEach((plan, idx) => {
         const card = document.createElement("div");
         card.className = "plan-card";
+        card.setAttribute("draggable", "false");
+        card.dataset.planId = plan.__id;
+
         card.innerHTML = `
           <div class="plan-card-header">
             <div class="plan-card-title">Plan ${idx + 1}</div>
+            <div style="display:flex; gap:8px; align-items:center;">
+            <button type="button" class="plan-drag-handle" hidden aria-hidden="true"</button>
             <button type="button" class="secondary" data-remove="${idx}">Remove</button>
-          </div>
+            </div>
+         </div>
+
 
           <div class="plan-card-topfields">
             <div class="field">
@@ -1489,6 +2218,10 @@ input:focus, select:focus, textarea:focus{
         plansContainer.appendChild(card);
       });
 
+      // keep ids stable
+      ensurePlanIds();
+
+
       if (state.clgPlans.length >= MAX_PLANS) {
         addPlanBtn.disabled = true; addPlanBtn.textContent = "Max plans reached";
       } else {
@@ -1531,14 +2264,32 @@ input:focus, select:focus, textarea:focus{
         contentsHtml: plan.clgContents || ""
       }));
 
-      window.APP_CONFIG = {
-        ui: {
-          companyName: s.clgFirmName || "Default Firm",
-          subhead: s.clgIncentive || "",
-          terms: delivered,
-          plans: plans
-        }
-      };
+// Keep Rep header selection available to the Presenter (raw + label)
+let repFile = "";
+let repLabel = "";
+try {
+  repFile  = localStorage.getItem("LNP_LN_REP_FILE")  || localStorage.getItem("LNP_LN_REP") || "";
+  repLabel = localStorage.getItem("LNP_LN_REP_LABEL") || "";
+} catch (e) {
+  repFile = "";
+  repLabel = "";
+}
+
+window.APP_CONFIG = {
+  ui: {
+    companyName: s.clgFirmName || "Default Firm",
+    subhead: s.clgIncentive || "",
+    terms: delivered,
+    plans: plans,
+
+    // Backward-compatible (now RAW filename)
+    LN_Rep: repFile,
+
+    // New explicit fields
+    LN_RepFile: repFile,
+    LN_RepLabel: repLabel
+  }
+};
     }
 
     /* =========================
@@ -1607,15 +2358,6 @@ input:focus, select:focus, textarea:focus{
         const btn = e.target.closest('.plan-toolbar button, .plan-toolbar .ln-btn');
         if (btn) e.preventDefault();
       });
-
-      let savedRange = null;
-
-      function saveSelection() {
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-          savedRange = sel.getRangeAt(0).cloneRange();
-        }
-      }
 
       document.addEventListener('change', (e) => {
         const colorInput = e.target.closest('.plan-toolbar input[type="color"].rte-color');
@@ -1686,23 +2428,6 @@ input:focus, select:focus, textarea:focus{
       }
     }
 
-    const SIZE_MAP = {
-      body:    { px: 14, className: 'rte-size-body'    },
-      subhead: { px: 17, className: 'rte-size-subhead' },
-      head:    { px: 19, className: 'rte-size-head'    }
-    };
-    const SIZE_ORDER = ['body','subhead','head'];
-
-    function closestSize(px){
-      let best = 'body', bestDiff = Infinity;
-      for (const key of SIZE_ORDER){
-        const d = Math.abs(px - SIZE_MAP[key].px);
-        if (d < bestDiff){ bestDiff = d; best = key;
-        }
-      }
-      return best;
-    }
-
     function convertFontTagsToSpan(rootEl){
       rootEl.querySelectorAll('font[color]').forEach(font => {
         const span = document.createElement('span');
@@ -1716,19 +2441,6 @@ input:focus, select:focus, textarea:focus{
     function syncPlanContents(idx, editor){
       sanitizeAndReplaceIfChanged(editor);
       if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
-    }
-
-    const SIZE_CLASS_SET = ['rte-size-body','rte-size-subhead','rte-size-head'];
-    const SIZE_CLASS_BY_KEY = { body:'rte-size-body', subhead:'rte-size-subhead', head:'rte-size-head' };
-
-    function stripSizeClassesIn(root){
-      root.querySelectorAll('span').forEach(s=>{
-        const had = SIZE_CLASS_SET.some(cls => s.classList.contains(cls));
-        if (had){
-          s.classList.remove(...SIZE_CLASS_SET);
-          if (!s.getAttribute('class')) s.removeAttribute('class');
-        }
-      });
     }
 
     function insertLinkWithLabel(editor){
@@ -1755,23 +2467,6 @@ input:focus, select:focus, textarea:focus{
       sel.removeAllRanges(); sel.addRange(range);
     }
 
-    function applySizeClassToSelection(editor, classKey){
-      const sel = window.getSelection();
-      if (!sel || !sel.rangeCount === 0) return;
-      let range = sel.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) { editor.focus(); return; }
-      if (range.collapsed) return;
-      const frag = range.cloneContents();
-      const tmp = document.createElement('div'); tmp.appendChild(frag);
-      stripSizeClassesIn(tmp);
-      const wrapper = document.createElement('span');
-      wrapper.classList.add(SIZE_CLASS_BY_KEY[classKey]);
-      while (tmp.firstChild) wrapper.appendChild(tmp.firstChild);
-      range.deleteContents(); range.insertNode(wrapper);
-      range = document.createRange(); range.selectNodeContents(wrapper); range.collapse(false);
-      sel.removeAllRanges(); sel.addRange(range);
-    }
-
     /* =========================
      * H) EVENT WIRING
      * ========================= */
@@ -1795,73 +2490,9 @@ input:focus, select:focus, textarea:focus{
         panels.forEach(p => p.classList.remove("active"));
         document.getElementById(target).classList.add("active");
       });
-
-      // === PRESETS: DRAG → DROP AT CARET POSITION ===
-
-// 1) Track caret position inside each plan body
-let currentRange = null;
-const planBodies = document.querySelectorAll('.plan-body[contenteditable="true"]');
-
-planBodies.forEach(el => {
-  const saveCaret = () => {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      currentRange = sel.getRangeAt(0);
-    }
-  };
-
-  el.addEventListener('mouseup', saveCaret);
-  el.addEventListener('keyup', saveCaret);
-  el.addEventListener('focus', saveCaret);
-
-  // Allow drop
-  el.addEventListener('dragover', e => {
-    e.preventDefault();
-  });
-
-  el.addEventListener('drop', e => {
-    e.preventDefault();
-
-    const presetHTML =
-      e.dataTransfer.getData('text/html') ||
-      e.dataTransfer.getData('text/plain');
-
-    if (!presetHTML) return;
-
-    // Use last known caret, or fallback to end of this plan body
-    let range = currentRange;
-    if (!range) {
-      range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-    }
-
-    const fragment = range.createContextualFragment(presetHTML);
-    range.insertNode(fragment);
-
-    // Move caret after inserted content
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  });
-});
-
-// 2) Make presets draggable and carry HTML content
-const presetItemsInitial = document.querySelectorAll('.preset-item');
-
-presetItemsInitial.forEach(item => {
-  item.setAttribute('draggable', 'true');
-
-  item.addEventListener('dragstart', e => {
-    // If you already store the HTML in a data attribute, use that:
-    const html = item.dataset.html || item.innerHTML;
-    e.dataTransfer.setData('text/html', html);
-  });
-});
     });
 
-    // Clear
+    // Clear (NOTE: does NOT clear LN_Rep)
     function clearForm() {
       form.querySelectorAll("[data-key]").forEach(el => { el.value = ""; });
       form.querySelectorAll("[data-term-option]").forEach(cb => { cb.checked = false; });
@@ -1890,6 +2521,111 @@ presetItemsInitial.forEach(item => {
 
     // Plans initial render
     renderPlans();
+
+/* =========================
+ * Plans: drag to reorder (handle-only, grid-safe)
+ * ========================= */
+let dragEl = null;
+
+function reorderStateFromDom() {
+  const cards = [...plansContainer.querySelectorAll(".plan-card[data-plan-id]")];
+  const ids = cards.map(c => c.dataset.planId);
+  const byId = new Map((state.clgPlans || []).map(p => [p.__id, p]));
+  const next = ids.map(id => byId.get(id)).filter(Boolean);
+  if (!next.length) return;
+
+  state.clgPlans = next;
+  renderPlans();                  // rebind data-plan-idx correctly
+  buildAppConfigFromState(state); // keep Presenter config accurate
+}
+
+// Pick the card whose CENTER is closest to the pointer (works for grid)
+function getClosestCard(container, x, y) {
+  const cards = [...container.querySelectorAll(".plan-card:not(.is-dragging)")];
+  let best = null;
+  let bestDist = Infinity;
+
+  for (const el of cards) {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const dist = (dx * dx) + (dy * dy);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = { el, rect: r, cx, cy };
+    }
+  }
+  return best; // { el, rect, cx, cy } or null
+}
+
+plansContainer.addEventListener("dragstart", (e) => {
+  const handle = e.target.closest('[data-drag-handle="1"]');
+  if (!handle) return; // only handle initiates drag
+
+  const card = handle.closest(".plan-card");
+  if (!card) return;
+
+  dragEl = card;
+  card.classList.add("is-dragging");
+
+  // Required for Firefox (must set some data)
+  try { e.dataTransfer.setData("text/plain", card.dataset.planId || "plan"); } catch {}
+  e.dataTransfer.effectAllowed = "move";
+
+  // Prevent weird “ghost image” from nested content
+  try {
+    const ghost = card.cloneNode(true);
+    ghost.style.position = "fixed";
+    ghost.style.top = "-9999px";
+    ghost.style.left = "-9999px";
+    ghost.style.width = card.getBoundingClientRect().width + "px";
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 20, 20);
+    setTimeout(() => ghost.remove(), 0);
+  } catch {}
+});
+
+plansContainer.addEventListener("dragover", (e) => {
+  if (!dragEl) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+
+  const hit = getClosestCard(plansContainer, e.clientX, e.clientY);
+  if (!hit || !hit.el || hit.el === dragEl) return;
+
+  // Clear old cue + set new
+  plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
+  hit.el.classList.add("drop-target");
+
+  // Decide before/after based on pointer position relative to the hit card’s center.
+  // For grids, this is stable and feels natural.
+  const after =
+    (e.clientY > hit.cy) ||
+    (Math.abs(e.clientY - hit.cy) < 6 && e.clientX > hit.cx);
+
+  if (after) {
+    const next = hit.el.nextElementSibling;
+    if (next !== dragEl) plansContainer.insertBefore(dragEl, next);
+  } else {
+    if (hit.el !== dragEl) plansContainer.insertBefore(dragEl, hit.el);
+  }
+});
+
+plansContainer.addEventListener("drop", (e) => {
+  if (!dragEl) return;
+  e.preventDefault();
+});
+
+plansContainer.addEventListener("dragend", () => {
+  if (dragEl) dragEl.classList.remove("is-dragging");
+  plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
+  dragEl = null;
+
+  // finalize order -> update state based on DOM order
+  reorderStateFromDom();
+});
 
     // Plan inputs
     plansContainer.addEventListener("input", function (e) {
@@ -1999,101 +2735,45 @@ presetItemsInitial.forEach(item => {
       });
     }
 
-    document.getElementById('exportEmailBtn').addEventListener('click', () => {
-      const data = getProposalData();
-      const rawPlans = data.plans || data.planCards || data.form?.plans || [];
-      const plans = rawPlans.map(normalizePlan);
-      const emailHtml = buildEmailHtml(plans, data);
-      downloadEmailHtml(emailHtml, 'proposal-email.html');
-    });
-
-    // Email Proposal button (if present)
-    if (emailProposalBtn) {
-      emailProposalBtn.addEventListener('click', () => {
-        const data = {
-          clgFirmName:      state.clgFirmName,
-          clgNumAttorneys:  state.clgNumAttorneys,
-          clgYoyIncrease:   state.clgYoyIncrease,
-          clgIncentive:     state.clgIncentive,
-          clgSelectedTerms: state.clgSelectedTerms,
-          clgCurrentSpend:  state.clgCurrentSpend,
-          clgEffectiveDate: state.clgEffectiveDate,
-          clgActivationDate: state.clgActivationDate,
-          clgCurrentTermEnd: state.clgCurrentTermEnd,
-          clgTermEndDate:    state.clgTermEndDate,
-          clgExtensionTermEnd: state.clgExtensionTermEnd,
-          clgExtensionTerm:    state.clgExtensionTerm,
-          clgnbExtensionTerm:  state.clgnbExtensionTerm,
-          clgIntroPrice:       state.clgIntroPrice,
-          clgTermStartDate:    state.clgTermStartDate
+    // Download Profile (JSON) with popup filename prompt
+    if (downloadProfileBtn) {
+      downloadProfileBtn.addEventListener("click", () => {
+        const payload = {
+          meta: {
+            app: "LNPresents-Builder",
+            version: 1,
+            exportedAt: new Date().toISOString()
+          },
+          data: buildProfilePayload()
         };
 
-        const plans = (state.clgPlans || []).map((p, idx) => ({
-          name:     p.clgPlatform || `Plan ${idx + 1}`,
-          price:    p.clgPrice || "",
-          term:     "",
-          contents: p.clgContents || ""
-        }));
+        const suggestedBase = state.clgFirmName || "lnpresents-profile";
+        let rawBase = window.prompt("File name for this profile (no extension):", suggestedBase);
+        if (rawBase === null) return;
 
-        const html = buildEmailHtml(plans, data);
-        const subject = `LexisNexis Proposal – ${data.clgFirmName || 'Proposal'}`;
-        const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(html)}`;
-        window.location.href = mailto;
+        rawBase = rawBase.trim();
+        if (!rawBase) rawBase = suggestedBase;
+
+        let safeBase = rawBase
+          .toLowerCase()
+          .replace(/[^a-z0-9\-]+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+
+        if (!safeBase) safeBase = "lnpresents-profile";
+        const filename = `${safeBase}.json`;
+
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
       });
     }
 
-   // NEW: Download Profile (JSON) with popup filename prompt
-if (downloadProfileBtn) {
-  downloadProfileBtn.addEventListener("click", () => {
-    const payload = {
-      meta: {
-        app: "LNPresents-Builder",
-        version: 1,
-        exportedAt: new Date().toISOString()
-      },
-      data: buildProfilePayload()
-    };
-
-    // Suggested base from firm name or default
-    const suggestedBase = state.clgFirmName || "lnpresents-profile";
-
-    // Ask the user for a name (no extension)
-    let rawBase = window.prompt(
-      "File name for this profile (no extension):",
-      suggestedBase
-    );
-
-    // If user cancels, do nothing
-    if (rawBase === null) return;
-
-    rawBase = rawBase.trim();
-    if (!rawBase) {
-      rawBase = suggestedBase;
-    }
-
-    let safeBase = rawBase
-      .toLowerCase()
-      .replace(/[^a-z0-9\-]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-
-    if (!safeBase) safeBase = "lnpresents-profile";
-
-    const filename = `${safeBase}.json`;
-
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json"
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-}
-
-    // NEW: Upload Profile (JSON) with overwrite confirmation
+    // Upload Profile (JSON) with overwrite confirmation
     if (uploadProfileInput) {
       uploadProfileInput.addEventListener("change", async (e) => {
         const file = e.target.files && e.target.files[0];
@@ -2201,7 +2881,7 @@ if (downloadProfileBtn) {
       } else if (cmd === 'removeFormat') {
         document.execCommand('removeFormat', false, null);
         editor.querySelectorAll('a').forEach(a=>{ a.replaceWith(document.createTextNode(a.textContent)); });
-      } else if (cmd !== 'foreColor') {
+      } else {
         document.execCommand(cmd, false, null);
       }
 
@@ -2210,57 +2890,6 @@ if (downloadProfileBtn) {
       if (state.clgPlans[i]) state.clgPlans[i].clgContents = editor.innerHTML;
     });
 
-    const presetItems = document.querySelectorAll('.preset-item');
-
-// keep focus in the plan body when interacting with presets
-presetItems.forEach(item => {
-  item.setAttribute('draggable', 'true');
-
-  // ⛔ prevent focus change on mousedown so the content box keeps focus
-  item.addEventListener('mousedown', e => {
-    e.preventDefault();
-
-    // restore caret into the active body if we have one
-    if (activeBody && currentRange) {
-      activeBody.focus();
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(currentRange);
-    }
-  });
-
-  // drag payload (for drag-to-insert)
-  item.addEventListener('dragstart', e => {
-    const html = item.dataset.html || item.innerHTML;
-    e.dataTransfer.setData('text/html', html);
-  });
-
-  // OPTIONAL: click-to-insert at last caret (if you ever want it)
-  /*
-  item.addEventListener('click', e => {
-    e.preventDefault();
-    if (!activeBody) return;
-
-    activeBody.focus();
-
-    let range = currentRange;
-    if (!range) {
-      range = document.createRange();
-      range.selectNodeContents(activeBody);
-      range.collapse(false);
-    }
-
-    const html = item.dataset.html || item.innerHTML;
-    const fragment = range.createContextualFragment(html);
-    range.insertNode(fragment);
-
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  });
-  */
-});
     document.addEventListener('selectionchange', ()=>{
       const sel = window.getSelection();
       if (!sel || sel.rangeCount === 0) return;
@@ -2281,200 +2910,280 @@ presetItems.forEach(item => {
       if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
     });
 
-    plansContainer.addEventListener('change', (e)=>{
-      if (!e.target.matches('[data-cmd="foreColor"]')) return;
-      const toolbar = e.target.closest('.plan-toolbar');
-      const idx = toolbar?.getAttribute('data-plan-idx');
-      const editor = plansContainer.querySelector('.plan-contents[data-plan-idx="'+idx+'"]');
+    // =========================
+    // PRESETS: load from GitHub + drag/drop with {{STATE}} injection
+    // =========================
+    const PRESETS_URL = "https://raw.githubusercontent.com/chase-gardner/LN-Presents/refs/heads/main/Plan-Presets.json";
+    const presetListEl = document.getElementById("presetList");
+    const STATE_TOKEN_RE = /\{\{\s*STATE\s*\}\}/gi;
+
+    let allPresets = [];
+    let draggedPreset = null;
+    let lastPresetState = localStorage.getItem("lnpPresetState") || "";
+
+    async function loadPlanPresetsFromGitHub() {
+      if (!presetListEl) return;
+      presetListEl.innerHTML = `<p class="presets-empty">Loading presets…</p>`;
+
+      try {
+        const res = await fetch(PRESETS_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        allPresets = Array.isArray(json) ? json : [];
+        renderPresetGroups(allPresets);
+      } catch (err) {
+        console.error("Error loading presets:", err);
+        presetListEl.innerHTML = `<p class="presets-empty">Could not load presets from GitHub. Please try again later.</p>`;
+      }
+    }
+
+    function renderPresetGroups(presets) {
+      if (!presets.length) {
+        presetListEl.innerHTML = `<p class="presets-empty">No presets found in Plan-Presets.json.</p>`;
+        return;
+      }
+
+      const byGroup = {};
+      presets.forEach(p => {
+        const g = p.group || "Other";
+        if (!byGroup[g]) byGroup[g] = [];
+        byGroup[g].push(p);
+      });
+
+      presetListEl.innerHTML = "";
+
+      Object.keys(byGroup).sort().forEach(groupName => {
+        const groupEl = document.createElement("div");
+        groupEl.className = "preset-group";
+
+        const label = document.createElement("div");
+        label.className = "preset-group__label";
+        label.textContent = groupName;
+        groupEl.appendChild(label);
+
+        byGroup[groupName].forEach(preset => {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "preset-pill";
+          pill.textContent = preset.name || "Preset";
+          pill.draggable = true;
+
+          pill.dataset.presetName = preset.name || "";
+          pill.dataset.usesState = STATE_TOKEN_RE.test(preset.contents || "") ? "true" : "false";
+
+          pill.addEventListener("dragstart", (e) => {
+            draggedPreset = preset;
+            e.dataTransfer.effectAllowed = "copy";
+            e.dataTransfer.setData("text/plain", preset.name || "Preset");
+          });
+
+          pill.addEventListener("dragend", () => {
+            draggedPreset = null;
+          });
+
+          groupEl.appendChild(pill);
+        });
+
+        presetListEl.appendChild(groupEl);
+      });
+    }
+
+    function applyPresetToEditor(editor, preset) {
+      if (!editor || !preset) return;
+
+      let raw = String(preset.contents || "");
+
+      if (STATE_TOKEN_RE.test(raw)) {
+        const userState = window.prompt(
+          "Enter the State for this proposal (e.g., Florida):",
+          lastPresetState || ""
+        );
+        if (userState === null) return;
+
+        lastPresetState = userState.trim();
+        if (lastPresetState) {
+          localStorage.setItem("lnpPresetState", lastPresetState);
+        }
+        raw = raw.replace(STATE_TOKEN_RE, lastPresetState || "");
+      }
+
+      const html = textToParagraphs(raw);
+      const cleaned = DOMPurify.sanitize(html, PLAN_RTE_ALLOWED);
+      insertHtmlAtCursor(editor, cleaned);
+    }
+
+    plansContainer.addEventListener("dragover", (e) => {
+      const editor = e.target.closest('[data-plan-content="true"]');
+      if (!editor || !draggedPreset) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      editor.classList.add("preset-drop-target");
+    });
+
+    plansContainer.addEventListener("dragleave", (e) => {
+      const editor = e.target.closest('[data-plan-content="true"]');
       if (!editor) return;
-      restoreSelectionFor(idx, editor);
-      try { document.execCommand('styleWithCSS', false, true); } catch(_) {}
-      document.execCommand('foreColor', false, e.target.value);
-      try { document.execCommand('styleWithCSS', false, false); } catch(_) {}
-      convertFontTagsToSpan(editor);
-      const i = Number(idx);
-      if (state.clgPlans[i]) state.clgPlans[i].clgContents = editor.innerHTML;
+      editor.classList.remove("preset-drop-target");
     });
 
-    // Duplicate but harmless fmtDate
-    function fmtDate(iso) {
-      if (!iso) return "";
-      return new Date(iso + "T00:00:00").toLocaleDateString();
-    }
+    plansContainer.addEventListener("drop", (e) => {
+      const editor = e.target.closest('[data-plan-content="true"]');
+      if (!editor || !draggedPreset) return;
+      e.preventDefault();
+      editor.classList.remove("preset-drop-target");
 
-   // =========================
-   // PRESETS: load from GitHub + drag/drop with {{STATE}} injection
-   // =========================
+      applyPresetToEditor(editor, draggedPreset);
 
-const PRESETS_URL = "https://raw.githubusercontent.com/chase-gardner/LN-Presents/refs/heads/main/Plan-Presets.json";
-
-const presetListEl = document.getElementById("presetList");
-const STATE_TOKEN_RE = /\{\{\s*STATE\s*\}\}/gi;
-
-let allPresets = [];
-let draggedPreset = null;
-let lastPresetState = localStorage.getItem("lnpPresetState") || "";
-
-// Fetch presets from GitHub on load
-async function loadPlanPresetsFromGitHub() {
-  if (!presetListEl) return;
-
-  presetListEl.innerHTML = `<p class="presets-empty">Loading presets…</p>`;
-
-  try {
-    const res = await fetch(PRESETS_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-
-    allPresets = Array.isArray(json) ? json : [];
-    renderPresetGroups(allPresets);
-  } catch (err) {
-    console.error("Error loading presets:", err);
-    presetListEl.innerHTML = `<p class="presets-empty">Could not load presets from GitHub. Please try again later.</p>`;
-  }
-}
-
-// Group by "group" and render pills (drag-only)
-function renderPresetGroups(presets) {
-  if (!presets.length) {
-    presetListEl.innerHTML = `<p class="presets-empty">No presets found in Plan-Presets.json.</p>`;
-    return;
-  }
-
-  // group -> [presets]
-  const byGroup = {};
-  presets.forEach(p => {
-    const g = p.group || "Other";
-    if (!byGroup[g]) byGroup[g] = [];
-    byGroup[g].push(p);
-  });
-
-  presetListEl.innerHTML = "";
-
-  Object.keys(byGroup).sort().forEach(groupName => {
-    const groupEl = document.createElement("div");
-    groupEl.className = "preset-group";
-
-    const label = document.createElement("div");
-    label.className = "preset-group__label";
-    label.textContent = groupName;
-    groupEl.appendChild(label);
-
-    byGroup[groupName].forEach(preset => {
-      const pill = document.createElement("button");
-      pill.type = "button";
-      pill.className = "preset-pill";
-      pill.textContent = preset.name || "Preset";
-      pill.draggable = true;
-
-      // keep ref to the preset object
-      pill.dataset.presetName = preset.name || "";
-      pill.dataset.usesState = STATE_TOKEN_RE.test(preset.contents || "") ? "true" : "false";
-
-      pill.addEventListener("dragstart", (e) => {
-        draggedPreset = preset;
-        e.dataTransfer.effectAllowed = "copy";
-        e.dataTransfer.setData("text/plain", preset.name || "Preset");
-      });
-
-      pill.addEventListener("dragend", () => {
-        draggedPreset = null;
-      });
-
-      // NOTE: no click handler here – presets are drag-only
-
-      groupEl.appendChild(pill);
+      const idx = Number(editor.getAttribute("data-plan-idx"));
+      syncPlanContents(idx, editor);
     });
 
-    presetListEl.appendChild(groupEl);
-  });
-}
-let currentRange = null;
-let activeBody = null;
-
-const planBodies2 = document.querySelectorAll('.plan-body[contenteditable="true"]');
-
-planBodies2.forEach(el => {
-  const saveCaret = () => {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      currentRange = sel.getRangeAt(0);
-      activeBody = el;
-    }
-  };
-
-  el.addEventListener('focus', saveCaret);
-  el.addEventListener('mouseup', saveCaret);
-  el.addEventListener('keyup', saveCaret);
-});
-
-// Apply preset contents into a specific editor, with {{STATE}} injection if needed
-function applyPresetToEditor(editor, preset) {
-  if (!editor || !preset) return;
-
-  let raw = String(preset.contents || "");
-
-  // If this preset uses {{STATE}}, ask the user once per use
-  if (STATE_TOKEN_RE.test(raw)) {
-    const userState = window.prompt(
-      "Enter the State for this proposal (e.g., Florida):",
-      lastPresetState || ""
-    );
-
-    // If user cancels, do nothing
-    if (userState === null) return;
-
-    lastPresetState = userState.trim();
-    if (lastPresetState) {
-      localStorage.setItem("lnpPresetState", lastPresetState);
-    }
-
-    raw = raw.replace(STATE_TOKEN_RE, lastPresetState || "");
-  }
-
-  // Turn plain text (with \n and • bullets) into paragraphs
-  const html = textToParagraphs(raw);
-  const cleaned = DOMPurify.sanitize(html, PLAN_RTE_ALLOWED);
-
-  // Insert at cursor; don’t flatten lists like normal paste
-  insertHtmlAtCursor(editor, cleaned);
-}
-
-// Make plan contents act as drop targets
-plansContainer.addEventListener("dragover", (e) => {
-  const editor = e.target.closest('[data-plan-content="true"]');
-  if (!editor || !draggedPreset) return;
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "copy";
-  editor.classList.add("preset-drop-target");
-});
-
-plansContainer.addEventListener("dragleave", (e) => {
-  const editor = e.target.closest('[data-plan-content="true"]');
-  if (!editor) return;
-  editor.classList.remove("preset-drop-target");
-});
-
-plansContainer.addEventListener("drop", (e) => {
-  const editor = e.target.closest('[data-plan-content="true"]');
-  if (!editor || !draggedPreset) return;
-  e.preventDefault();
-  editor.classList.remove("preset-drop-target");
-
-  applyPresetToEditor(editor, draggedPreset);
-
-  const idx = Number(editor.getAttribute("data-plan-idx"));
-  syncPlanContents(idx, editor);
-});
-
-// Kick off GitHub preset load when the app boots
-loadPlanPresetsFromGitHub();
+    loadPlanPresetsFromGitHub();
 
     /* =========================
      * J) INITIAL CONFIG BUILD
      * ========================= */
     buildAppConfigFromState(state);
+
   });
+</script>
+<script>
+(function(){
+  const body = document.body;
+  const openBtn = document.getElementById('sidebarToggle');
+  const closeBtn = document.getElementById('sidebarClose');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  if (!openBtn || !closeBtn || !overlay) return;
+
+  function openPanel(){
+    body.classList.add('sidebar-open');
+  }
+  function closePanel(){
+    body.classList.remove('sidebar-open');
+  }
+  function toggle(){
+    body.classList.toggle('sidebar-open');
+  }
+
+  openBtn.addEventListener('click', toggle);
+  closeBtn.addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePanel();
+  });
+
+  // Close if user rotates / resizes back to desktop
+  window.addEventListener('resize', () => {
+    if (window.matchMedia('(min-width: 1101px)').matches) closePanel();
+  });
+})();
+</script>
+<script>
+(function () {
+  function ready(fn){ if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
+
+  ready(function () {
+    const presetsPanel = document.querySelector(".presets-panel");
+    const presetList = document.getElementById("presetList");
+    if (!presetsPanel || !presetList) return;
+
+    // Create a placeholder so the original panel doesn't "collapse" when we move #presetList
+    const placeholder = document.createElement("div");
+    placeholder.className = "presets-list-placeholder";
+    placeholder.hidden = true;
+
+    // Insert placeholder right after the header (before the list)
+    const header = presetsPanel.querySelector(".presets-header");
+    if (header && header.nextSibling) {
+      presetsPanel.insertBefore(placeholder, header.nextSibling);
+    } else {
+      presetsPanel.appendChild(placeholder);
+    }
+
+    // Build the sidecar
+    const sidecar = document.createElement("aside");
+    sidecar.className = "presets-sidecar";
+    sidecar.setAttribute("aria-hidden", "true");
+
+    sidecar.innerHTML = `
+      <div class="presets-sidecar__header">
+        <div>
+          <h3>Plan Content Presets</h3>
+          <p>Drag a preset into a plan's Contents area to start from a template.</p>
+        </div>
+        <button type="button" class="presets-sidecar__close" aria-label="Close presets">✕</button>
+      </div>
+      <div class="presets-sidecar__body"></div>
+    `;
+
+    document.body.appendChild(sidecar);
+
+    const sidecarBody = sidecar.querySelector(".presets-sidecar__body");
+    const closeBtn = sidecar.querySelector(".presets-sidecar__close");
+
+    let userClosed = false;
+
+    closeBtn.addEventListener("click", function () {
+      userClosed = true;
+      hideSidecar();
+      // Move list back to original when user closes
+      moveListToOriginal();
+    });
+
+    function showSidecar() {
+      if (userClosed) return;
+      sidecar.classList.add("is-open");
+      sidecar.setAttribute("aria-hidden", "false");
+    }
+
+    function hideSidecar() {
+      sidecar.classList.remove("is-open");
+      sidecar.setAttribute("aria-hidden", "true");
+    }
+
+    function moveListToSidecar() {
+      if (!sidecarBody.contains(presetList)) {
+        placeholder.hidden = false;
+        sidecarBody.appendChild(presetList);
+      }
+    }
+
+    function moveListToOriginal() {
+      if (!presetsPanel.contains(presetList)) {
+        placeholder.hidden = true;
+        // Put it back where it originally lived: after the header, before placeholder (or at end)
+        if (header && placeholder.parentNode === presetsPanel) {
+          presetsPanel.insertBefore(presetList, placeholder);
+        } else {
+          presetsPanel.appendChild(presetList);
+        }
+      }
+    }
+
+    // Detect when user scrolls past the presets panel
+    function onScroll() {
+      const rect = presetsPanel.getBoundingClientRect();
+      const passed = rect.bottom <= 8; // threshold: once the panel is fully above the viewport
+
+      if (passed) {
+        showSidecar();
+        moveListToSidecar();
+      } else {
+        hideSidecar();
+        moveListToOriginal();
+        userClosed = false; // re-enable if they scroll back above then down again
+      }
+    }
+
+    // Use passive scroll + also run once initially
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
+  });
+})();
 </script>
 </body>
 </html>

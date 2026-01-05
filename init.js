@@ -163,20 +163,20 @@
     let firm = '';
 
     // 1) try common config paths
-    if (cfg.ui && cfg.ui.firmName) {
-      firm = cfg.ui.firmName;
+    if (cfg.ui && cfg.ui.drawerCta) {
+      firm = cfg.ui.drawerCta;
     } else if (cfg.details && cfg.details.firmName) {
       firm = cfg.details.firmName;
     } else if (cfg.client && cfg.client.firmName) {
       firm = cfg.client.firmName;
-    } else if (cfg.firmName) {
-      firm = cfg.firmName;
+    } else if (stored.clgFirmName) {
+      firm = stored.clgFirmName;
     }
 
     // 2) fallback: scrape from whatever element is already showing firm name
     if (!firm) {
       const el =
-        document.querySelector('[data-key$="firmName"]') ||
+        document.querySelector('[data-key$="state.clgFirmName"]') ||
         document.querySelector('[data-key*="Firm Name"]') ||
         document.querySelector('[data-key*="firm"]');
       if (el) firm = el.textContent.trim();
@@ -188,7 +188,7 @@
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    const dateStr = `${yyyy}-${mm}-${dd}`;
+    const dateStr = `${mm}-${dd}-${yyyy}`;
 
     const safeFirm = firm.replace(/[\/\\:*?"<>|]/g, '-'); // windows-safe
 

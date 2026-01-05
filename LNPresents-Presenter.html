@@ -28,13 +28,55 @@
   <!-- Header -->
   <header class="ln-header">
     <!-- Left: header image -->
-    <div class="ln-header-left">
-      <img
-        src="./Headers/ln_header.jpg"
-        class="ln-header-image"
-        onerror="this.style.display='none';"
-      />
-    </div>
+<div class="ln-header-left">
+  <img
+    id="repHeaderImg"
+    src=""
+    class="ln-header-image"
+    alt=""
+    style="display:none;"
+  />
+</div>
+
+<script>
+(function () {
+  // Folder where headers live in your repo (you are using ./Headers/ln-logo.png already)
+  const HEADER_FOLDER = "./Headers/";
+
+  // Pull raw filename from localStorage (Builder writes these)
+  let raw = "";
+  try {
+    raw =
+      localStorage.getItem("LNP_LN_REP_FILE") ||
+      localStorage.getItem("LNP_LN_REP") ||
+      "";
+  } catch (e) {}
+
+  // Fallback to APP_CONFIG if available (optional)
+  try {
+    if (!raw && window.APP_CONFIG && window.APP_CONFIG.ui) {
+      raw = window.APP_CONFIG.ui.LN_RepFile || window.APP_CONFIG.ui.LN_Rep || "";
+    }
+  } catch (e) {}
+
+  const img = document.getElementById("repHeaderImg");
+  if (!img) return;
+
+  raw = String(raw || "").trim();
+  if (!raw) return; // nothing selected
+
+  // If someone stored a full/relative path accidentally, normalize:
+  // - if raw already looks like a path or URL, use it as-is
+  // - otherwise assume it's a filename inside HEADER_FOLDER
+  const looksLikePath = /^(https?:\/\/|\.{0,2}\/|\/)/i.test(raw) || raw.includes("/");
+  const src = looksLikePath ? raw : (HEADER_FOLDER + raw);
+
+  img.onerror = function () { this.style.display = "none"; };
+  img.onload = function () { this.style.display = ""; };
+
+  img.src = src;
+})();
+</script>
 
     <!-- Center: drawer + export PDF button -->
     <div class="ln-header-center">
@@ -44,7 +86,7 @@
     <div class="ln-header-right">
       <a class="ln-logo-company">
         <img
-          src="./Headers/ln-logo.png"
+          src="./ln-logo.png"
           alt="LexisNexis"
           width="200"
           height="70"
