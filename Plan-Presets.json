@@ -2,22 +2,22 @@
   {
     "group": "Simplified Packaging",
     "name": "Essentials",
-    "contents": "Essential Package Includes:\n• {{STATE}} Primary\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions"
+    "contents": "Essential Package Includes:\n{{STATE}} Primary\n{{STATE}} Jury Instructions\n{{STATE}} Briefs, Pleadings, and Motions"
   },
   {
     "group": "Simplified Packaging",
     "name": "Enhanced",
-    "contents": "Enhanced Package Includes:\n• {{STATE}} Enhanced with Full Federal\n• {{STATE}} Jury Instructions\n• {{STATE}} Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• {{STATE}} Verdicts and Settlements"
+    "contents": "Enhanced Package Includes:\n{{STATE}} Enhanced with Full Federal\n{{STATE}} Jury Instructions\n{{STATE}} Briefs, Pleadings, and Motions\n{{STATE}} Practice Library \nAll Forms\nPractical Guidance\n{{STATE}} Automated Templates\n{{STATE}} Verdicts and Settlements"
   },
   {
     "group": "Simplified Packaging",
     "name": "Professional",
-    "contents": "Professional Package Includes:\n• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• {{STATE}} Practice Library \n• All Forms\n• Practical Guidance\n• {{STATE}} Automated Templates\n• National Verdicts and Settlements with Analyzer\n• Courtlink\n• Law360\n• News with Factiva"
+    "contents": "Professional Package Includes:\nNational Primary Enhanced\nAll Jury Instructions\nNational Briefs, Pleadings, and Motions\n{{STATE}} Practice Library \nAll Forms\nPractical Guidance\n{{STATE}} Automated Templates\nNational Verdicts and Settlements with Analyzer\nCourtlink\nLaw360\nNews with Factiva"
   },
   {
     "group": "Simplified Packaging",
     "name": "Premier",
-    "contents": "Premier Package Includes:\n• National Primary Enhanced\n• All Jury Instructions\n• National Briefs, Pleadings, and Motions\n• All Research Materials\n• All Forms\n• Practical Guidance\n• National Automated Templates\n• National Verdicts and Settlements with Analyzer\n• Courtlink\n• Context\n• Law360\n• News with Factiva"
+    "contents": "Premier Package Includes:\nNational Primary Enhanced\nAll Jury Instructions\nNational Briefs, Pleadings, and Motions\nAll Research Materials\nAll Forms\nPractical Guidance\nNational Automated Templates\nNational Verdicts and Settlements with Analyzer\nCourtlink\nContext\nLaw360\nNews with Factiva"
   },
   {
   "group": "Simplified Packaging Expanded",
@@ -27,6 +27,6 @@
   {
   "group": "Platform",
   "name": "Lexis+AI",
-  "contents": "Protege Includes:\n• Protege Ask, Draft, Summarize, and Documents\n• Create+ with Protege Integration\n• Legal and General AI models for every task\n• Free upgrade to Protege Workflows at Launch\n"
+  "contents": "Protege Includes:\nProtege Ask, Draft, Summarize, and Documents\nCreate+ with Protege Integration\nLegal and General AI models for every task\nFree upgrade to Protege Workflows at Launch\n"
   }
 ]
