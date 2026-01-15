@@ -2,10 +2,12 @@
   {
     "group": "Simplified Packaging",
     "name": "Essentials",
-    "contents": [ "Essential Package Includes:,",
+    "contents": [
+      "Essential Package Includes:",
       "{{STATE}} Primary",
       "{{STATE}} Jury Instructions",
-      "{{STATE}} Briefs, Pleadings, and Motions"]
+      "{{STATE}} Briefs, Pleadings, and Motions"
+    ]
   },
   {
     "group": "Simplified Packaging",
