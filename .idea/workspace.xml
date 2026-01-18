@@ -3,6 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="40f25f1e-0f18-443c-b9f5-5000a51eafca" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Headers/Chase,LaWarre-Gardner.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Headers/myheader.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LNPresents-Builder.html" beforeDir="false" afterPath="$PROJECT_DIR$/LNPresents-Builder.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LNPresents-Presenter.html" beforeDir="false" afterPath="$PROJECT_DIR$/LNPresents-Presenter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plan-Presets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Plan-Presets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/init.js" beforeDir="false" afterPath="$PROJECT_DIR$/init.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +64,17 @@
       <updated>1761929126942</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

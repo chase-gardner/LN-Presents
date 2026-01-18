@@ -1,15 +1,18 @@
 // config.js
 
-// try to read what the form saved
+function safeParseJSON(str, fallback) {
+  try {
+    const v = JSON.parse(str);
+    return v && typeof v === "object" ? v : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
+// Single source of truth for Presenter config inputs
 const stored =
-  JSON.parse(localStorage.getItem("clgFormVars") || "{}") ||
-  (typeof window !== "undefined" ? window.formVars || {} : {});
-
-const clgFormVars =
-  JSON.parse(localStorage.getItem("clgFormVars") || "{}") ||
-  (typeof window !== "undefined" ? window.formVars || {} : {});
-
+  safeParseJSON(localStorage.getItem("clgFormVars") || "{}", {}) ||
+  (typeof window !== "undefined" ? (window.formVars || {}) : {});
 
 // helper to format dates for legacy fields
 function formatIsoToShort(iso) {
@@ -29,78 +32,18 @@ function buildUiTerms() {
     : [];
 
   const termDefs = [
-    {
-      key: "numAttorneys",
-      labelBase: "Number of Attorneys",
-      value: stored.clgNumAttorneys || "",
-      type: "text"
-    },
-    {
-      key: "yoyIncrease",
-      labelBase: "Year over Year increase",
-      value: stored.clgYoyIncrease || "",
-      type: "text"
-    },
-    {
-      key: "currentSpend",
-      labelBase: "Current Spend",
-      value: stored.clgCurrentSpend || "",
-      type: "text"
-    },
-    {
-      key: "effectiveDate",
-      labelBase: "Effective Date",
-      value: stored.clgEffectiveDate || "",
-      type: "date"
-    },
-    {
-      key: "currentTermEnd",
-      labelBase: "Current Term End",
-      value: stored.clgCurrentTermEnd || "",
-      type: "date"
-    },
-    {
-      key: "extensionTermEnd",
-      labelBase: "Extension Term End",
-      value: stored.clgExtensionTermEnd || "",
-      type: "date"
-    },
-    {
-      key: "extensionTerm",
-      labelBase: "Term Extension",
-      value: stored.clgExtensionTerm || "",
-      type: "text"
-    },
-    {
-      key: "ActivationDate",
-      labelBase: "Activation Date",
-      value: stored.clgActivationDate || "",
-      type: "date"
-    },
-    {
-      key: "introPrice",
-      labelBase: "Promo Price",
-      value: stored.clgIntroPrice || "",
-      type: "text"
-    },
-    {
-      key: "termStartDate",
-      labelBase: "Promo End Date",
-      value: stored.clgTermStartDate || "",
-      type: "date"
-    },
-    {
-      key: "termEndDate",
-      labelBase: "Term End Date",
-      value: stored.clgTermEndDate || "",
-      type: "date"
-    },
-    {
-      key: "nbExtensionTerm",
-      labelBase: "Term Length",
-      value: stored.clgnbExtensionTerm || "",
-      type: "text"
-    }
+    { key: "numAttorneys", labelBase: "Number of Attorneys", value: stored.clgNumAttorneys || "", type: "text" },
+    { key: "yoyIncrease", labelBase: "Year over Year increase", value: stored.clgYoyIncrease || "", type: "text" },
+    { key: "currentSpend", labelBase: "Current Spend", value: stored.clgCurrentSpend || "", type: "text" },
+    { key: "effectiveDate", labelBase: "Effective Date", value: stored.clgEffectiveDate || "", type: "date" },
+    { key: "currentTermEnd", labelBase: "Current Term End", value: stored.clgCurrentTermEnd || "", type: "date" },
+    { key: "extensionTermEnd", labelBase: "Extension Term End", value: stored.clgExtensionTermEnd || "", type: "date" },
+    { key: "extensionTerm", labelBase: "Term Extension", value: stored.clgExtensionTerm || "", type: "text" },
+    { key: "ActivationDate", labelBase: "Activation Date", value: stored.clgActivationDate || "", type: "date" },
+    { key: "introPrice", labelBase: "Promo Price", value: stored.clgIntroPrice || "", type: "text" },
+    { key: "termStartDate", labelBase: "Promo End Date", value: stored.clgTermStartDate || "", type: "date" },
+    { key: "termEndDate", labelBase: "Term End Date", value: stored.clgTermEndDate || "", type: "date" },
+    { key: "nbExtensionTerm", labelBase: "Term Length", value: stored.clgnbExtensionTerm || "", type: "text" }
   ];
 
   const picked = [];
@@ -109,6 +52,7 @@ function buildUiTerms() {
     if (!def) continue;
 
     let label = def.labelBase;
+
     if (def.type === "date" && def.value) {
       label = `${def.labelBase}: ${formatIsoToShort(def.value)}`;
     } else if (def.value) {
@@ -127,7 +71,6 @@ function buildUiTerms() {
 function buildUiPlans() {
   const rawPlans = Array.isArray(stored.clgPlans) ? stored.clgPlans : [];
   if (!rawPlans.length) {
-    // fallback single demo plan
     return [
       {
         id: 1,
@@ -145,14 +88,11 @@ function buildUiPlans() {
     id: idx + 1,
     tier: p.clgPlatform || `Plan ${idx + 1}`,
     description: p.clgPrice || "Contact for pricing",
-    // 👇 the actual styled HTML from the form
     bodyHtml: p.clgContents || "",
-    // keep this as a fallback
     features: [],
     cta: "This Month Only"
   }));
 }
-
 
 // Expose a single APP_CONFIG the presenter uses
 window.APP_CONFIG = {
@@ -164,7 +104,6 @@ window.APP_CONFIG = {
   assets: {
     logo: "Headers/ln_header.jpg"
   },
-
   ui: {
     companyName: "LexisNexis",
     drawerCta: stored.clgFirmName || "Law Office of LexisNexis",

@@ -28,59 +28,106 @@
   <!-- Header -->
   <header class="ln-header">
     <!-- Left: header image -->
-<div class="ln-header-left">
-  <img
-    id="repHeaderImg"
-    src=""
-    class="ln-header-image"
-    alt=""
-    style="display:none;"
-  />
-</div>
-
-<script>
+    <div class="ln-header-left">
+      <img
+        id="repHeaderImg"
+        src=""
+        class="ln-header-image"
+        alt=""
+        style="display:none;"
+      />
+    </div>
+    <script>
 (function () {
-  // Folder where headers live in your repo (you are using ./Headers/ln-logo.png already)
-  const HEADER_FOLDER = "./Headers/";
-
-  // Pull raw filename from localStorage (Builder writes these)
-  let raw = "";
-  try {
-    raw =
-      localStorage.getItem("LNP_LN_REP_FILE") ||
-      localStorage.getItem("LNP_LN_REP") ||
-      "";
-  } catch (e) {}
-
-  // Fallback to APP_CONFIG if available (optional)
-  try {
-    if (!raw && window.APP_CONFIG && window.APP_CONFIG.ui) {
-      raw = window.APP_CONFIG.ui.LN_RepFile || window.APP_CONFIG.ui.LN_Rep || "";
-    }
-  } catch (e) {}
+  // === Uploaded header storage (must match Builder keys) ===
+  const UPLOADED_HEADER_DATAURL_KEY = "LNP_UPLOADED_HEADER_DATAURL_V1";
+  const LNP_IDB_NAME = "LNPresentsDB";
+  const LNP_IDB_VERSION = 1;
+  const LNP_IDB_STORE = "kv";
+  const LNP_IDB_KEY = "uploadedHeaderV1";
 
   const img = document.getElementById("repHeaderImg");
   if (!img) return;
 
-  raw = String(raw || "").trim();
-  if (!raw) return; // nothing selected
-
-  // If someone stored a full/relative path accidentally, normalize:
-  // - if raw already looks like a path or URL, use it as-is
-  // - otherwise assume it's a filename inside HEADER_FOLDER
-  const looksLikePath = /^(https?:\/\/|\.{0,2}\/|\/)/i.test(raw) || raw.includes("/");
-  const src = looksLikePath ? raw : (HEADER_FOLDER + raw);
-
+  // Default: hidden until we successfully load something
+  img.style.display = "none";
   img.onerror = function () { this.style.display = "none"; };
-  img.onload = function () { this.style.display = ""; };
+  img.onload  = function () { this.style.display = ""; };
 
-  img.src = src;
+  function openLnpDb(){
+    return new Promise((resolve, reject) => {
+      try {
+        const req = indexedDB.open(LNP_IDB_NAME, LNP_IDB_VERSION);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(LNP_IDB_STORE)) {
+            db.createObjectStore(LNP_IDB_STORE);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  async function idbGet(key){
+    const db = await openLnpDb();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(LNP_IDB_STORE, "readonly");
+      const req = tx.objectStore(LNP_IDB_STORE).get(key);
+      req.onsuccess = () => {
+        try { db.close(); } catch(e){}
+        resolve(req.result);
+      };
+      req.onerror = () => {
+        try { db.close(); } catch(e){}
+        reject(req.error);
+      };
+    });
+  }
+
+  function setSrc(src){
+    if (!src) return;
+    img.style.display = "none"; // wait for load
+    img.src = src;
+  }
+
+  // ======================================================
+  // ONLY SOURCES:
+  // 1) IndexedDB uploaded header
+  // 2) localStorage uploaded header fallback
+  // ======================================================
+  (async function initHeader(){
+    // 1) IndexedDB (preferred)
+    try {
+      const obj = await idbGet(LNP_IDB_KEY);
+      if (obj && obj.dataUrl) {
+        setSrc(String(obj.dataUrl));
+        return;
+      }
+    } catch (e) {
+      // silently fall through
+    }
+
+    // 2) localStorage fallback
+    try {
+      const dataUrl = localStorage.getItem(UPLOADED_HEADER_DATAURL_KEY) || "";
+      if (dataUrl) {
+        setSrc(String(dataUrl));
+        return;
+      }
+    } catch (e) {}
+
+    // 3) Nothing found → no header
+    img.style.display = "none";
+  })();
 })();
 </script>
 
     <!-- Center: drawer + export PDF button -->
-    <div class="ln-header-center">
-    </div>
+    <div class="ln-header-center"></div>
 
     <!-- Right: existing LN logo -->
     <div class="ln-header-right">
@@ -95,14 +142,17 @@
       </a>
     </div>
   </header>
-    <div class="drawer">
-        <button class="drawer-button" id="drawerCta">
-          <span data-key="ui.drawerCta"></span>
-        </button>
-      </div>
-      <button type="button" id="exportPdfBtn" class="presenter-cta">
-          Export PDF
-        </button>
+
+  <div class="drawer">
+    <button class="drawer-button" id="drawerCta">
+      <span data-key="ui.drawerCta"></span>
+    </button>
+  </div>
+
+  <button type="button" id="exportPdfBtn" class="exportPdfBtn">
+    Export PDF
+  </button>
+
   <main>
     <!-- Hero / Title -->
     <section class="hero">
@@ -140,11 +190,12 @@
     <small>&copy; <span data-key="ui.companyName"></span></small>
   </footer>
 </section>
-  <!-- libs first -->
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
 
-  <!-- your app scripts -->
-  <script src="./config.js"></script>
-  <script src="./init.js"></script>
+<!-- libs first -->
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+
+<!-- your app scripts -->
+<script src="./config.js"></script>
+<script src="./init.js"></script>
 </body>
 </html>

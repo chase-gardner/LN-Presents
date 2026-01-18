@@ -1,15 +1,15 @@
 /* =============== 1) Theming tokens (no external assets) =============== */
 :root{
-  --bg: linear-gradient(180deg,#191970,#4b0082); /* default “indigo” hero */
-  --surface: #0f172a;         /* page chrome (used behind cards on dark themes) */
-  --card-bg: #ffffff;         /* card body */
-  --card-muted: #f8fafc;      /* subtle rows / headers */
-  --text: #0b0f19;            /* body text */
-  --ink: #5b6470;             /* secondary text */
-  --border: rgba(0,0,0,.08);  /* hairline */
-  --accent: #cc0000;          /* LN red by default for CTAs */
-  --accent-ink: #fff;         /* CTA text */
-  --chip-bg: #eef2ff;         /* term chip */
+  --bg: linear-gradient(180deg,#191970,#4b0082);
+  --surface: #0f172a;
+  --card-bg: #ffffff;
+  --card-muted: #f8fafc;
+  --text: #0b0f19;
+  --ink: #5b6470;
+  --border: rgba(0,0,0,.08);
+  --accent: #cc0000;
+  --accent-ink: #fff;
+  --chip-bg: #eef2ff;
   --chip-ink:#1e1b4b;
   --radius-lg: 16px;
   --radius-md: 12px;
@@ -18,55 +18,41 @@
   --shadow-lg: 0 18px 40px rgba(0,0,0,.18);
 }
 
-/* =========================================================
-   THEME TOKENS (Default + Variants)
-   - Default: Midnight Indigo (your current scheme)
-   - Light:   Soft light UI used previously
-   - LN Red:  LexisNexis red gradient
-   ========================================================= */
-
-/* ---------- Base (default) ---------- */
 :root{
-  /* Core palette */
-  --bg: linear-gradient(to right, #191970, #4b0082); /* background (page / hero) */
-  --card-bg: #ffffff;          /* surfaces/cards */
-  --input-bg: #f1f3f5;         /* inputs */
-  --text: #050301;             /* body text */
-  --accent: #191970;           /* primary accent (buttons, links) */
-  --purple: #4b0082;           /* secondary accent */
-  --green: #16a34a;            /* success/positive */
-  --ink:#96a8a1;               /* subtle text */
-  --slate:#96a8a1;             /* neutral */
+  --bg: linear-gradient(to right, #191970, #4b0082);
+  --card-bg: #ffffff;
+  --input-bg: #f1f3f5;
+  --text: #050301;
+  --accent: #191970;
+  --purple: #4b0082;
+  --green: #16a34a;
+  --ink:#96a8a1;
+  --slate:#96a8a1;
   --blank:#ffffff;
   --muted:#f8fafc;
   --border: rgba(0,0,0,.06);
 
-  /* Elevation & effects */
   --ring: rgba(25,25,112,.25);
   --shadow: 0 8px 24px rgba(0,0,0,.12);
 
-  /* Component helpers (optional) */
   --btn-fg: #ffffff;
   --btn-bg: var(--accent);
   --chip-bg: #eef2ff;
   --chip-text: #1e293b;
 
-  /* Transition for smooth theme swap */
   --theme-transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 
-html, body {
-  transition: var(--theme-transition);
-}
+html, body { transition: var(--theme-transition); }
 
 /* ---------- Theme: Light ---------- */
 :root[data-theme="light"]{
-  --bg: #f7f8fc;               /* flat light backdrop */
+  --bg: #f7f8fc;
   --card-bg: #ffffff;
   --input-bg: #f3f4f6;
   --text: #0b0b0f;
-  --accent: #1f3a8a;           /* deep indigo for contrast */
-  --purple:#4338ca;            /* vivid indigo */
+  --accent: #1f3a8a;
+  --purple:#4338ca;
   --green:#16a34a;
   --ink:#6b7280;
   --slate:#94a3b8;
@@ -87,10 +73,10 @@ html, body {
 :root[data-theme="ln-red"]{
   --bg: linear-gradient(90deg,#8b0000,#cc0000);
   --card-bg: #ffffff;
-  --input-bg: #fbf2f2;         /* lightly-tinted red input */
+  --input-bg: #fbf2f2;
   --text: #0a0a0a;
-  --accent: #b30000;           /* primary red */
-  --purple:#8b0000;            /* deeper red for secondary */
+  --accent: #b30000;
+  --purple:#8b0000;
   --green:#16a34a;
   --ink:#7a7a7a;
   --slate:#8b8b8b;
@@ -106,77 +92,6 @@ html, body {
   --chip-bg: #ffe4e6;
   --chip-text: #7f1d1d;
 }
-
-/* ---------- App wide basics using tokens (keeps your layout/logic) ---------- */
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  transition: var(--theme-transition);
-}
-
-input, textarea, select {
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  transition: var(--theme-transition);
-}
-
-.button, button, .btn {
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  border: 1px solid transparent;
-  border-radius: 10px;
-  padding: .6rem .9rem;
-  cursor: pointer;
-  transition: var(--theme-transition);
-}
-.button:hover, button:hover, .btn:hover { filter: brightness(1.05); }
-
-/* ---------- Tiny Theme Panel styles ---------- */
-.theme-panel {
-  display: grid;
-  gap: .75rem;
-  padding: 1rem;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-
-.theme-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .75rem;
-}
-
-.theme-option {
-  display: grid;
-  gap: .5rem;
-  padding: .75rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  align-content: start;
-}
-
-.theme-swatches {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: .25rem;
-}
-.theme-swatch {
-  height: 18px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-}
-
 
 /* =============== 2) Global/base =============== */
 * { box-sizing: border-box; }
@@ -203,7 +118,7 @@ a { color: inherit; text-decoration: none; }
   top: 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: auto 1fr auto; /* left image / center spacer / right logo */
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   column-gap: 1rem;
   padding: 8px 20px;
@@ -211,7 +126,6 @@ a { color: inherit; text-decoration: none; }
   box-shadow: inset 0 -1px 0 var(--border);
 }
 
-/* left / center / right header regions */
 .ln-header-left,
 .ln-header-center,
 .ln-header-right{
@@ -219,20 +133,10 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
 }
 
-.ln-header-left{
-  justify-content: flex-start;
-}
+.ln-header-left{ justify-content: flex-start; }
+.ln-header-center{ justify-content: center; }
+.ln-header-right{ justify-content: flex-end; }
 
-/* this is now just a spacer column; actual centering happens via .drawer */
-.ln-header-center{
-  justify-content: center;
-}
-
-.ln-header-right{
-  justify-content: flex-end;
-}
-
-/* left header image */
 .ln-header-image{
   display: block;
   height: auto;
@@ -240,7 +144,6 @@ a { color: inherit; text-decoration: none; }
   border-radius: 10px;
 }
 
-/* right-side logo(s) */
 .ln-logo img,
 .ln-logo-company img {
   display:block;
@@ -249,22 +152,20 @@ a { color: inherit; text-decoration: none; }
   border-radius: 10px;
 }
 
-/* Drawer CTA — truly centered on the screen */
 .drawer{
-  position: absolute;          /* anchor to full header, not just center column */
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%); /* horizontally center in viewport */
+  transform: translateX(-50%);
   display:flex;
   align-items:center;
   justify-content:center;
   gap: .75rem;
-  padding: 0;                   /* no extra offset */
+  padding: 30px;
 }
 
-/* Keep it more forgiving on narrow screens */
 @media (max-width: 640px){
   .drawer{
-    position: dynamic;          /* revert to normal flow on small screens */
+    position: flex;
     transform: none;
     justify-content: center;
   }
@@ -278,7 +179,7 @@ a { color: inherit; text-decoration: none; }
   color:#111;
   border:2.5px solid var(--border);
   border-radius: 999px;
-  padding: 7px 12px;
+  padding: 7px 10px;
   font-weight:700;
   font-size: clamp(.9rem, 1.1vw, 1rem);
   box-shadow: var(--shadow-sm);
@@ -289,16 +190,14 @@ a { color: inherit; text-decoration: none; }
   outline-offset: 3px;
 }
 
-
 /* =============== 4) Hero =============== */
 .hero{
   width: 100%;
-  display: grid;             /* robust centering across OS/browsers */
-  place-items: center;       /* centers both axes */
-  text-align: center;
+  display: grid;
+  place-items: center;
   max-width: 1120px;
-  margin: 2px auto 0;
-  padding: 16px 20px 8px;
+  margin: 50px auto 0;
+  padding: 16px 0px 15px;
   text-align:left;
   color:#fff;
 }
@@ -310,11 +209,22 @@ a { color: inherit; text-decoration: none; }
   text-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
 
-/* Subhead highlighted slightly more, but still compact */
+.exportPdfBtn{
+  background: var(--accent);
+  color:#fff;
+  border: 2px solid rgba(255,255,255,.18);
+  border-radius: 14px;
+  margin: 0px 0px 0px 10px;
+  padding: 6px 10px;
+  font-size: .74rem;
+  font-weight: 450;
+  cursor:pointer;
+  box-shadow: 0 22px 60px rgba(2,6,23,.18);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
 .subhead{
-  max-width: 80ch;           /* readable line length */
-  margin: 0 auto;            /* centers the block */
-  text-align: center;
+  max-width: 80ch;
   margin: 15px 0px 0px 0px;
   padding: 8px 14px;
   border-radius: 999px;
@@ -324,17 +234,17 @@ a { color: inherit; text-decoration: none; }
   font-size: clamp(.99rem, 1.6vw, 1.1rem);
   line-height: 1.75;
   box-shadow: 0 10px 28px rgba(15,23,42,.55);
+  text-align: center;
 }
 
-/* =============== 5) Term selector (radio chips) =============== */
 /* =============== 5) Term selector (radio chips) =============== */
 .selector{
   display:flex;
   flex-wrap:wrap;
   gap:10px 14px;
   width: 100%;
-  display: grid;             /* robust centering across OS/browsers */
-  place-items: center;       /* centers both axes */
+  display: grid;
+  place-items: center;
   text-align: center;
   align-items:center;
   justify-content:center;
@@ -346,8 +256,8 @@ a { color: inherit; text-decoration: none; }
 
 .selector-label{
   width: 110%;
-  display: grid;             /* robust centering across OS/browsers */
-  place-items: center;       /* centers both axes */
+  display: grid;
+  place-items: center;
   text-align: center;
   align-items:center;
   font-weight:700;
@@ -357,12 +267,12 @@ a { color: inherit; text-decoration: none; }
   font-size:.78rem;
 }
 
-/* PRINT SAFETY: prevent stacked/overlapping letters in PDF on Windows */
+/* PRINT SAFETY */
 @media print {
   .selector-label{
-    display: block !important;          /* simpler layout for print */
+    display: block !important;
     text-align: center !important;
-    letter-spacing: 1 !important;       /* remove spacing that causes stacking */
+    letter-spacing: 1 !important;
     word-spacing: 0 !important;
     white-space: normal !important;
     line-height: 1.3 !important;
@@ -375,14 +285,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 #termRadios{
-  display:flex;             /* inline-flex won’t center across full row */
-  width:100%;               /* lets justify-content center the row */
+  display:flex;
+  width:100%;
   flex-wrap:wrap;
   gap:8px 10px;
-  justify-content:center;   /* was flex-start */
+  justify-content:center;
 }
-#termRadios .radio-chip{         /* robust centering across OS/browsers */
-  display:inline-grid;      /* enables place-items on the chip */
+#termRadios .radio-chip{
+  display:inline-grid;
   place-items:center;
   text-align:center;
   align-items:center;
@@ -406,8 +316,6 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
-#termRadios .radio-chip:has(input:checked){
-}
 #termRadios .radio-chip input[type="radio"]{
   appearance:none;
   width:0;
@@ -417,9 +325,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* =============== 6) Plans grid =============== */
-.plans{
-  padding: 18px 20px 48px;
-}
+.plans{ padding: 18px 20px 48px; }
 .plans-grid{
   display:grid;
   gap: 16px;
@@ -439,6 +345,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--shadow-sm);
   overflow:hidden;
   transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+  position: relative;
 }
 .plan-card:hover{
   transform: translateY(-2px);
@@ -457,33 +364,68 @@ a { color: inherit; text-decoration: none; }
 }
 .plan-card__desc{
   margin: 0;
-  color: var(--bg);
+  color: #111;
+  opacity: .85;
   font-size: .95rem;
 }
 
-/* Rich text features area (fed by your builder). Keep lists “real only”. */
+/* =============== Presenter-side RTE Normalization ===============
+   Goal: preserve bold/italic/underline/color/bullets
+   while forcing consistent spacing & typography.
+   (Works even if Builder content contains messy div/br/nbsp.) */
+.rte-html{
+  font: inherit;
+  font-size: .98rem;
+  line-height: 1.38;
+  color: inherit;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.rte-html :where(*){
+  /* prevent “giant gaps” from pasted inline styles (Presenter safety) */
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.rte-html :where(p, div){
+  display: block;
+  margin: .38em 0;
+}
+
+.rte-html :where(ul, ol){
+  margin: .38em 0 .38em 1.2em;
+  padding: 0;
+  list-style-position: outside;
+}
+
+.rte-html :where(li){
+  margin: .22em 0;
+}
+
+.rte-html :where(ul ul, ul ol, ol ul, ol ol){
+  margin-top: .25em;
+  margin-bottom: .25em;
+}
+
+.rte-html :where(br){
+  line-height: 1;
+}
+
+.rte-html a{
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Features container (layout) */
 .plan-card__features{
   flex:1;
   margin: 12px 16px;
-  padding-left: 1.1rem;
+  padding-left: 0; /* the rte-html list margins handle indent */
 }
-.plan-card__features :where(p,div,span){
-  display:block;
-  margin:.35rem 0;
-  padding:0;
-  list-style:none;
-}
-.plan-card__features :where(p,div,span)::marker,
-.plan-card__features :where(p,div,span)::before{
-  content:none;
-}
-.plan-card__features ul,
-.plan-card__features ol{
-  list-style: revert;
-  margin:.35rem 0 .35rem 1.1rem;
-  padding:0;
-}
-.rte-html a { text-decoration: underline; }
 
 /* Footer / CTA */
 .plan-card__footer{
@@ -495,6 +437,7 @@ a { color: inherit; text-decoration: none; }
   border-top: 1px solid var(--border);
   background: linear-gradient(180deg, transparent, rgba(0,0,0,.02));
 }
+
 .btn-primary,
 .plan-card__cta{
   display:inline-flex;
@@ -512,48 +455,56 @@ a { color: inherit; text-decoration: none; }
   cursor:pointer;
   transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
 }
+
+/* PDF-safe overrides (html2canvas-friendly) */
+.pdf-export .plan-card__cta{
+  display: inline-block !important;          /* avoid inline-flex rendering differences */
+  text-align: center !important;
+  white-space: nowrap !important;
+  font-weight: 700 !important;
+  letter-spacing: .01em !important;
+
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+
+  /* Avoid color-mix() entirely in PDF */
+  border: 1px solid rgba(0,0,0,.12) !important;
+
+  /* Avoid CSS var color uncertainty in canvas */
+  background: #191970 !important;
+  color: #ffffff !important;
+
+  /* Safer shadow than color-mix() */
+  box-shadow: 0 6px 20px rgba(25,25,112,.22) !important;
+
+  cursor: default !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* If your CTA includes an icon + text and you relied on gap, use margin instead */
+.pdf-export .plan-card__cta > * + *{
+  margin-left: 8px !important;
+}
 .btn-primary:hover{
   transform: translateY(-1px);
   filter: brightness(1.02);
   box-shadow: var(--shadow-lg);
 }
-.btn-primary:active{
-  transform: translateY(0);
-}
+.btn-primary:active{ transform: translateY(0); }
 
-/* Optional “Most Popular” badge (purely visual) */
-.plan-card.is-popular{
-  border-width: 2px;
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.plan-card.is-popular::before{
-  content:"Most Popular";
-  position:absolute;
-  inset:auto 16px 100% auto;
-  transform: translateY(14px);
-  background: linear-gradient(180deg, #fff, #f7f8fb);
-  color:#111;
-  border:1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight:700;
-  font-size:.8rem;
-  box-shadow: var(--shadow-sm);
-}
-/* =============== Single plan card layout =============== */
-/* When ONLY one plan-card is present, keep a default width and center it */
+/* Single plan card layout */
 .plans-grid:has(> .plan-card:only-child){
   grid-template-columns: 1fr;
   justify-items: center;
 }
-
 .plans-grid:has(> .plan-card:only-child) > .plan-card{
   width: 100%;
-  max-width: 700px; /* 👈 adjust if you want slightly wider/narrower */
+  max-width: 700px;
 }
 
-/* =============== 8) Footer & utility =============== */
+/* Footer */
 .site-footer{
   margin-top: auto;
   text-align:center;
@@ -561,33 +512,9 @@ a { color: inherit; text-decoration: none; }
   padding: 16px 20px;
   border-top: 1px solid rgba(255,255,255,.15);
 }
-.no-print button{
-  padding:.6rem .8rem;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.35);
-  background: rgba(255,255,255,.15);
-  color:#fff;
-  backdrop-filter: blur(6px);
-}
 
-/* =============== 9) Responsive polish =============== */
-@media (min-width: 1200px){
-  .plans{ padding-bottom: 64px; }
-  .plans-grid{ gap: 18px; }
-}
-@media (max-width: 480px){
-  .ln-header{ padding: 8px 12px; }
-  .ln-logo img,
-  .ln-logo-company img{ max-height:44px; }
-  .drawer{ padding: 8px 12px; }
-  .plan-card__features{ margin: 12px; }
-}
-
-/* =============== 10) Print (A3 landscape) =============== */
-@page{
-  size: A3 landscape;
-  margin: 2mm;
-}
+/* Buttons hidden in print */
+@page{ size: A3 landscape; margin: 2mm; }
 @media print{
   html, body{
     -webkit-print-color-adjust: exact !important;
@@ -606,21 +533,26 @@ a { color: inherit; text-decoration: none; }
     page-break-inside: avoid;
   }
   .plans{ padding: 0 0 6mm; }
-}
 
-/* Hide export buttons in print/PDF */
   .btn-export,
   .exportPdfBtn,
   .export-pdf,
-  [data-print-hidden] {
-    display: none !important;
-    visibility: hidden !important;
+  #exportPdfBtn,
+  [data-print-hidden]{
+    display:none !important;
+    visibility:hidden !important;
   }
+}
 
-  /* Prevent empty space left behind */
-  .btn-export *,
-  .exportPdfBtn *,
-  .export-pdf * {
-    display: none !important;
-  }
+/* Responsive polish */
+@media (min-width: 1200px){
+  .plans{ padding-bottom: 64px; }
+  .plans-grid{ gap: 18px; }
+}
+@media (max-width: 480px){
+  .ln-header{ padding: 8px 12px; }
+  .ln-logo img,
+  .ln-logo-company img{ max-height:44px; }
+  .drawer{ padding: 8px 12px; }
+  .plan-card__features{ margin: 12px; }
 }

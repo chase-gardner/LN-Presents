@@ -1,12 +1,13 @@
 /**
- * Very small "templating" layer:
- * - Replaces {{dot.path}} placeholders in HEAD/HTML with values in APP_CONFIG.
- * - Binds any [data-key="dot.path"] elements' textContent.
- * - Generates radio chips & plan cards from config arrays.
+ * Presenter init
+ * - placeholder binding
+ * - term chips
+ * - plan rendering
+ * - PDF export
  *
- * Updated to:
- * - support dynamic term details from the form (up to 6, from cfg.ui.terms)
- * - support plans that carry HTML body (color/styling) from the form
+ * Includes: Presenter-side RTE cleanup pipeline
+ * Preserves: bold/italic/underline/color/bullets/links
+ * Fixes: giant spacing, empty blocks, excessive <br>, messy pasted divs/spans
  */
 
 (function () {
@@ -14,18 +15,31 @@
 
   // --- Helpers ---
   const get = (obj, path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
-  const setText = (selectorOrEl, value) => {
-    const el = typeof selectorOrEl === 'string' ? document.querySelector(selectorOrEl) : selectorOrEl;
-    if (el && value != null) el.textContent = value;
-  };
+
+  function safeParseJSON(str, fallback) {
+    try {
+      const v = JSON.parse(str);
+      return v && typeof v === "object" ? v : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getStoredFormVars() {
+    // Presenter must not assume builder globals exist
+    try {
+      return safeParseJSON(localStorage.getItem("clgFormVars") || "{}", {});
+    } catch {
+      return {};
+    }
+  }
 
   // Replace all {{dot.path}} placeholders across the document (safe for <head> as well)
   function replacePlaceholders(root) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const parts = [];
-    while (walker.nextNode()) {
-      parts.push(walker.currentNode);
-    }
+    while (walker.nextNode()) parts.push(walker.currentNode);
+
     parts.forEach(node => {
       const txt = node.nodeValue;
       if (txt && txt.includes('{{')) {
@@ -52,20 +66,16 @@
 
     const terms = (cfg.ui && cfg.ui.terms ? cfg.ui.terms : []).slice(0, 6);
 
-    // if 3 or fewer → keep your current single-row behavior
-    if (terms.length > 3) {
-      root.classList.add('termRadios--twoRows');
-    } else {
-      root.classList.remove('termRadios--twoRows');
-    }
+    if (terms.length > 3) root.classList.add('termRadios--twoRows');
+    else root.classList.remove('termRadios--twoRows');
 
     root.innerHTML = terms.map((t, idx) => {
       const id = `term-${idx}`;
       const checked = idx === 0 ? 'checked' : '';
       return `
         <label class="radio-chip" for="${id}">
-          <input type="radio" name="term" id="${id}" value="${t.value ?? (idx + 1)}" ${checked} aria-label="${t.label}"/>
-          <span>${t.label}</span>
+          <input type="radio" name="term" id="${id}" value="${t.value ?? (idx + 1)}" ${checked} aria-label="${escapeHtml(t.label)}"/>
+          <span>${escapeHtml(t.label)}</span>
         </label>
       `;
     }).join('');
@@ -90,7 +100,7 @@
       // NOTE: allow re-assignment because we might replace UL/OL with DIV
       let featuresEl = frag.querySelector('.plan-card__features');
       if (featuresEl) {
-        // If the template used <ul>/<ol>, swap it to <div> so freeform HTML doesn't inherit bullets
+        // If the template used <ul>/<ol>, swap it to <div> so freeform HTML doesn't inherit bullets incorrectly
         if (/^(UL|OL)$/i.test(featuresEl.tagName)) {
           const div = document.createElement('div');
           div.className = featuresEl.className;
@@ -101,7 +111,7 @@
 
         const htmlIn = (p.bodyHtml ?? p.contentsHtml ?? '');
         if (htmlIn && String(htmlIn).trim() !== '') {
-          featuresEl.innerHTML = sanitizePlanHtml(htmlIn);
+          featuresEl.innerHTML = sanitizeAndNormalizePlanHtml(String(htmlIn));
         } else if (Array.isArray(p.features) && p.features.length) {
           featuresEl.innerHTML = p.features.map(t => `<p>${escapeHtml(t)}</p>`).join('');
         } else {
@@ -122,64 +132,246 @@
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
-  function renderPlanContents(rawHtml, targetEl) {
-    const hasList =
-      rawHtml.includes('<ul') ||
-      rawHtml.includes('<ol') ||
-      rawHtml.includes('<li');
+  // =========================
+  // Presenter-side Cleanup Pipeline
+  // =========================
 
-    // keep blank lines
-    targetEl.style.whiteSpace = 'pre-wrap';
+  function sanitizeAndNormalizePlanHtml(rawHtml) {
+    // 1) sanitize (allowed tags/attrs/styles)
+    const sanitized = sanitizePlanHtml(rawHtml);
 
-    // we’re no longer auto-building <ul><li> – just show what the user gave us
-    targetEl.innerHTML = rawHtml;
+    // 2) normalize structure/spacing (Presenter safety net)
+    return normalizePlanHtml(sanitized);
   }
 
-  function bulletsFromHtmlPreserveBlanks(cleanHtml, ulEl) {
-    // split on <br>, <br/>, or real newlines
-    const parts = cleanHtml.split(/<br\s*\/?>|\r?\n/gi);
+  function sanitizePlanHtml(rawHtml) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = rawHtml;
 
-    ulEl.innerHTML = '';
+    const allowedTags = new Set(['B','STRONG','I','EM','U','BR','SPAN','DIV','P','UL','OL','LI','A']);
+    const allowedStyles = new Set(['color','font-weight','font-style','text-decoration']);
+    const allowedSizeClasses = new Set(['rte-size-body','rte-size-subhead','rte-size-head']);
 
-    parts.forEach(segment => {
-      const li = document.createElement('li');
+    // Convert <font color="..."> → <span style="color:...">
+    wrapper.querySelectorAll('font[color]').forEach(font => {
+      const span = document.createElement('span');
+      span.setAttribute('style', 'color:' + font.getAttribute('color'));
+      span.innerHTML = font.innerHTML;
+      font.replaceWith(span);
+    });
 
-      // empty or whitespace-only line → keep as spacer
-      if (!segment || segment.trim() === '') {
-        li.innerHTML = '&nbsp;';
-        li.style.listStyleType = 'disc';   // still a bullet
-        li.style.minHeight = '0.5rem';
-      } else {
-        // keep inline HTML that survived the sanitizer
-        li.innerHTML = segment.trim();
+    function cleanNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) return;
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const tag = node.tagName.toUpperCase();
+
+        // Strip disallowed elements but keep children
+        if (!allowedTags.has(tag)) {
+          const parent = node.parentNode;
+          while (node.firstChild) parent.insertBefore(node.firstChild, node);
+          parent.removeChild(node);
+          return;
+        }
+
+        // Attributes: keep href on <a>, keep style, keep class (only our size classes)
+        const toRemove = [];
+        for (const a of Array.from(node.attributes)) {
+          const name = a.name.toLowerCase();
+          if (name === 'href' && tag === 'A') continue;
+          if (name === 'style') continue;
+          if (name === 'class') continue;
+          toRemove.push(name);
+        }
+        toRemove.forEach(n => node.removeAttribute(n));
+
+        // Filter class → keep ONLY our rte-size-* classes
+        if (node.hasAttribute('class')) {
+          const kept = Array.from(node.classList).filter(c => allowedSizeClasses.has(c));
+          if (kept.length) node.className = kept.join(' ');
+          else node.removeAttribute('class');
+        }
+
+        // Filter style → keep only allowed styles (removes margin/padding/line-height/font-size/font-family/background/etc.)
+        if (node.hasAttribute('style')) {
+          const parts = node
+            .getAttribute('style')
+            .split(';')
+            .map(s => s.trim())
+            .filter(Boolean);
+
+          const kept = [];
+          for (const part of parts) {
+            const idx = part.indexOf(':');
+            if (idx === -1) continue;
+            const prop = part.slice(0, idx).trim().toLowerCase();
+            const val  = part.slice(idx + 1).trim();
+            if (!prop || !val) continue;
+            if (allowedStyles.has(prop)) kept.push(`${prop}:${val}`);
+          }
+
+          if (kept.length) node.setAttribute('style', kept.join(';'));
+          else node.removeAttribute('style');
+        }
+
+        // Harden links
+        if (tag === 'A') {
+          node.target = '_blank';
+          node.rel = 'noopener noreferrer';
+        }
       }
 
-      ulEl.appendChild(li);
+      Array.from(node.childNodes).forEach(cleanNode);
+    }
+
+    Array.from(wrapper.childNodes).forEach(cleanNode);
+    return wrapper.innerHTML;
+  }
+
+  function normalizePlanHtml(html) {
+    const root = document.createElement('div');
+    root.innerHTML = html;
+
+    // A) repair lists: if UL/OL contains text nodes directly, wrap them as LI
+    root.querySelectorAll('ul,ol').forEach(list => {
+      const kids = Array.from(list.childNodes);
+      kids.forEach(n => {
+        if (n.nodeType === Node.TEXT_NODE) {
+          const txt = (n.nodeValue || '').replace(/\u00a0/g, ' ').trim();
+          if (!txt) {
+            n.remove();
+            return;
+          }
+          const li = document.createElement('li');
+          li.textContent = txt;
+          list.insertBefore(li, n);
+          n.remove();
+        }
+      });
+    });
+
+    // B) convert "div-only paragraphs" into <p> when safe (reduces weird spacing)
+    // Only convert DIVs that do not contain block children other than BR.
+    root.querySelectorAll('div').forEach(div => {
+      if (div.closest('ul,ol,li')) return;
+
+      const hasBlockChild = Array.from(div.children).some(ch => {
+        const t = ch.tagName ? ch.tagName.toUpperCase() : '';
+        return ['P','DIV','UL','OL','LI','H1','H2','H3','H4','H5','H6','TABLE','BLOCKQUOTE'].includes(t);
+      });
+
+      if (hasBlockChild) return;
+
+      // If it's basically inline content and/or brs, prefer <p>
+      const p = document.createElement('p');
+      p.innerHTML = div.innerHTML;
+      div.replaceWith(p);
+    });
+
+    // C) collapse excessive <br> runs (max 2)
+    collapseBrRuns(root, 2);
+
+    // D) remove empty blocks (p/div/li) that are whitespace/nbsp-only (but keep non-empty list items)
+    removeEmptyBlocks(root);
+
+    // E) unwrap redundant spans with no attrs (Presenter cleanup)
+    unwrapRedundantSpans(root);
+
+    return root.innerHTML.trim();
+  }
+
+  function collapseBrRuns(root, maxRun) {
+    const brs = Array.from(root.querySelectorAll('br'));
+    brs.forEach(br => {
+      // Only handle runs where this BR is the first in a sequence
+      const prev = previousMeaningfulSibling(br);
+      if (prev && prev.nodeType === 1 && prev.tagName && prev.tagName.toUpperCase() === 'BR') return;
+
+      // Count run length
+      let count = 1;
+      let cur = nextMeaningfulSibling(br);
+      while (cur && cur.nodeType === 1 && cur.tagName && cur.tagName.toUpperCase() === 'BR') {
+        count++;
+        cur = nextMeaningfulSibling(cur);
+      }
+
+      // Remove extras beyond maxRun
+      if (count > maxRun) {
+        let removeCount = count - maxRun;
+        let node = nextMeaningfulSibling(br);
+        while (node && removeCount > 0) {
+          if (node.nodeType === 1 && node.tagName.toUpperCase() === 'BR') {
+            const toRemove = node;
+            node = nextMeaningfulSibling(node);
+            toRemove.remove();
+            removeCount--;
+          } else {
+            break;
+          }
+        }
+      }
     });
   }
 
-  // === build PDF filename from firm name + today's date ===
+  function previousMeaningfulSibling(node) {
+    let n = node.previousSibling;
+    while (n && n.nodeType === 3 && (n.nodeValue || '').trim() === '') n = n.previousSibling;
+    return n;
+  }
+
+  function nextMeaningfulSibling(node) {
+    let n = node.nextSibling;
+    while (n && n.nodeType === 3 && (n.nodeValue || '').trim() === '') n = n.nextSibling;
+    return n;
+  }
+
+  function removeEmptyBlocks(root) {
+    const candidates = root.querySelectorAll('p, div, li');
+    candidates.forEach(el => {
+      // Do not remove list items that contain nested lists
+      if (el.tagName.toUpperCase() === 'LI' && el.querySelector('ul,ol')) return;
+
+      const text = (el.textContent || '').replace(/\u00a0/g, ' ').trim();
+      const hasMedia = el.querySelector('img,video,svg');
+      const hasNonBrChild = Array.from(el.childNodes).some(n => {
+        if (n.nodeType === 1) {
+          const t = n.tagName.toUpperCase();
+          return t !== 'BR';
+        }
+        if (n.nodeType === 3) return (n.nodeValue || '').trim() !== '';
+        return false;
+      });
+
+      // If it's empty or only BRs, remove it
+      if (!hasMedia && !hasNonBrChild && text === '') {
+        el.remove();
+      }
+    });
+  }
+
+  function unwrapRedundantSpans(root) {
+    root.querySelectorAll('span').forEach(span => {
+      if (span.attributes.length === 0) {
+        // no style/class/href etc.
+        const parent = span.parentNode;
+        while (span.firstChild) parent.insertBefore(span.firstChild, span);
+        parent.removeChild(span);
+      }
+    });
+  }
+
+  // =========================
+  // PDF filename
+  // =========================
+
   function buildPdfFilename() {
     let firm = '';
 
-    // 1) try common config paths
     if (cfg.ui && cfg.ui.drawerCta) {
       firm = cfg.ui.drawerCta;
-    } else if (cfg.details && cfg.details.firmName) {
-      firm = cfg.details.firmName;
-    } else if (cfg.client && cfg.client.firmName) {
-      firm = cfg.client.firmName;
-    } else if (stored.clgFirmName) {
-      firm = stored.clgFirmName;
-    }
-
-    // 2) fallback: scrape from whatever element is already showing firm name
-    if (!firm) {
-      const el =
-        document.querySelector('[data-key$="state.clgFirmName"]') ||
-        document.querySelector('[data-key*="Firm Name"]') ||
-        document.querySelector('[data-key*="firm"]');
-      if (el) firm = el.textContent.trim();
+    } else {
+      const stored = getStoredFormVars();
+      firm = stored.clgFirmName || '';
     }
 
     if (!firm) firm = 'Firm';
@@ -190,71 +382,50 @@
     const dd = String(d.getDate()).padStart(2, '0');
     const dateStr = `${mm}-${dd}-${yyyy}`;
 
-    const safeFirm = firm.replace(/[\/\\:*?"<>|]/g, '-'); // windows-safe
-
+    const safeFirm = firm.replace(/[\/\\:*?"<>|]/g, '-');
     return `${safeFirm} - Proposals - ${dateStr}.pdf`;
   }
 
   /**
    * Create a clean clone of the presenter node for PDF:
-   * - Injects a PDF-only "LexisNexis Proposals" header
+   * - Injects a PDF-only header
    * - Strips all <img> tags
    * - Removes any CSS background-image:url(...) (keeps gradients)
-   * - Forces "Plans built just for you" to render black in PDF
-   * - Simplifies the selector layout (label + chips) so it renders cleanly in PDF (esp. on Windows)
-   * - Normalizes plan CTA text so lettering alignment is consistent in PDF
-   * - Removes export buttons / print-hidden controls from the PDF
-   * - Normalizes drawer layout so it sits below header and is left-aligned with 20px padding
+   * - Simplifies selector layout so it renders cleanly in PDF (esp. on Windows)
+   * - Removes export buttons
    */
   function makePrintNode(node) {
     const clone = node.cloneNode(true);
 
-    // --- Remove export controls so they never appear in the PDF ---
     clone.querySelectorAll('#exportPdfBtn, .btn-export, #btnExportPDF, .export-pdf, [data-print-hidden]')
       .forEach(el => el.remove());
 
-    // --- 0) PDF-only tweaks to existing presenter content ---
-
-    // 0a) Force the "Plans built just for you" headline to render black in the PDF
+    // Force headline to black in PDF if it matches your hero headline
     try {
       const headlineCandidate = Array.from(
-        clone.querySelectorAll(
-          'h1, h2, h3, .hero-title, .presenter-heading, .page-title, div, span'
-        )
+        clone.querySelectorAll('h1, h2, h3, .hero-title, .presenter-heading, .page-title, div, span')
       ).find(
         el =>
           el.textContent &&
           el.textContent.trim().toLowerCase() === 'plans built just for you'
       );
-      if (headlineCandidate) {
-        headlineCandidate.style.color = '#000000';
-      }
-    } catch (e) {
-      console.warn('PDF headline color tweak skipped:', e);
-    }
+      if (headlineCandidate) headlineCandidate.style.color = '#000000';
+    } catch (e) {}
 
-    // 0b) Simplify selector layout for PDF so the label and terms don't crowd/stack
+    // Simplify selector layout for PDF
     try {
-      // Wrapper around label + term chips
       const selectorWrapper = clone.querySelector('.selector');
       if (selectorWrapper) {
-        // Kill grid complexity in the PDF clone — simpler = fewer html2canvas bugs
         selectorWrapper.style.display = 'block';
         selectorWrapper.style.textAlign = 'center';
         selectorWrapper.style.placeItems = 'initial';
-        selectorWrapper.style.alignItems = 'stretch';
-        selectorWrapper.style.justifyContent = 'center';
       }
 
-      // Actual label element
       const selectorLabels = clone.querySelectorAll('.selector-label');
       selectorLabels.forEach(el => {
-        // Put label on its own line above the chips
         el.style.display = 'block';
         el.style.width = '100%';
         el.style.margin = '0 0 6px 0';
-
-        // Text styling tuned for PDF (Windows friendly)
         el.style.color = '#000000';
         el.style.background = 'transparent';
         el.style.letterSpacing = '0';
@@ -262,40 +433,10 @@
         el.style.whiteSpace = 'normal';
         el.style.lineHeight = '1.3';
         el.style.fontWeight = '700';
-        el.style.textTransform = 'none';  // avoid text-transform bugs
+        el.style.textTransform = 'none';
         el.style.textShadow = 'none';
       });
 
-      // If, for some reason, markup changed and .selector-label isn't present,
-      // fall back to searching for the common text.
-      if (!selectorLabels.length) {
-        const fallback = Array.from(
-          clone.querySelectorAll('h2, h3, span, div')
-        ).find(el => {
-          const txt = (el.textContent || '').trim().toLowerCase();
-          return txt === 'your proposal details' ||
-                 txt === 'your proposal details:' ||
-                 txt === 'your proposal options' ||
-                 txt === 'your proposal options:';
-        });
-
-        if (fallback) {
-          fallback.style.display = 'block';
-          fallback.style.width = '100%';
-          fallback.style.margin = '0 0 6px 0';
-          fallback.style.color = '#000000';
-          fallback.style.background = 'transparent';
-          fallback.style.letterSpacing = '0';
-          fallback.style.wordSpacing = '0';
-          fallback.style.whiteSpace = 'normal';
-          fallback.style.lineHeight = '1.3';
-          fallback.style.fontWeight = '700';
-          fallback.style.textTransform = 'none';
-          fallback.style.textShadow = 'none';
-        }
-      }
-
-      // Term chips container — force a clean flex row under the label
       const termRadios = clone.querySelector('#termRadios');
       if (termRadios) {
         termRadios.style.display = 'flex';
@@ -306,46 +447,9 @@
         termRadios.style.marginTop = '4px';
         termRadios.style.width = '100%';
       }
-    } catch (e) {
-      console.warn('PDF selector layout tweak skipped:', e);
-    }
+    } catch (e) {}
 
-    // 0c) Drawer container: ensure it participates in normal flow (no overlap)
-    //     and is left-aligned with 20px padding in the PDF.
-    try {
-      // Try to match common drawer container selectors.
-      // If your actual class is different, just add it here.
-      const drawerContainer = clone.querySelector(
-        '.drawer-container, .drawer, .drawer-row, .drawer-shell, [data-role="drawer"]'
-      );
-
-      if (drawerContainer) {
-        const parent = drawerContainer.parentElement;
-
-        // Make sure neither the parent nor the drawer are absolutely positioned
-        if (parent) {
-          parent.style.position = 'static';
-          parent.style.display = 'block';
-          parent.style.textAlign = 'left';
-          parent.style.paddingLeft = '20px';   // 20px left pad for the row
-        }
-
-        drawerContainer.style.position = 'static';
-        drawerContainer.style.transform = 'none';
-        drawerContainer.style.left = 'auto';
-        drawerContainer.style.right = 'auto';
-        drawerContainer.style.top = 'auto';
-        drawerContainer.style.bottom = 'auto';
-        drawerContainer.style.margin = '12px 0 0 0'; // push it below head/subhead
-        drawerContainer.style.marginLeft = '0';
-        drawerContainer.style.marginRight = 'auto';
-        drawerContainer.style.alignSelf = 'flex-start';
-      }
-    } catch (e) {
-      console.warn('PDF drawer layout normalization skipped:', e);
-    }
-
-    // --- 1) Inject PDF-only page header at the very top ---
+    // PDF-only header
     const pdfHeader = document.createElement('div');
     pdfHeader.style.display = 'flex';
     pdfHeader.style.flexDirection = 'column';
@@ -362,7 +466,6 @@
     eyebrow.style.color = 'rgba(148,163,184,.9)';
     eyebrow.style.marginBottom = '4px';
 
-    // Row that holds "Proposals" and the Confidential badge inline
     const headerRow = document.createElement('div');
     headerRow.style.display = 'flex';
     headerRow.style.alignItems = 'center';
@@ -376,31 +479,28 @@
     title.style.textTransform = 'uppercase';
     title.style.color = '#0f172a';
 
-    // --- LexisNexis Confidential badge (darker gray pill, bold lettering) ---
     const confidentialBadge = document.createElement('div');
     confidentialBadge.textContent = 'LexisNexis Confidential';
-    confidentialBadge.style.marginLeft = 'auto';              // push to right
+    confidentialBadge.style.marginLeft = 'auto';
     confidentialBadge.style.padding = '4px 10px';
     confidentialBadge.style.borderRadius = '999px';
-    confidentialBadge.style.backgroundColor = '#111827';      // dark gray pill
+    confidentialBadge.style.backgroundColor = '#111827';
     confidentialBadge.style.fontSize = '12px';
-    confidentialBadge.style.fontWeight = '600';               // bold
+    confidentialBadge.style.fontWeight = '600';
     confidentialBadge.style.letterSpacing = '.16em';
     confidentialBadge.style.textTransform = 'uppercase';
     confidentialBadge.style.color = '#ffffff';
-    confidentialBadge.style.border = '1px solid #1f2937';      // subtle edge
+    confidentialBadge.style.border = '1px solid #1f2937';
     confidentialBadge.style.boxShadow = '0 0 0.5px rgba(0,0,0,.4)';
 
     headerRow.appendChild(title);
     headerRow.appendChild(confidentialBadge);
-
     pdfHeader.appendChild(eyebrow);
     pdfHeader.appendChild(headerRow);
 
-    // Put header at top of presenter clone
     clone.insertBefore(pdfHeader, clone.firstChild);
 
-    // --- 2) Attach clone offscreen so we can use computed styles ---
+    // Attach clone offscreen so we can read computed styles
     const wrapper = document.createElement('div');
     wrapper.style.position = 'fixed';
     wrapper.style.left = '-9999px';
@@ -408,38 +508,25 @@
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
-    // --- 3) Strip out all <img> tags (no local images in PDF) ---
+    // Strip images
     wrapper.querySelectorAll('img').forEach(img => img.remove());
 
-    // --- 4) Remove any CSS background-images that use url(...) (but keep gradients) ---
+    // Remove background images with url(...) but keep gradients
     wrapper.querySelectorAll('*').forEach(el => {
       const cs = window.getComputedStyle(el);
       const bgImg = cs && cs.backgroundImage;
-      if (bgImg && bgImg.includes('url(')) {
-        el.style.backgroundImage = 'none';
-      }
+      if (bgImg && bgImg.includes('url(')) el.style.backgroundImage = 'none';
     });
 
-    // --- 5) Normalize CTA text rendering for PDF (lettering alignment) ---
-    wrapper.querySelectorAll('.plan-card__cta').forEach(cta => {
-      cta.style.display = 'inline-block';
-      cta.style.textAlign = 'center';
-      cta.style.letterSpacing = '0';
-      cta.style.textTransform = 'none';
-      cta.style.lineHeight = '1.2';
-    });
-
-    // Detach from DOM and return clean clone
     document.body.removeChild(wrapper);
     return clone;
   }
 
-  /** Main export: uses makePrintNode (no fetch, no images) */
   async function exportPresenter({
-    selector = '#presenter',            // presenter root
+    selector = '#presenter',
     filename,
-    page = { format: 'a3', orientation: 'landscape' }, // A3 landscape
-    margin = [5, 5, 0, 10],          // mm — tweak if you need more room
+    page = { format: 'a3', orientation: 'landscape' },
+    margin = [5, 5, 0, 10],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -448,16 +535,8 @@
       return;
     }
 
-    // build default filename if one wasn’t provided
-    if (!filename) {
-      if (typeof buildPdfFilename === 'function') {
-        filename = buildPdfFilename();
-      } else {
-        filename = 'LexisNexis Proposals.pdf';
-      }
-    }
+    if (!filename) filename = buildPdfFilename();
 
-    // Prepare a clean clone for PDF (no images / file-based backgrounds + PDF header)
     const printNode = makePrintNode(root);
 
     const opt = {
@@ -466,9 +545,26 @@
       image: { type: 'jpeg', quality: 0.95 },
       html2canvas: {
         scale,
-        useCORS: false,    // not loading external images anymore
-        allowTaint: false, // safer with no external images
-        logging: false
+        useCORS: false,
+        allowTaint: false,
+        logging: false,
+        onclone: (clonedDoc) => {
+  // Add export class so CSS overrides apply in the capture clone
+  const capRoot = clonedDoc.querySelector('#presenter');
+  if (capRoot) capRoot.classList.add('pdf-export');
+
+  // (optional but helpful) force CTA to avoid flex/gap in clone even if CSS misses
+  clonedDoc.querySelectorAll('.plan-card__cta').forEach(cta => {
+    cta.style.display = 'inline-block';
+    cta.style.gap = '0';              // flex-gap can still be read; neutralize anyway
+    cta.style.whiteSpace = 'nowrap';
+    cta.style.transition = 'none';
+    cta.style.transform = 'none';
+    cta.style.filter = 'none';
+  });
+
+  // ...keep the rest of your onclone logic (strip imgs, remove url() bgs, etc.)
+}
       },
       jsPDF: {
         unit: 'mm',
@@ -487,118 +583,17 @@
     }
   }
 
-  function sanitizePlanHtml(rawHtml) {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = rawHtml;
-
-    // Allowed tags/attributes
-    const allowedTags = new Set(['B','STRONG','I','EM','U','BR','SPAN','DIV','P','UL','OL','LI','A']);
-    // Only keep these inline styles (no background, no font-family/size)
-    const allowedStyles = new Set(['color','font-weight','font-style','text-decoration']);
-    const allowedSizeClasses = new Set(['rte-size-body','rte-size-subhead','rte-size-head']);
-
-    // Convert <font color="..."> → <span style="color:...">
-    wrapper.querySelectorAll('font[color]').forEach(font => {
-      const span = document.createElement('span');
-      span.setAttribute('style', 'color:' + font.getAttribute('color'));
-      span.innerHTML = font.innerHTML;
-      font.replaceWith(span);
-    });
-
-    function cleanNode(node) {
-      if (node.nodeType === Node.TEXT_NODE) return;
-
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const tag = node.tagName.toUpperCase();
-
-        // Strip disallowed elements but keep their children
-        if (!allowedTags.has(tag)) {
-          const parent = node.parentNode;
-          while (node.firstChild) parent.insertBefore(node.firstChild, node);
-          parent.removeChild(node);
-          return;
-        }
-
-        // Attributes: keep href on <a>, keep style, and keep class (only our size classes)
-        const toRemove = [];
-        for (const a of node.attributes) {
-          const name = a.name.toLowerCase();
-          if (name === 'href' && tag === 'A') continue;
-          if (name === 'style') continue;
-          if (name === 'class') continue; // we will filter next
-          // drop everything else (id, onclick, data-*, etc.)
-          toRemove.push(name);
-        }
-        toRemove.forEach(n => node.removeAttribute(n));
-
-        // Filter class → keep ONLY our rte-size-* classes
-        if (node.hasAttribute('class')) {
-          const kept = Array.from(node.classList).filter(c => allowedSizeClasses.has(c));
-          if (kept.length) {
-            node.className = kept.join(' ');
-          } else {
-            node.removeAttribute('class');
-          }
-        }
-
-        // Filter style → keep only allowed styles; background/font-family/size are removed
-        if (node.hasAttribute('style')) {
-          const parts = node
-            .getAttribute('style')
-            .split(';')
-            .map(s => s.trim())
-            .filter(Boolean);
-
-          const kept = [];
-          for (const part of parts) {
-            const [propRaw, valRaw] = part.split(':');
-            if (!propRaw || !valRaw) continue;
-            const prop = propRaw.trim().toLowerCase();
-            const val  = valRaw.trim();
-
-            if (allowedStyles.has(prop)) kept.push(`${prop}:${val}`);
-          }
-
-          if (kept.length) node.setAttribute('style', kept.join(';'));
-          else node.removeAttribute('style');
-        }
-
-        // Harden links (open new tab, safe rel)
-        if (tag === 'A') {
-          node.target = '_blank';
-          node.rel = 'noopener noreferrer';
-        }
-      }
-
-      // Recurse
-      [...node.childNodes].forEach(cleanNode);
-    }
-    [...wrapper.childNodes].forEach(cleanNode);
-    return wrapper.innerHTML;
-  }
-
-  // === Wire the Export button once DOM is ready ===
   function setupExportButton() {
     const btn = document.getElementById('exportPdfBtn');
-    if (!btn) {
-      console.warn('Export button #exportPdfBtn not found in DOM.');
-      return;
-    }
+    if (!btn) return;
 
-    // Prevent double-binding if this script is included twice
-    if (btn.dataset.exportBound === 'true') {
-      return;
-    }
+    if (btn.dataset.exportBound === 'true') return;
     btn.dataset.exportBound = 'true';
 
     btn.addEventListener('click', async (evt) => {
       evt.preventDefault();
 
-      // Global re-entry guard so one click only ever triggers a single export
-      if (window.__lnpPdfExporting) {
-        console.warn('PDF export already in progress; ignoring extra click.');
-        return;
-      }
+      if (window.__lnpPdfExporting) return;
       window.__lnpPdfExporting = true;
 
       try {
@@ -608,15 +603,7 @@
           return;
         }
 
-        const selector = '#presenter';
-        const root = document.querySelector(selector);
-        if (!root) {
-          alert('Export failed: presenter root not found.');
-          console.error('No element matches selector', selector);
-          return;
-        }
-
-        await exportPresenter({ selector });
+        await exportPresenter({ selector: '#presenter' });
       } catch (err) {
         console.error('Error during PDF export:', err);
         alert('Export failed. Open the browser console for details.');

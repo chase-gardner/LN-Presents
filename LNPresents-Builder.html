@@ -206,6 +206,63 @@ h1,h2,h3{ margin:0; }
   box-shadow: 0 14px 30px rgba(2,6,23,.06);
 }
 
+/* ===============================
+   Header Upload Preview
+   =============================== */
+.header-preview-wrap{
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: 14px;
+  background: rgba(255,255,255,.92);
+  padding: 10px;
+  box-shadow: 0 14px 30px rgba(2,6,23,.06);
+  overflow:flex;
+}
+.clearUploadedHeaderBtn{
+  background: var(--accent-solid);
+  color:#fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 14px;
+  margin: 0, 0, 0, .5rem;
+  padding: 6px 10px;
+  font-size: .74rem;
+  font-weight: 750;
+  cursor:pointer;
+  box-shadow: 0 22px 60px rgba(2,6,23,.18);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.downloadProfileBtn{
+  background: var(--accent-solid);
+  color:#fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 14px;
+  margin: 0, 0, 0, .5rem;
+  padding: 6px 10px;
+  font-size: .74rem;
+  font-weight: 750;
+  cursor:pointer;
+  box-shadow: 0 22px 60px rgba(2,6,23,.18);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
+.header-preview-meta{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+  font-size:.82rem;
+  font-weight:750;
+  color:#0f172a;
+  margin-bottom:2px;
+}
+#headerPreviewImg{
+  width: 100%;
+  height: auto;
+  display:none; /* shown when we have an image */
+  border-radius: 10px;
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(248,250,252,.9);
+}
+
 /* =========================================
    Profile Upload — Revived Drop Zone
    ========================================= */
@@ -374,20 +431,18 @@ h1,h2,h3{ margin:0; }
 }
 .top-field label,
 .top-label{
-  font-size:.75rem;
-  font-weight: 850;
+  font-size:.85rem;
+  font-weight: 650;
   color:#0f172a;
   letter-spacing:.02em;
 }
 .top-field.term-style{
   grid-template-columns: 20px 1fr minmax(120px, 180px);
   align-items:center;
-  gap:10px;
 }
 .top-field.yoy-row{
   grid-template-columns: 20px 1fr minmax(120px, 180px);
   align-items:center;
-  gap:10px;
   padding: 4px 0;
 }
 
@@ -469,7 +524,7 @@ input:focus, select:focus, textarea:focus{
   gap:.35rem;
   padding: 8px 12px;
   font-size:.80rem;
-  font-weight: 850;
+  font-weight: 750;
   letter-spacing:.01em;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.18);
@@ -512,11 +567,12 @@ input:focus, select:focus, textarea:focus{
   margin: 0, 0, 0, .5rem;
   padding: 6px 10px;
   font-size: .74rem;
-  font-weight: 850;
+  font-weight: 750;
   cursor:pointer;
   box-shadow: 0 22px 60px rgba(2,6,23,.18);
   transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
 }
+
 .addPlanbtn:hover{ transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 30px 80px rgba(2,6,23,.22); }
 .addPlanbtn:active{ transform: translateY(0); }
 
@@ -557,7 +613,7 @@ input:focus, select:focus, textarea:focus{
   justify-content:space-between;
   gap:12px;
 }
-.presets-header h3{ margin:0; font-size:.92rem; font-weight:850; }
+.presets-header h3{ margin:0; font-size:.92rem; font-weight:650; }
 .presets-header p{ margin:.15rem 0 0; font-size:.82rem; color: var(--ink); line-height:1.35; }
 
 .preset-list{
@@ -591,7 +647,7 @@ input:focus, select:focus, textarea:focus{
   background: rgba(224,231,255,.92);
   color:#0b0f19;
   font-size:.78rem;
-  font-weight: 800;
+  font-weight: 600;
   border:1px solid rgba(15,23,42,.10);
   cursor:grab;
   user-select:none;
@@ -617,8 +673,7 @@ input:focus, select:focus, textarea:focus{
 .presets-sidecar{
   position: fixed;
   right: 16px;
-  top: 300px;
-  bottom: 100px; /* <-- extend toward the bottom */
+  bottom: 75px; /* <-- extend toward the bottom */
   width: min(200px, calc(100vw - 32px));
 
   /* viewport-fit height (no fixed 600px cap) */
@@ -778,18 +833,6 @@ input:focus, select:focus, textarea:focus{
 }
 .plan-card button.secondary:active{ transform: translateY(0); }
 
-.plan-card-topfields{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:8px;
-}
-.plan-card .field{ display:grid; gap:6px; }
-.plan-card label{
-  font-size:.78rem;
-  color:#334155;
-  font-weight: 950;
-}
-
 /* ===============================
    Plan reorder (drag + drop)
    =============================== */
@@ -797,7 +840,6 @@ input:focus, select:focus, textarea:focus{
   position: relative;
 }
 .plan-card[draggable="true"]{
-  /* helps Safari show correct drag affordance */
   -webkit-user-drag: element;
 }
 
@@ -867,7 +909,7 @@ input:focus, select:focus, textarea:focus{
   border-radius: 16px;
   padding: 12px 12px;
   font-size: .97rem;
-  line-height: 1.6;
+  line-height: 1.35;
   overflow-wrap:anywhere;
   word-break:break-word;
   box-shadow: 0 18px 50px rgba(2,6,23,.08);
@@ -877,12 +919,18 @@ input:focus, select:focus, textarea:focus{
   border-color: rgba(99,102,241,.45);
   box-shadow: var(--ring), 0 24px 70px rgba(2,6,23,.14);
 }
-.plan-contents.rte p{ margin:.45rem 0; }
+.plan-contents.rte p{ margin:.45rem 0; line-height: 1.35; }
 .plan-contents.rte ul, .plan-contents.rte ol{ margin:.3rem 0 .3rem 1.15rem; padding:0; }
 .plan-contents.rte li{ margin:3px 0; }
 .plan-contents.rte a{ text-decoration: underline; }
 .plan-contents.rte > *:first-child{ margin-top:0 !important; }
 .plan-contents.rte > *:last-child{ margin-bottom:0 !important; }
+
+.plan-contents.rte p:has(> span),
+.plan-contents.rte p:has(strong),
+.plan-contents.rte p:has(em){
+  margin-block: .35rem;
+}
 
 /* 18) Bullets + footer */
 .bullet-list{ margin:0; padding-left:1.15rem; list-style:disc; }
@@ -905,8 +953,6 @@ input:focus, select:focus, textarea:focus{
   position: fixed;
   inset: 0;
   background: rgba(2,6,23,.62);
-
-  /* IMPORTANT: remove blur so the menu stays crisp */
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 
@@ -944,32 +990,28 @@ input:focus, select:focus, textarea:focus{
 /* When small: main uses full width, sidebar becomes fixed panel */
 @media (max-width:1100px){
 
-  /* IMPORTANT: prevent parent stage blur from affecting the fixed panel (Safari/stacking context) */
   .builder-layout{
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
-  /* Make the sidebar panel itself crisp (optional but recommended) */
   .builder-sidebar{
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: rgba(255,255,255,.96);
   }
-  /* The stage should not create a second "inset width" difference */
+
   .builder-layout{
     flex-direction: column;
     align-items: stretch;
   }
 
-  /* Main stays in the normal flow */
   .builder-main{
     width:100%;
     max-width:100%;
     min-width:0;
   }
 
-  /* Sidebar becomes an off-canvas panel */
   .builder-sidebar{
     position: fixed;
     top: 0;
@@ -991,11 +1033,9 @@ input:focus, select:focus, textarea:focus{
     z-index: calc(var(--panel-z) + 1);
   }
 
-  /* Show toggle + close */
   .sidebar-toggle{ display:inline-flex; }
   .sidebar-close{ display:inline-flex; }
 
-  /* Body lock when open */
   body.sidebar-open{
     overflow: hidden;
     touch-action: none;
@@ -1009,6 +1049,170 @@ input:focus, select:focus, textarea:focus{
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+/* ===============================
+   NEW: First-time Demo / Tour Modal
+   =============================== */
+.demo-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: rgba(2,6,23,.70);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+}
+.demo-overlay.is-open{ display:flex; }
+
+.demo-modal{
+  width: min(860px, 94vw);
+  max-height: min(88vh, 860px);
+  overflow: hidden;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 20px;
+  box-shadow: 0 30px 120px rgba(2,6,23,.50);
+  display:flex;
+  flex-direction:column;
+}
+
+.demo-head{
+  padding: 16px 18px;
+  background: var(--accent);
+  color:#fff;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+}
+.demo-head h2{
+  margin:0;
+  font-size: 1.05rem;
+  font-weight: 850;
+  letter-spacing:.01em;
+}
+.demo-head p{
+  margin:.25rem 0 0;
+  font-size:.88rem;
+  opacity:.95;
+  line-height: 1.45;
+  max-width: 90ch;
+}
+
+.demo-close{
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.18);
+  color:#fff;
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor:pointer;
+  font-weight: 900;
+  line-height: 1;
+}
+.demo-close:hover{ filter: brightness(1.05); transform: translateY(-1px); }
+.demo-close:active{ transform: translateY(0); }
+
+.demo-body{
+  padding: 14px 18px 16px;
+  overflow:auto;
+}
+.demo-grid{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 12px;
+}
+@media (max-width: 860px){
+  .demo-grid{ grid-template-columns: 1fr; }
+}
+
+.demo-card{
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: 16px;
+  padding: 12px 12px;
+  box-shadow: 0 14px 34px rgba(2,6,23,.10);
+}
+.demo-card h3{
+  margin:0 0 8px;
+  font-size:.92rem;
+  font-weight: 900;
+  color:#0b0f19;
+}
+.demo-card p{
+  margin:0 0 10px;
+  color:#334155;
+  line-height: 1.55;
+  font-size:.90rem;
+}
+.demo-steps{
+  margin:0;
+  padding-left: 1.15rem;
+}
+.demo-steps li{
+  margin: 8px 0;
+  line-height: 1.5;
+  color:#334155;
+  font-size:.90rem;
+}
+.demo-kv{
+  display:grid;
+  gap:10px;
+}
+.demo-kv .kv{
+  background: rgba(248,250,252,.95);
+  border: 1px solid rgba(15,23,42,.08);
+  border-radius: 14px;
+  padding: 10px 10px;
+}
+.demo-kv .kv b{
+  display:block;
+  font-size:.82rem;
+  color:#0b0f19;
+}
+.demo-kv .kv span{
+  display:block;
+  margin-top:3px;
+  font-size:.86rem;
+  color:#334155;
+  line-height: 1.45;
+}
+.demo-actions{
+  margin-top: 12px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.demo-actions .pill{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.96);
+  cursor:pointer;
+  font-weight: 900;
+  font-size: .84rem;
+  box-shadow: 0 14px 34px rgba(2,6,23,.10);
+}
+.demo-actions .pill.primary{
+  border-color: rgba(255,255,255,.25);
+  background: var(--accent);
+  color:#fff;
+}
+.demo-actions .pill:hover{ transform: translateY(-1px); }
+.demo-actions .pill:active{ transform: translateY(0); }
+
+.demo-footnote{
+  margin-top: 12px;
+  font-size:.82rem;
+  color:#64748b;
+  line-height: 1.45;
 }
 
 /* 19) Print */
@@ -1027,7 +1231,8 @@ input:focus, select:focus, textarea:focus{
   .builder-sidebar,
   .sidebar-overlay,
   .sidebar-toggle,
-  .sidebar-close{ display:none !important; }
+  .sidebar-close,
+  .demo-overlay{ display:none !important; }
 }
 </style>
 </head>
@@ -1078,10 +1283,15 @@ input:focus, select:focus, textarea:focus{
   const err = document.getElementById("gateErr");
   const remember = document.getElementById("gateRemember");
 
+  function signalUnlocked(){
+    try{ window.dispatchEvent(new Event("lnp:unlocked")); } catch(e){}
+  }
+
   // if remembered, skip gate
   try{
     if (localStorage.getItem("LNP_BUILDER_UNLOCKED") === "1") {
       gate.remove();
+      signalUnlocked();
       return;
     }
   } catch(e){}
@@ -1093,6 +1303,7 @@ input:focus, select:focus, textarea:focus{
         try{ localStorage.setItem("LNP_BUILDER_UNLOCKED", "1"); } catch(e){}
       }
       gate.remove();
+      signalUnlocked();
     } else {
       err.style.display = "block";
       input.select();
@@ -1114,7 +1325,7 @@ input:focus, select:focus, textarea:focus{
       <h1>LNPresents - Builder</h1>
       <p>
         Welcome to the LexisNexis Proposal Builder for LNPresents.
-        Fill out this form and show up to four proposals with up to six term details selected to present on LNPresents.
+        Fill out this form and show up to four plans with up to six term details selected to present on LNPresents.
         The plan contents support basic text formatting (bold, italic, underline, bulletpoint, and color).
       </p>
     </div>
@@ -1123,6 +1334,10 @@ input:focus, select:focus, textarea:focus{
   <!-- ========== TOP ACTIONS ========== -->
   <div class="form-top-actions">
     <button type="button" class="btn-export sidebar-toggle" id="sidebarToggle">Menu</button>
+
+    <!-- NEW: Demo button (always available, even after first run) -->
+    <button type="button" id="demoBtn" class="btn-copy" title="Open the Builder Info Page">Info</button>
+
     <button type="button" id="clearBtn" class="btn-clear">Clear</button>
     <button type="submit" form="clgForm" id="saveBtn" class="btn-save">Save Details</button>
     <button id="openPresenterBtn" type="button" class="btn-open">Open Presenter</button>
@@ -1149,7 +1364,12 @@ input:focus, select:focus, textarea:focus{
     <!-- Export button kept; placeholder keeps scripts happy -->
     <span id="exportEmailBtn" hidden aria-hidden="true"></span>
   </div>
-<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- NEW: Demo modal container (injected content is built by JS so it stays easy to update) -->
+  <div class="demo-overlay" id="demoOverlay" aria-hidden="true"></div>
+
   <!-- ========== FORM + LEFT SIDEBAR ========== -->
   <div class="form-shell">
     <div class="builder-layout">
@@ -1157,77 +1377,86 @@ input:focus, select:focus, textarea:focus{
       <!-- LEFT: Add Your Header card -->
       <aside class="builder-sidebar">
         <button type="button" class="sidebar-close" id="sidebarClose">Close Menu</button>
+
         <!-- Add Your Header (LEFT CARD) -->
-<div class="card" id="repHeaderCard">
-  <h2>Add Your Header</h2>
-  <p class="lede">
-    If you have already submitted your header, please search for your name. Otherwise, click the button below to submit your header for presentation.
-    <br><br>
-    <em>*Your header will only show in the presenter. It will not be present in the PDF export.</em>
-  </p>
+        <div class="card" id="repHeaderCard">
+          <h2>Add Your Header</h2>
+          <p class="lede">
+            Upload your header below to personalize your presentation. Your header will not be present on the exported PDF.
+          </p>
 
-  <div class="card-info">
-    <label style="display:block; font-weight:600; margin-bottom:6px;">Search your name</label>
+          <div class="card-info">
 
-    <!-- INPUT + DATALIST (dropdown) -->
-    <input
-      id="repHeaderSearch"
-      type="text"
-      class="input-style"
-      placeholder="Start typing your name…"
-      list="repHeaderList"
-      autocomplete="off"
-    />
-    <datalist id="repHeaderList"></datalist>
+            <datalist id="repHeaderList"></datalist>
+            <!-- NEW: Local header upload (stored on this device/browser) -->
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+  </div>
 
-        <p class="muted-text" style="margin-top:15px;">
-      Click the button below to submit your header via email.
-    </p>
+  <div style="display:grid; gap:10px; margin-top:10px;">
+    <label class="profile-upload" style="margin:0;">
+      <span>Upload Header</span>
+      <input type="file" id="headerUploadInput" accept="image/png,image/jpeg">
+    </label>
 
-    <button type="button" id="submitHeaderBtn" class="btn-export" style="margin-top:10px;">
-      Submit your Header
+    <!-- Preview -->
+    <div class="header-preview-wrap">
+      <div class="header-preview-meta">
+        <span id="headerPreviewStatus">No uploaded header yet.</span>
+        <span id="headerPreviewInfo" style="opacity:.75;"></span>
+      </div>
+      <img id="headerPreviewImg" alt="Header preview" />
+    </div>
+        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn" style="padding:.55rem .85rem; font-size:.78rem;">
+      Clear uploaded header
     </button>
+
+    <small class="muted-text">
+      This saves the image to <b>this device/browser</b> so the Presenter can use it.
+    </small>
   </div>
 </div>
-                    <!-- Save / Load Profiles card -->
-            <div class="card">
-              <h2>Save / Load Profiles</h2>
-              <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
-              <div class="card-info">
-                <div class="profile-card-controls">
-                  <button type="button" id="downloadProfileBtn" class="btn-export">
-                    Download Profile
-                  </button>
+          </div>
 
-                  <label class="profile-upload">
-                    <span>Load Profile</span>
-                    <input type="file" id="uploadProfileInput" accept="application/json">
-                  </label>
-                </div>
-                <p class="muted-text">
-                  When you download a profile, you’ll be asked to name the file. The default filename is
-                  the <strong>Firm Name</strong> .
-                </p>
-              </div>
+        <!-- Save / Load Profiles card -->
+        <div class="card">
+          <h2>Save / Load Profiles</h2>
+          <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
+          <div class="card-info">
+            <div class="profile-card-controls">
+              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn">
+                Download Profile
+              </button>
+
+              <label class="profile-upload">
+                <span>Load Profile</span>
+                <input type="file" id="uploadProfileInput" accept="application/json">
+              </label>
             </div>
-                            <div class="card">
-              <p class="lede">Quick tips for using LNPresents:</p>
-              <ul class="bullet-list">
-                <li>You may choose up to <strong>six</strong> terms to show above your plans.</li>
-                <li>You may show up to <strong>four</strong> plans at once.</li>
-                <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
-                <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
-              </ul>
-              <a
-                class="ln-btn ln-btn--sm"
-                role="button"
-                aria-label="Send LN Presents feedback email"
-                href="mailto:chase.lawarregardner@lexisnexis.com
-                ?subject=LN%20Presents%20Feedback
-                &amp;body=Hello,%0D%0A%0D%0AThanks%20for%20using%20LN%20Presents!%20Please%20answer%20these%20questions%20when%20sending%20feedback%20or%20reporting%20bugs.%0D%0A%0D%0AFeature%20Request%20or%20Bug%3F%0D%0A%0D%0ADescribe%20the%20idea%20or%20issue%3F%0D%0A%0D%0AIf%20bug,%20list%20steps%20to%20reproduce.%0D%0A%0D%0AOther%20Information%20or%20suggestions%3F%0D%0A%0D%0ADo%20I%20have%20your%20permission%20to%20reach%20out%20to%20you%20to%20seek%20more%20detail%20about%20your%20submission,%20if%20necessary%3F">
-                Send Feedback
-              </a>
-            </div>
+            <p class="muted-text">
+              When you download a profile, you’ll be asked to name the file. The default filename is
+              the <strong>Firm Name</strong> .
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="lede">Quick tips for using LNPresents:</p>
+          <ul class="bullet-list">
+            <li>You may choose up to <strong>six</strong> terms to show above your plans.</li>
+            <li>You may show up to <strong>four</strong> plans at once.</li>
+            <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
+            <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
+          </ul>
+          <a
+            class="ln-btn ln-btn--sm"
+            role="button"
+            aria-label="Send LN Presents feedback email"
+            href="mailto:chase.lawarregardner@lexisnexis.com
+            ?subject=LN%20Presents%20Feedback
+            &amp;body=Hello,%0D%0A%0D%0AThanks%20for%20using%20LN%20Presents!%20Please%20answer%20these%20questions%20when%20sending%20feedback%20or%20reporting%20bugs.%0D%0A%0D%0AFeature%20Request%20or%20Bug%3F%0D%0A%0D%0ADescribe%20the%20idea%20or%20issue%3F%0D%0A%0D%0AIf%20bug,%20list%20steps%20to%20reproduce.%0D%0A%0D%0AOther%20Information%20or%20suggestions%3F%0D%0A%0D%0ADo%20I%20have%20your%20permission%20to%20reach%20out%20to%20you%20to%20seek%20more%20detail%20about%20your%20submission,%20if%20necessary%3F">
+            Send Feedback
+          </a>
+        </div>
       </aside>
 
       <!-- RIGHT: Existing Builder form -->
@@ -1328,6 +1557,161 @@ input:focus, select:focus, textarea:focus{
   document.addEventListener("DOMContentLoaded", function () {
 
     /* =========================
+     * 0) FIRST-TIME DEMO OVERVIEW (shown once)
+     * ========================= */
+    const DEMO_SEEN_KEY = "LNP_BUILDER_DEMO_SEEN";
+    const demoOverlay = document.getElementById("demoOverlay");
+    const demoBtn = document.getElementById("demoBtn");
+
+    function setDemoSeen(){
+      try{ localStorage.setItem(DEMO_SEEN_KEY, "1"); } catch(e){}
+    }
+    function hasSeenDemo(){
+      try{ return localStorage.getItem(DEMO_SEEN_KEY) === "1"; } catch(e){ return false; }
+    }
+
+    function closeDemo({ markSeen = true } = {}){
+      if (!demoOverlay) return;
+      demoOverlay.classList.remove("is-open");
+      demoOverlay.setAttribute("aria-hidden","true");
+      demoOverlay.innerHTML = "";
+      document.body.style.overflow = "";
+      if (markSeen) setDemoSeen();
+    }
+
+    function openDemo({ markSeenOnClose = true } = {}){
+      if (!demoOverlay) return;
+
+      // Build content (easy to edit later)
+      demoOverlay.innerHTML = `
+        <div class="demo-modal" role="dialog" aria-modal="true" aria-label="LNPresents Builder Info Page">
+          <div class="demo-head">
+            <div>
+              <h2>Welcome to LNPresents Builder</h2>
+              <p>
+                This Builder creates the proposal content that your Presenter displays. Fill in firm details, select up to 6 terms, build up to 4 plans,
+                then click <b>Open Presenter</b> to view the live output.
+              </p>
+            </div>
+            <button type="button" class="demo-close" aria-label="Close demo">✕</button>
+          </div>
+
+          <div class="demo-body">
+            <div class="demo-grid">
+              <div class="demo-card">
+                <h3>Builder Breakdown</h3>
+                <ol class="demo-steps">
+                  <li><b>Firm Details</b>: Enter the Firm Name + Incentive (Personalized Proposal Message).</li>
+                  <li><b>Terms</b>: Choose up to <b>6</b> checkboxes across Retention/New Business options to be displayed with your plans.</li>
+                  <li><b>Plans</b>: Add up to <b>4</b> plans with Platform, Price, and Contents displayed in a clean and direct format.</li>
+                  <li><b>Presets</b>: Drag a preset into a plan’s Contents area to start from a personalized template.</li>
+                  <li><b>Save Details</b>: Save details in an easy and secure way by exporting your Plan Profile found in the side menu.</li>
+                  <li><b>Open Presenter</b>: Once you've saved your details, Open the Presenter. You will be taken to another page with your presentation and the PDF export.</li>
+                </ol>
+
+                <div class="demo-actions">
+                  <button type="button" class="pill primary" data-demo-action="gotit">Got it — start building</button>
+                </div>
+
+                <div class="demo-footnote">
+                  <b>Note:</b> You can always reopen this using the <b>Info</b> button in the top-right.
+                </div>
+              </div>
+
+              <div class="demo-card">
+                <h3>Key features you’ll use most</h3>
+                <div class="demo-kv">
+                  <div class="kv">
+                    <b>Plan Presets</b>
+                    <span>Start building your plan with personalized presets designed to make professional and personalized plans quickly. </span>
+                  </div>
+                  <div class="kv">
+                    <b>Profiles (Download / Load)</b>
+                    <span>Import and export proposal Profiles as a .json file. This allows you to switch between proposals quickly and share proposals with coworkers and managers for feedback.</span>
+                  </div>
+                  <div class="kv">
+                    <b>Personalized Headers</b>
+                    <span>If you choose, you may submit your Header for your use on presentations. This is a great way to personalize your proposals.</span>
+                  </div>
+                  <div class="kv">
+                    <b>Hyperlinked PDFs</b>
+                    <span>Full hyperlink support allows you to add Seismic Digital Sales Room Links to your exported Proposal PDFs.</span>
+                  </div>
+                  <div class="kv">
+                    <b>Privacy and Security</b>
+                    <span>All information entered on this site is stored locally in your browser cache. At no time is customer or usage data stored or tracked by LNPresents.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      demoOverlay.classList.add("is-open");
+      demoOverlay.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+
+      // Close handlers
+      const closeBtn = demoOverlay.querySelector(".demo-close");
+      closeBtn?.addEventListener("click", () => closeDemo({ markSeen: markSeenOnClose }));
+
+      demoOverlay.addEventListener("click", (e) => {
+        // click outside modal closes
+        const modal = demoOverlay.querySelector(".demo-modal");
+        if (modal && !modal.contains(e.target)) closeDemo({ markSeen: markSeenOnClose });
+      });
+
+      document.addEventListener("keydown", function escClose(ev){
+        if (!demoOverlay.classList.contains("is-open")) return;
+        if (ev.key === "Escape") {
+          closeDemo({ markSeen: markSeenOnClose });
+        }
+      }, { passive: true, once: true });
+
+      // Action shortcuts
+      demoOverlay.querySelectorAll("[data-demo-action]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const action = btn.getAttribute("data-demo-action");
+
+          if (action === "gotit") {
+            closeDemo({ markSeen: markSeenOnClose });
+            return;
+          }
+
+          if (action === "scrollToPlans") {
+            closeDemo({ markSeen: markSeenOnClose });
+            const el = document.getElementById("plansSection");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+          }
+
+          if (action === "scrollToHeader") {
+            closeDemo({ markSeen: markSeenOnClose });
+            const el = document.getElementById("repHeaderCard");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+          }
+        });
+      });
+    }
+
+    // Allow users to reopen demo any time (does not need to “un-see”)
+    if (demoBtn) {
+      demoBtn.addEventListener("click", () => openDemo({ markSeenOnClose: true }));
+    }
+
+    // Only show automatically once, and only after passcode gate is gone
+    function tryAutoShowDemo(){
+      if (document.getElementById("gate")) return; // still locked
+      if (!hasSeenDemo()) openDemo({ markSeenOnClose: true });
+    }
+
+    // Run now, and also after unlock signal
+    tryAutoShowDemo();
+    window.addEventListener("lnp:unlocked", tryAutoShowDemo, { once: true });
+
+    /* =========================
      * A) DOM REFERENCES
      * ========================= */
     const form = document.getElementById("clgForm");
@@ -1351,6 +1735,13 @@ input:focus, select:focus, textarea:focus{
     const repHeaderSearch = document.getElementById("repHeaderSearch");
     const repHeaderList   = document.getElementById("repHeaderList");
     const submitHeaderBtn = document.getElementById("submitHeaderBtn");
+    // NEW: uploaded header controls
+const headerUploadInput       = document.getElementById("headerUploadInput");
+const headerPreviewImg        = document.getElementById("headerPreviewImg");
+const headerPreviewStatus     = document.getElementById("headerPreviewStatus");
+const headerPreviewInfo       = document.getElementById("headerPreviewInfo");
+const clearUploadedHeaderBtn  = document.getElementById("clearUploadedHeaderBtn");
+
 
 
     /* =========================
@@ -1363,179 +1754,409 @@ input:focus, select:focus, textarea:focus{
     /* =========================
      * B.1) LN REP (HEADER) STATE
      * ========================= */
-/* =========================
- * HEADER DROPDOWN (from repo /Header or /Headers)
- * Store RAW filename for reliable lookups, display friendly label
+    /* =========================
+     * HEADER DROPDOWN (from repo /Header or /Headers)
+     * Store RAW filename for reliable lookups, display friendly label
+     * ========================= */
+
+    // Keys:
+    // - LN_REP_FILE_STORAGE_KEY: raw filename (e.g., "Gardner, Chase.png")
+    // - LN_REP_LABEL_STORAGE_KEY: friendly label
+    // - LN_REP_STORAGE_KEY: backward-compat "LN_Rep" value (we set this to RAW filename)
+    let LN_RepFile = "";
+    let LN_RepLabel = "";
+
+    const LN_REP_STORAGE_KEY       = "LNP_LN_REP";        // legacy / compat
+    const LN_REP_FILE_STORAGE_KEY  = "LNP_LN_REP_FILE";   // raw filename
+    const LN_REP_LABEL_STORAGE_KEY = "LNP_LN_REP_LABEL";  // friendly display label
+
+    // Repo + folder settings
+    const HEADERS_REPO_OWNER = "chase-gardner";
+    const HEADERS_REPO_NAME  = "LN-Presents";
+    const HEADERS_BRANCH     = "main";
+    const HEADERS_FOLDERS_TO_TRY = ["Header", "Headers", "headers", "header"];
+
+    // In-memory options so we can map label <-> raw
+    let headerOptions = []; // [{ raw, label }]
+
+    function setLnRepSelection({ raw, label }) {
+      LN_RepFile  = (raw || "").trim();
+      LN_RepLabel = (label || "").trim();
+
+      // Persist
+      try {
+        if (LN_RepFile)  localStorage.setItem(LN_REP_FILE_STORAGE_KEY, LN_RepFile);
+        else             localStorage.removeItem(LN_REP_FILE_STORAGE_KEY);
+
+        if (LN_RepLabel) localStorage.setItem(LN_REP_LABEL_STORAGE_KEY, LN_RepLabel);
+        else             localStorage.removeItem(LN_REP_LABEL_STORAGE_KEY);
+
+        // Backward compatibility: keep LN_Rep as RAW filename for reliable Presenter lookup
+        if (LN_RepFile)  localStorage.setItem(LN_REP_STORAGE_KEY, LN_RepFile);
+        else             localStorage.removeItem(LN_REP_STORAGE_KEY);
+      } catch (e) {}
+
+      // Display friendly label in the input
+      if (repHeaderSearch && repHeaderSearch.value !== LN_RepLabel) {
+        repHeaderSearch.value = LN_RepLabel;
+      }
+    }
+
+    function displayNameFromFilename(filename) {
+      const base = String(filename || "").replace(/\.[^.]+$/, "");
+      const parts = base.split(",").map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 2) return `${parts[1]}, ${parts[0]}`; // "First, Last" if filename is "Last, First"
+      return base.replace(/[_-]+/g, " ").trim() || filename;
+    }
+
+    function findOptionByLabel(label) {
+      const v = (label || "").trim();
+      return headerOptions.find(o => o.label === v) || null;
+    }
+
+    function findOptionByRaw(raw) {
+      const v = (raw || "").trim();
+      return headerOptions.find(o => o.raw === v) || null;
+    }
+
+    async function fetchFolderListing(folderName) {
+      const url =
+        `https://api.github.com/repos/${encodeURIComponent(HEADERS_REPO_OWNER)}/${encodeURIComponent(HEADERS_REPO_NAME)}` +
+        `/contents/${encodeURIComponent(folderName)}?ref=${encodeURIComponent(HEADERS_BRANCH)}`;
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`GitHub API ${res.status} for ${folderName}`);
+      return res.json();
+    }
+
+    async function loadHeaderFolderOptions() {
+      if (!repHeaderList) return;
+
+      // show loading
+      repHeaderList.innerHTML = "";
+      repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Loading…" }));
+
+      let items = null;
+      let lastErr = null;
+
+      for (const folder of HEADERS_FOLDERS_TO_TRY) {
+        try {
+          const data = await fetchFolderListing(folder);
+          if (Array.isArray(data)) { items = data; break; }
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+
+      repHeaderList.innerHTML = "";
+      headerOptions = [];
+
+      if (!items) {
+        console.error("Header list load failed:", lastErr);
+        repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Could not load headers" }));
+        return;
+      }
+
+      headerOptions = items
+        .filter(x => x && x.type === "file" && typeof x.name === "string" && /\.(jpe?g|png)$/i.test(x.name))
+        .map(x => ({ raw: x.name, label: displayNameFromFilename(x.name) }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      if (!headerOptions.length) {
+        repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "No headers found" }));
+        return;
+      }
+
+      // Populate datalist with FRIENDLY labels only (so the input shows label)
+      headerOptions.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt.label;
+        repHeaderList.appendChild(o);
+      });
+
+      // After options load, restore any saved selection into the input (label),
+      // while keeping raw available in storage.
+      try {
+        const savedLabel = localStorage.getItem(LN_REP_LABEL_STORAGE_KEY) || "";
+        const savedRaw   = localStorage.getItem(LN_REP_FILE_STORAGE_KEY) || localStorage.getItem(LN_REP_STORAGE_KEY) || "";
+
+        // Prefer saved label if it still matches an option
+        if (savedLabel) {
+          const match = findOptionByLabel(savedLabel);
+          if (match) {
+            setLnRepSelection(match);
+            return;
+          }
+        }
+
+        // Otherwise, if we have a raw filename, derive label from it and restore if possible
+        if (savedRaw) {
+          const matchByRaw = findOptionByRaw(savedRaw);
+          if (matchByRaw) {
+            setLnRepSelection(matchByRaw);
+            return;
+          }
+
+          // Fallback: show derived label even if not in list (rare)
+          const derivedLabel = displayNameFromFilename(savedRaw);
+          setLnRepSelection({ raw: savedRaw, label: derivedLabel });
+        }
+      } catch (e) {}
+    }
+
+    // When user selects a real option (label), store BOTH label + raw
+    function commitFromInputIfValid() {
+      const val = (repHeaderSearch?.value || "").trim();
+      if (!val) return;
+
+      const match = findOptionByLabel(val);
+      if (!match) return; // don’t persist arbitrary typing
+      setLnRepSelection(match);
+    }
+    /* =========================
+ * HEADER UPLOAD (IndexedDB + localStorage fallback)
  * ========================= */
 
-// Keys:
-// - LN_REP_FILE_STORAGE_KEY: raw filename (e.g., "Gardner, Chase.png")
-// - LN_REP_LABEL_STORAGE_KEY: friendly label (e.g., "Chase, Gardner" or "Gardner, Chase" depending on your formatter)
-// - LN_REP_STORAGE_KEY: backward-compat "LN_Rep" value (we set this to RAW filename)
-let LN_RepFile = "";
-let LN_RepLabel = "";
+// Storage keys (schema-versioned)
+const UPLOADED_HEADER_SCHEMA = 1;
+const UPLOADED_HEADER_META_KEY = "LNP_UPLOADED_HEADER_META_V1";
+const UPLOADED_HEADER_DATAURL_KEY = "LNP_UPLOADED_HEADER_DATAURL_V1"; // fallback only (may be removed if too big)
 
-const LN_REP_STORAGE_KEY       = "LNP_LN_REP";        // legacy / compat
-const LN_REP_FILE_STORAGE_KEY  = "LNP_LN_REP_FILE";   // raw filename
-const LN_REP_LABEL_STORAGE_KEY = "LNP_LN_REP_LABEL";  // friendly display label
+// IndexedDB settings
+const LNP_IDB_NAME = "LNPresentsDB";
+const LNP_IDB_VERSION = 1;
+const LNP_IDB_STORE = "kv";
+const LNP_IDB_KEY = "uploadedHeaderV1";
 
-// Repo + folder settings
-const HEADERS_REPO_OWNER = "chase-gardner";
-const HEADERS_REPO_NAME  = "LN-Presents";
-const HEADERS_BRANCH     = "main";
-const HEADERS_FOLDERS_TO_TRY = ["Header", "Headers", "headers", "header"];
-
-// In-memory options so we can map label <-> raw
-let headerOptions = []; // [{ raw, label }]
-
-function setLnRepSelection({ raw, label }) {
-  LN_RepFile  = (raw || "").trim();
-  LN_RepLabel = (label || "").trim();
-
-  // Persist
-  try {
-    if (LN_RepFile)  localStorage.setItem(LN_REP_FILE_STORAGE_KEY, LN_RepFile);
-    else             localStorage.removeItem(LN_REP_FILE_STORAGE_KEY);
-
-    if (LN_RepLabel) localStorage.setItem(LN_REP_LABEL_STORAGE_KEY, LN_RepLabel);
-    else             localStorage.removeItem(LN_REP_LABEL_STORAGE_KEY);
-
-    // Backward compatibility: keep LN_Rep as RAW filename for reliable Presenter lookup
-    if (LN_RepFile)  localStorage.setItem(LN_REP_STORAGE_KEY, LN_RepFile);
-    else             localStorage.removeItem(LN_REP_STORAGE_KEY);
-  } catch (e) {}
-
-  // Display friendly label in the input
-  if (repHeaderSearch && repHeaderSearch.value !== LN_RepLabel) {
-    repHeaderSearch.value = LN_RepLabel;
-  }
-}
-
-function displayNameFromFilename(filename) {
-  const base = String(filename || "").replace(/\.[^.]+$/, "");
-  const parts = base.split(",").map(s => s.trim()).filter(Boolean);
-  if (parts.length >= 2) return `${parts[1]}, ${parts[0]}`; // "First, Last" if filename is "Last, First"
-  return base.replace(/[_-]+/g, " ").trim() || filename;
-}
-
-function findOptionByLabel(label) {
-  const v = (label || "").trim();
-  return headerOptions.find(o => o.label === v) || null;
-}
-
-function findOptionByRaw(raw) {
-  const v = (raw || "").trim();
-  return headerOptions.find(o => o.raw === v) || null;
-}
-
-async function fetchFolderListing(folderName) {
-  const url =
-    `https://api.github.com/repos/${encodeURIComponent(HEADERS_REPO_OWNER)}/${encodeURIComponent(HEADERS_REPO_NAME)}` +
-    `/contents/${encodeURIComponent(folderName)}?ref=${encodeURIComponent(HEADERS_BRANCH)}`;
-
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`GitHub API ${res.status} for ${folderName}`);
-  return res.json();
-}
-
-async function loadHeaderFolderOptions() {
-  if (!repHeaderList) return;
-
-  // show loading
-  repHeaderList.innerHTML = "";
-  repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Loading…" }));
-
-  let items = null;
-  let lastErr = null;
-
-  for (const folder of HEADERS_FOLDERS_TO_TRY) {
-    try {
-      const data = await fetchFolderListing(folder);
-      if (Array.isArray(data)) { items = data; break; }
-    } catch (e) {
-      lastErr = e;
+function openLnpDb(){
+  return new Promise((resolve, reject) => {
+    try{
+      const req = indexedDB.open(LNP_IDB_NAME, LNP_IDB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(LNP_IDB_STORE)) db.createObjectStore(LNP_IDB_STORE);
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    } catch (e){
+      reject(e);
     }
-  }
-
-  repHeaderList.innerHTML = "";
-  headerOptions = [];
-
-  if (!items) {
-    console.error("Header list load failed:", lastErr);
-    repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "Could not load headers" }));
-    return;
-  }
-
-  headerOptions = items
-    .filter(x => x && x.type === "file" && typeof x.name === "string" && /\.(jpe?g|png)$/i.test(x.name))
-    .map(x => ({ raw: x.name, label: displayNameFromFilename(x.name) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-
-  if (!headerOptions.length) {
-    repHeaderList.appendChild(Object.assign(document.createElement("option"), { value: "No headers found" }));
-    return;
-  }
-
-  // Populate datalist with FRIENDLY labels only (so the input shows label)
-  headerOptions.forEach(opt => {
-    const o = document.createElement("option");
-    o.value = opt.label;
-    repHeaderList.appendChild(o);
   });
+}
 
-  // After options load, restore any saved selection into the input (label),
-  // while keeping raw available in storage.
-  try {
-    const savedLabel = localStorage.getItem(LN_REP_LABEL_STORAGE_KEY) || "";
-    const savedRaw   = localStorage.getItem(LN_REP_FILE_STORAGE_KEY) || localStorage.getItem(LN_REP_STORAGE_KEY) || "";
+async function idbSet(key, value){
+  const db = await openLnpDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(LNP_IDB_STORE, "readwrite");
+    tx.objectStore(LNP_IDB_STORE).put(value, key);
+    tx.oncomplete = () => { try{ db.close(); } catch(e){} resolve(true); };
+    tx.onerror = () => { try{ db.close(); } catch(e){} reject(tx.error); };
+  });
+}
 
-    // Prefer saved label if it still matches an option
-    if (savedLabel) {
-      const match = findOptionByLabel(savedLabel);
-      if (match) {
-        setLnRepSelection(match);
+async function idbGet(key){
+  const db = await openLnpDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(LNP_IDB_STORE, "readonly");
+    const req = tx.objectStore(LNP_IDB_STORE).get(key);
+    req.onsuccess = () => { try{ db.close(); } catch(e){} resolve(req.result); };
+    req.onerror = () => { try{ db.close(); } catch(e){} reject(req.error); };
+  });
+}
+
+async function idbDel(key){
+  const db = await openLnpDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(LNP_IDB_STORE, "readwrite");
+    tx.objectStore(LNP_IDB_STORE).delete(key);
+    tx.oncomplete = () => { try{ db.close(); } catch(e){} resolve(true); };
+    tx.onerror = () => { try{ db.close(); } catch(e){} reject(tx.error); };
+  });
+}
+
+function fileToDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function bytesToNice(n){
+  if (!Number.isFinite(n) || n <= 0) return "";
+  const kb = n / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
+  return `${(kb/1024).toFixed(2)} MB`;
+}
+
+// Best-effort: store in IDB; fallback to localStorage only if modest size
+async function storeUploadedHeader({ dataUrl, type, name, size }){
+  const meta = {
+    __schema: UPLOADED_HEADER_SCHEMA,
+    storedAt: new Date().toISOString(),
+    type: type || "",
+    name: name || "",
+    size: size || 0
+  };
+
+  // 1) Try IndexedDB first (best retention)
+  try{
+    await idbSet(LNP_IDB_KEY, { meta, dataUrl });
+    // Keep a small meta marker in localStorage so Presenter can know it's available
+    try{ localStorage.setItem(UPLOADED_HEADER_META_KEY, JSON.stringify(meta)); } catch(e){}
+    // Optional fallback dataURL (keep only if not huge)
+    try{
+      // Many browsers allow ~5MB in localStorage; keep a conservative limit.
+      if (dataUrl.length < 1_500_000) localStorage.setItem(UPLOADED_HEADER_DATAURL_KEY, dataUrl);
+      else localStorage.removeItem(UPLOADED_HEADER_DATAURL_KEY);
+    } catch(e){}
+    return true;
+  } catch (e){
+    console.warn("IndexedDB store failed; falling back to localStorage if possible:", e);
+  }
+
+  // 2) Fallback: localStorage dataURL (may fail if large)
+  try{
+    localStorage.setItem(UPLOADED_HEADER_META_KEY, JSON.stringify(meta));
+    localStorage.setItem(UPLOADED_HEADER_DATAURL_KEY, dataUrl);
+    return true;
+  } catch (e){
+    console.error("localStorage fallback failed (image likely too large):", e);
+    return false;
+  }
+}
+
+async function loadUploadedHeader(){
+  // 1) Try IndexedDB
+  try{
+    const obj = await idbGet(LNP_IDB_KEY);
+    if (obj && obj.dataUrl) return obj;
+  } catch(e){}
+
+  // 2) Try localStorage fallback
+  try{
+    const metaStr = localStorage.getItem(UPLOADED_HEADER_META_KEY);
+    const dataUrl = localStorage.getItem(UPLOADED_HEADER_DATAURL_KEY);
+    if (dataUrl) {
+      const meta = metaStr ? JSON.parse(metaStr) : { __schema: UPLOADED_HEADER_SCHEMA };
+      return { meta, dataUrl };
+    }
+  } catch(e){}
+
+  return null;
+}
+
+async function clearUploadedHeader(){
+  try{ await idbDel(LNP_IDB_KEY); } catch(e){}
+  try{ localStorage.removeItem(UPLOADED_HEADER_META_KEY); } catch(e){}
+  try{ localStorage.removeItem(UPLOADED_HEADER_DATAURL_KEY); } catch(e){}
+}
+
+function setHeaderPreview({ dataUrl, meta }){
+  if (!headerPreviewImg || !headerPreviewStatus) return;
+
+  if (!dataUrl) {
+    headerPreviewImg.style.display = "none";
+    headerPreviewImg.src = "";
+    headerPreviewStatus.textContent = "No uploaded header yet.";
+    if (headerPreviewInfo) headerPreviewInfo.textContent = "";
+    return;
+  }
+
+  headerPreviewImg.src = dataUrl;
+  headerPreviewImg.style.display = "block";
+
+  const name = meta?.name ? ` • ${meta.name}` : "";
+  const size = meta?.size ? ` • ${bytesToNice(meta.size)}` : "";
+  headerPreviewStatus.textContent = "Uploaded header will be used in Presenter.";
+}
+
+async function initHeaderUploadUi(){
+  const existing = await loadUploadedHeader();
+  setHeaderPreview({ dataUrl: existing?.dataUrl || "", meta: existing?.meta });
+
+  if (headerUploadInput) {
+    headerUploadInput.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const isOk = /image\/(png|jpeg)/i.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
+      if (!isOk) {
+        alert("Please upload a JPG or PNG file.");
+        e.target.value = "";
         return;
       }
-    }
 
-    // Otherwise, if we have a raw filename, derive label from it and restore if possible
-    if (savedRaw) {
-      const matchByRaw = findOptionByRaw(savedRaw);
-      if (matchByRaw) {
-        setLnRepSelection(matchByRaw);
-        return;
+      // Optional guardrail: huge images bloat storage; still try, but warn
+      if (file.size > 6 * 1024 * 1024) {
+        const ok = confirm("That image is larger than 6MB. It may not persist reliably in browser storage. Continue?");
+        if (!ok) { e.target.value = ""; return; }
       }
 
-      // Fallback: show derived label even if not in list (rare)
-      const derivedLabel = displayNameFromFilename(savedRaw);
-      setLnRepSelection({ raw: savedRaw, label: derivedLabel });
+      try{
+        const dataUrl = await fileToDataUrl(file);
+        const ok = await storeUploadedHeader({
+          dataUrl,
+          type: file.type,
+          name: file.name,
+          size: file.size
+        });
+
+        if (!ok) {
+          alert("Could not store this header (likely too large). Try a smaller image.");
+          e.target.value = "";
+          return;
+        }
+
+        // IMPORTANT: uploaded header should take precedence over repo selection in Presenter
+        // We'll keep the dropdown selection intact, but Presenter will prefer uploaded dataUrl.
+        setHeaderPreview({
+          dataUrl,
+          meta: { name: file.name, size: file.size, type: file.type }
+        });
+
+        // Rebuild config so Presenter has it immediately
+        buildAppConfigFromState(state);
+        persistNow();
+        alert("Header uploaded and saved for Presenter on this device.");
+      } catch(err){
+        console.error(err);
+        alert("Upload failed. Please try again.");
+      } finally {
+        e.target.value = "";
+      }
+    });
+  }
+
+  if (clearUploadedHeaderBtn) {
+    clearUploadedHeaderBtn.addEventListener("click", async () => {
+      const ok = confirm("Clear the uploaded header from this device/browser?");
+      if (!ok) return;
+      await clearUploadedHeader();
+      setHeaderPreview({ dataUrl: "", meta: null });
+      buildAppConfigFromState(state);
+      persistNow();
+    });
+  }
+}
+
+// boot it
+initHeaderUploadUi();
+
+    if (repHeaderSearch) {
+      repHeaderSearch.addEventListener("change", commitFromInputIfValid);
+      repHeaderSearch.addEventListener("input", commitFromInputIfValid); // Safari-friendly
     }
-  } catch (e) {}
-}
 
-// When user selects a real option (label), store BOTH label + raw
-function commitFromInputIfValid() {
-  const val = (repHeaderSearch?.value || "").trim();
-  if (!val) return;
+    // Submit header email button (unchanged)
+    if (submitHeaderBtn) {
+      submitHeaderBtn.addEventListener("click", (e) => {
+        e.preventDefault();
 
-  const match = findOptionByLabel(val);
-  if (!match) return; // don’t persist arbitrary typing
-  setLnRepSelection(match);
-}
-
-if (repHeaderSearch) {
-  repHeaderSearch.addEventListener("change", commitFromInputIfValid);
-  repHeaderSearch.addEventListener("input", commitFromInputIfValid); // Safari-friendly
-}
-
-// Submit header email button (unchanged)
-if (submitHeaderBtn) {
-  submitHeaderBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    const to = "chase.lawarregardner@lexisnexis.com";
-    const subject = "LNPresents Header Submission";
-    const body =
+        const to = "chase.lawarregardner@lexisnexis.com";
+        const subject = "LNPresents Header Submission";
+        const body =
 `Hello,
 
 You have opted to submit your header to be displayed on LNPresents. This is a great way to personalize your presentations and maintain a consistent image across communication channels. To submit your header please:
@@ -1547,17 +2168,17 @@ You have opted to submit your header to be displayed on LNPresents. This is a gr
 Thanks,
 LNPresents Support`;
 
-    const mailto =
-      `mailto:${encodeURIComponent(to)}` +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`;
+        const mailto =
+          `mailto:${encodeURIComponent(to)}` +
+          `?subject=${encodeURIComponent(subject)}` +
+          `&body=${encodeURIComponent(body)}`;
 
-    window.location.assign(mailto);
-  });
-}
+        window.location.assign(mailto);
+      });
+    }
 
-// Load headers on boot
-loadHeaderFolderOptions();
+    // Load headers on boot
+    loadHeaderFolderOptions();
 
     /* =========================
      * C) TERM DEFINITIONS
@@ -1583,35 +2204,44 @@ loadHeaderFolderOptions();
      * ========================= */
     const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
 
-   function makeEmptyPlan() {
-    return {
-      __id: "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8),
-      clgPlatform: "",
-      clgPriceCents: null,
-      clgPrice: "",
-      clgContents: ""
-    };
-   }
-
+    function makeEmptyPlan() {
+      return {
+        __id: "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8),
+        clgPlatform: "",
+        clgPriceCents: null,
+        clgPrice: "",
+        clgContents: ""
+      };
+    }
 
     const state = {
       clgFirmName: saved.clgFirmName || "",
       clgNumAttorneys: saved.clgNumAttorneys || "",
       clgYoyIncrease: saved.clgYoyIncrease || "",
       clgIncentive: saved.clgIncentive || "",
+      clgCurrentSpend: saved.clgCurrentSpend || "",
+      clgEffectiveDate: saved.clgEffectiveDate || "",
+      clgActivationDate: saved.clgActivationDate || "",
+      clgCurrentTermEnd: saved.clgCurrentTermEnd || "",
+      clgTermEndDate: saved.clgTermEndDate || "",
+      clgExtensionTermEnd: saved.clgExtensionTermEnd || "",
+      clgExtensionTerm: saved.clgExtensionTerm || "",
+      clgnbExtensionTerm: saved.clgnbExtensionTerm || "",
+      clgIntroPrice: saved.clgIntroPrice || "",
+      clgTermStartDate: saved.clgTermStartDate || "",
       clgSelectedTerms: Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [],
       clgPlans: Array.isArray(saved.clgPlans) && saved.clgPlans.length ? saved.clgPlans : [makeEmptyPlan()]
     };
 
     function ensurePlanIds() {
-  if (!Array.isArray(state.clgPlans)) state.clgPlans = [makeEmptyPlan()];
-  state.clgPlans = state.clgPlans.map(p => {
-    if (!p || typeof p !== "object") p = {};
-    if (!p.__id) p.__id = "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
-    return p;
-  });
-}
-ensurePlanIds();
+      if (!Array.isArray(state.clgPlans)) state.clgPlans = [makeEmptyPlan()];
+      state.clgPlans = state.clgPlans.map(p => {
+        if (!p || typeof p !== "object") p = {};
+        if (!p.__id) p.__id = "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+        return p;
+      });
+    }
+    ensurePlanIds();
 
     // NEW: snapshot -> used by Save & profile download
     function buildProfilePayload() {
@@ -1681,6 +2311,7 @@ ensurePlanIds();
       ensurePlanIds();
       hydrateFormFromState();
       renderPlans();
+      persistNow();
 
       const toSave = buildProfilePayload();
       localStorage.setItem("clgFormVars", JSON.stringify(toSave));
@@ -1871,6 +2502,11 @@ ensurePlanIds();
       blockifyTopLevel(doc);
       doc.querySelectorAll('h1,h2,h3').forEach(h => { if (!h.textContent.trim()) h.remove(); });
       return doc.body.innerHTML || '<p><br></p>';
+
+      doc.querySelectorAll('p').forEach(p => {
+      p.innerHTML = p.innerHTML.replace(/^[\s•\-–—]+/g, '• ');
+      });
+
     }
 
     function normalizeForStorage(html){
@@ -2124,7 +2760,7 @@ ensurePlanIds();
         cb.setAttribute("data-term-option", term.key);
         const box = document.createElement("span");
         box.className = "box";
-        cb.checked = term.defaultSelected === true;
+        cb.checked = Array.isArray(state.clgSelectedTerms) && state.clgSelectedTerms.includes(term.key);
         checkWrap.appendChild(cb);
         checkWrap.appendChild(box);
 
@@ -2162,18 +2798,17 @@ ensurePlanIds();
       state.clgPlans.forEach((plan, idx) => {
         const card = document.createElement("div");
         card.className = "plan-card";
-        card.setAttribute("draggable", "false");
+        card.setAttribute("draggable", "true");       /* enable drag on card */
         card.dataset.planId = plan.__id;
 
         card.innerHTML = `
           <div class="plan-card-header">
             <div class="plan-card-title">Plan ${idx + 1}</div>
             <div style="display:flex; gap:8px; align-items:center;">
-            <button type="button" class="plan-drag-handle" hidden aria-hidden="true"</button>
-            <button type="button" class="secondary" data-remove="${idx}">Remove</button>
+              <!-- FIXED: handle is real + visible -->
+              <button type="button" class="secondary" data-remove="${idx}">Remove</button>
             </div>
-         </div>
-
+          </div>
 
           <div class="plan-card-topfields">
             <div class="field">
@@ -2206,11 +2841,11 @@ ensurePlanIds();
               <button type="button" data-cmd="removeFormat" title="Clear formatting">Clear</button>
             </div>
 
-           <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
+            <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
               data-plan-idx="${idx}" data-plan-field="clgContents"
               placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets and links supported.">
               ${(plan.clgContents || '').trim() || '<p><br></p>'}
-           </div>
+            </div>
 
             <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K for links.</small>
           </div>
@@ -2220,7 +2855,6 @@ ensurePlanIds();
 
       // keep ids stable
       ensurePlanIds();
-
 
       if (state.clgPlans.length >= MAX_PLANS) {
         addPlanBtn.disabled = true; addPlanBtn.textContent = "Max plans reached";
@@ -2264,32 +2898,48 @@ ensurePlanIds();
         contentsHtml: plan.clgContents || ""
       }));
 
-// Keep Rep header selection available to the Presenter (raw + label)
-let repFile = "";
-let repLabel = "";
-try {
-  repFile  = localStorage.getItem("LNP_LN_REP_FILE")  || localStorage.getItem("LNP_LN_REP") || "";
-  repLabel = localStorage.getItem("LNP_LN_REP_LABEL") || "";
-} catch (e) {
-  repFile = "";
-  repLabel = "";
-}
+      // Keep Rep header selection available to the Presenter (raw + label)
+      let repFile = "";
+      let repLabel = "";
+      try {
+        repFile  = localStorage.getItem("LNP_LN_REP_FILE")  || localStorage.getItem("LNP_LN_REP") || "";
+        repLabel = localStorage.getItem("LNP_LN_REP_LABEL") || "";
+      } catch (e) {
+        repFile = "";
+        repLabel = "";
+      }
+      // NEW: pull uploaded header (best-effort) so Presenter can use it
+let uploadedHeaderDataUrl = "";
+let uploadedHeaderMeta = null;
 
-window.APP_CONFIG = {
-  ui: {
-    companyName: s.clgFirmName || "Default Firm",
-    subhead: s.clgIncentive || "",
-    terms: delivered,
-    plans: plans,
+try{
+  // Prefer IDB, fallback to localStorage
+  // Note: buildAppConfigFromState isn't async; we rely on localStorage fallback being present.
+  const metaStr = localStorage.getItem("LNP_UPLOADED_HEADER_META_V1");
+  const dataUrl = localStorage.getItem("LNP_UPLOADED_HEADER_DATAURL_V1");
+  if (dataUrl) uploadedHeaderDataUrl = dataUrl;
+  if (metaStr) uploadedHeaderMeta = JSON.parse(metaStr);
+} catch(e){}
 
-    // Backward-compatible (now RAW filename)
-    LN_Rep: repFile,
 
-    // New explicit fields
-    LN_RepFile: repFile,
-    LN_RepLabel: repLabel
-  }
-};
+      window.APP_CONFIG = {
+        ui: {
+          companyName: s.clgFirmName || "Default Firm",
+          subhead: s.clgIncentive || "",
+          terms: delivered,
+          plans: plans,
+
+          // Backward-compatible (now RAW filename)
+          LN_Rep: repFile,
+
+          // New explicit fields
+          LN_RepFile: repFile,
+          LN_RepLabel: repLabel,
+          uploadedHeaderDataUrl: uploadedHeaderDataUrl || "",
+          uploadedHeaderMeta: uploadedHeaderMeta || null
+
+        }
+      };
     }
 
     /* =========================
@@ -2441,7 +3091,9 @@ window.APP_CONFIG = {
     function syncPlanContents(idx, editor){
       sanitizeAndReplaceIfChanged(editor);
       if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
+      persistNow();
     }
+
 
     function insertLinkWithLabel(editor){
       const url = prompt('Link URL:');
@@ -2480,6 +3132,18 @@ window.APP_CONFIG = {
     // Render term panels
     renderTermPanel(retentionHost, retentionTerms);
     renderTermPanel(newBizHost, newBizTerms);
+    hydrateFormFromState();
+
+    const STORAGE_KEY = "clgFormVars";
+const STORAGE_SCHEMA = 1;
+
+function persistNow(){
+  const payload = {
+    __schema: STORAGE_SCHEMA,
+    ...buildProfilePayload()
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e){}
+}
 
     // Tabs
     tabs.forEach(btn => {
@@ -2522,110 +3186,102 @@ window.APP_CONFIG = {
     // Plans initial render
     renderPlans();
 
-/* =========================
- * Plans: drag to reorder (handle-only, grid-safe)
- * ========================= */
-let dragEl = null;
+    /* =========================
+     * Plans: drag to reorder (handle-only, grid-safe)
+     * ========================= */
+    let dragEl = null;
 
-function reorderStateFromDom() {
-  const cards = [...plansContainer.querySelectorAll(".plan-card[data-plan-id]")];
-  const ids = cards.map(c => c.dataset.planId);
-  const byId = new Map((state.clgPlans || []).map(p => [p.__id, p]));
-  const next = ids.map(id => byId.get(id)).filter(Boolean);
-  if (!next.length) return;
+    function reorderStateFromDom() {
+      const cards = [...plansContainer.querySelectorAll(".plan-card[data-plan-id]")];
+      const ids = cards.map(c => c.dataset.planId);
+      const byId = new Map((state.clgPlans || []).map(p => [p.__id, p]));
+      const next = ids.map(id => byId.get(id)).filter(Boolean);
+      if (!next.length) return;
 
-  state.clgPlans = next;
-  renderPlans();                  // rebind data-plan-idx correctly
-  buildAppConfigFromState(state); // keep Presenter config accurate
-}
-
-// Pick the card whose CENTER is closest to the pointer (works for grid)
-function getClosestCard(container, x, y) {
-  const cards = [...container.querySelectorAll(".plan-card:not(.is-dragging)")];
-  let best = null;
-  let bestDist = Infinity;
-
-  for (const el of cards) {
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    const dx = x - cx;
-    const dy = y - cy;
-    const dist = (dx * dx) + (dy * dy);
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = { el, rect: r, cx, cy };
+      state.clgPlans = next;
+      renderPlans();
+      buildAppConfigFromState(state);
     }
-  }
-  return best; // { el, rect, cx, cy } or null
-}
 
-plansContainer.addEventListener("dragstart", (e) => {
-  const handle = e.target.closest('[data-drag-handle="1"]');
-  if (!handle) return; // only handle initiates drag
+    function getClosestCard(container, x, y) {
+      const cards = [...container.querySelectorAll(".plan-card:not(.is-dragging)")];
+      let best = null;
+      let bestDist = Infinity;
 
-  const card = handle.closest(".plan-card");
-  if (!card) return;
+      for (const el of cards) {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = (dx * dx) + (dy * dy);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = { el, rect: r, cx, cy };
+        }
+      }
+      return best;
+    }
 
-  dragEl = card;
-  card.classList.add("is-dragging");
+    plansContainer.addEventListener("dragstart", (e) => {
+      const handle = e.target.closest('[data-drag-handle="1"]');
+      if (!handle) { e.preventDefault(); return; }
 
-  // Required for Firefox (must set some data)
-  try { e.dataTransfer.setData("text/plain", card.dataset.planId || "plan"); } catch {}
-  e.dataTransfer.effectAllowed = "move";
+      const card = handle.closest(".plan-card");
+      if (!card) return;
 
-  // Prevent weird “ghost image” from nested content
-  try {
-    const ghost = card.cloneNode(true);
-    ghost.style.position = "fixed";
-    ghost.style.top = "-9999px";
-    ghost.style.left = "-9999px";
-    ghost.style.width = card.getBoundingClientRect().width + "px";
-    document.body.appendChild(ghost);
-    e.dataTransfer.setDragImage(ghost, 20, 20);
-    setTimeout(() => ghost.remove(), 0);
-  } catch {}
-});
+      dragEl = card;
+      card.classList.add("is-dragging");
 
-plansContainer.addEventListener("dragover", (e) => {
-  if (!dragEl) return;
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "move";
+      try { e.dataTransfer.setData("text/plain", card.dataset.planId || "plan"); } catch {}
+      e.dataTransfer.effectAllowed = "move";
 
-  const hit = getClosestCard(plansContainer, e.clientX, e.clientY);
-  if (!hit || !hit.el || hit.el === dragEl) return;
+      try {
+        const ghost = card.cloneNode(true);
+        ghost.style.position = "fixed";
+        ghost.style.top = "-9999px";
+        ghost.style.left = "-9999px";
+        ghost.style.width = card.getBoundingClientRect().width + "px";
+        document.body.appendChild(ghost);
+        e.dataTransfer.setDragImage(ghost, 20, 20);
+        setTimeout(() => ghost.remove(), 0);
+      } catch {}
+    });
 
-  // Clear old cue + set new
-  plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-  hit.el.classList.add("drop-target");
+    plansContainer.addEventListener("dragover", (e) => {
+      if (!dragEl) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
 
-  // Decide before/after based on pointer position relative to the hit card’s center.
-  // For grids, this is stable and feels natural.
-  const after =
-    (e.clientY > hit.cy) ||
-    (Math.abs(e.clientY - hit.cy) < 6 && e.clientX > hit.cx);
+      const hit = getClosestCard(plansContainer, e.clientX, e.clientY);
+      if (!hit || !hit.el || hit.el === dragEl) return;
 
-  if (after) {
-    const next = hit.el.nextElementSibling;
-    if (next !== dragEl) plansContainer.insertBefore(dragEl, next);
-  } else {
-    if (hit.el !== dragEl) plansContainer.insertBefore(dragEl, hit.el);
-  }
-});
+      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
+      hit.el.classList.add("drop-target");
 
-plansContainer.addEventListener("drop", (e) => {
-  if (!dragEl) return;
-  e.preventDefault();
-});
+      const after =
+        (e.clientY > hit.cy) ||
+        (Math.abs(e.clientY - hit.cy) < 6 && e.clientX > hit.cx);
 
-plansContainer.addEventListener("dragend", () => {
-  if (dragEl) dragEl.classList.remove("is-dragging");
-  plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-  dragEl = null;
+      if (after) {
+        const next = hit.el.nextElementSibling;
+        if (next !== dragEl) plansContainer.insertBefore(dragEl, next);
+      } else {
+        if (hit.el !== dragEl) plansContainer.insertBefore(dragEl, hit.el);
+      }
+    });
 
-  // finalize order -> update state based on DOM order
-  reorderStateFromDom();
-});
+    plansContainer.addEventListener("drop", (e) => {
+      if (!dragEl) return;
+      e.preventDefault();
+    });
+
+    plansContainer.addEventListener("dragend", () => {
+      if (dragEl) dragEl.classList.remove("is-dragging");
+      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
+      dragEl = null;
+      reorderStateFromDom();
+    });
 
     // Plan inputs
     plansContainer.addEventListener("input", function (e) {
@@ -2705,6 +3361,7 @@ plansContainer.addEventListener("dragend", () => {
       }
 
       state[key] = e.target.value;
+      persistNow();
     });
 
     // Term checkbox selection
@@ -2722,6 +3379,7 @@ plansContainer.addEventListener("dragend", () => {
         selected = selected.filter(k => k !== termKey);
       }
       state.clgSelectedTerms = selected;
+      persistNow();
     });
 
     // Export -> HTML file
@@ -2904,7 +3562,6 @@ plansContainer.addEventListener("dragend", () => {
     plansContainer.addEventListener('focusout', (e)=>{
       const editor = e.target.closest('.plan-contents[contenteditable]');
       if (!editor) return;
-      sanitizeAndReplaceIfChanged(editor);
       convertFontTagsToSpan(editor);
       const idx = Number(editor.getAttribute('data-plan-idx'));
       if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
@@ -3048,6 +3705,7 @@ plansContainer.addEventListener("dragend", () => {
 
   });
 </script>
+
 <script>
 (function(){
   const body = document.body;
@@ -3057,9 +3715,6 @@ plansContainer.addEventListener("dragend", () => {
 
   if (!openBtn || !closeBtn || !overlay) return;
 
-  function openPanel(){
-    body.classList.add('sidebar-open');
-  }
   function closePanel(){
     body.classList.remove('sidebar-open');
   }
@@ -3081,6 +3736,7 @@ plansContainer.addEventListener("dragend", () => {
   });
 })();
 </script>
+
 <script>
 (function () {
   function ready(fn){ if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
