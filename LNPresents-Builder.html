@@ -593,22 +593,24 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
 .terms-classic-grid{
-  display:grid;
-  grid-template-columns: 1fr;
+  display:flex;
+  flex-wrap:nowrap;
   gap: 8px;
-}
-@media (min-width: 880px){
-  .terms-classic-grid{ grid-template-columns: 1fr 1fr 1fr; }
+  overflow-x:auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 12px 1fr;
-  gap:10px;
-  align-items:start;
-  padding: 10px 10px;
-  border-radius: 14px;
+  grid-template-columns: 14px minmax(90px, 120px) minmax(150px, 200px);
+  gap:8px;
+  align-items:center;
+  padding: 8px 10px;
+  border-radius: 12px;
   border: 1px solid rgba(15,23,42,.10);
   background: rgba(255,255,255,.92);
+  min-width: max-content;
+  scroll-snap-align: start;
 }
 .terms-classic-row .term-label{
   white-space:normal;
@@ -616,7 +618,7 @@ input:focus, select:focus, textarea:focus{
   text-overflow:clip;
   font-size:.74rem;
 }
-.terms-classic-row .term-input{ margin-top:6px; }
+.terms-classic-row .term-input{ margin-top:0; }
 .terms-classic-row input,
 .terms-classic-row select{
   width:100%;
