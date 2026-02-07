@@ -255,7 +255,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .selector-label{
-  width: 110%;
+  width: 100%;
+  max-width: 100%;
   display: grid;
   place-items: center;
   text-align: center;
@@ -287,6 +288,7 @@ a { color: inherit; text-decoration: none; }
 #termRadios{
   display:flex;
   width:100%;
+  max-width: 100%;
   flex-wrap:wrap;
   gap:8px 10px;
   justify-content:center;
@@ -306,6 +308,7 @@ a { color: inherit; text-decoration: none; }
   cursor:pointer;
   user-select:none;
   white-space:nowrap;
+  max-width: 100%;
   transition:
     transform .15s ease,
     box-shadow .15s ease,

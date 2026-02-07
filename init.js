@@ -569,6 +569,17 @@
     if (!filename) filename = buildPdfFilename();
 
     const printNode = makePrintNode(root);
+    const printWrapper = document.createElement('div');
+    printWrapper.style.position = 'fixed';
+    printWrapper.style.left = '-9999px';
+    printWrapper.style.top = '0';
+    const rootWidth = root.offsetWidth || 1;
+    const rootHeight = root.offsetHeight || 1;
+    printWrapper.style.width = `${rootWidth}px`;
+    printWrapper.style.height = `${rootHeight}px`;
+    printWrapper.style.overflow = 'hidden';
+    printWrapper.appendChild(printNode);
+    document.body.appendChild(printWrapper);
 
     const opt = {
       margin,
@@ -612,6 +623,10 @@
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
+    } finally {
+      if (printWrapper.parentNode) {
+        printWrapper.parentNode.removeChild(printWrapper);
+      }
     }
   }
 
