@@ -120,7 +120,21 @@
       }
 
       const ctaEl = frag.querySelector('.plan-card__cta');
-      if (ctaEl) ctaEl.textContent = p.cta || 'Select plan';
+      if (ctaEl) {
+        const ctaUrl = (p.ctaUrl || '').trim();
+        const ctaLabel = (p.ctaLabel || p.cta || (ctaUrl ? 'Learn more' : 'Select plan')).trim();
+        ctaEl.textContent = ctaLabel || 'Select plan';
+        if (ctaUrl) {
+          ctaEl.dataset.href = ctaUrl;
+          ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
+          ctaEl.addEventListener('click', () => {
+            window.open(ctaUrl, '_blank', 'noopener');
+          });
+        } else {
+          ctaEl.removeAttribute('data-href');
+          ctaEl.removeAttribute('aria-label');
+        }
+      }
 
       const termsWrap = frag.querySelector('.plan-card__terms');
       const termsList = frag.querySelector('.plan-card__terms-list');
