@@ -423,11 +423,16 @@ h1,h2,h3{ margin:0; }
 }
 
 /* 8) Grids */
-.top-grid{ display:grid; gap:12px; }
+.top-grid{
+  display:grid;
+  gap:12px;
+  min-width:0;
+}
 .top-simple{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 10px 12px;
+  min-width:0;
 }
 /* Top terms grid: slightly tighter + better responsive fit */
 .top-term-row{
@@ -578,6 +583,8 @@ input:focus, select:focus, textarea:focus{
   border-radius: var(--radius-lg);
   border: 1px solid rgba(15,23,42,.08);
   background: rgba(15,23,42,.03);
+  max-width: 100%;
+  overflow: hidden;
 }
 .terms-classic-panel__head{
   display:flex;
@@ -597,6 +604,8 @@ input:focus, select:focus, textarea:focus{
   flex-wrap:nowrap;
   gap: 8px;
   overflow-x:auto;
+  max-width: 100%;
+  min-width: 0;
   padding-bottom: 4px;
   scroll-snap-type: x proximity;
 }
