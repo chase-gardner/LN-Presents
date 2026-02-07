@@ -601,31 +601,33 @@ input:focus, select:focus, textarea:focus{
 .terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
 .terms-classic-grid{
   display:flex;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
   gap: 8px;
-  overflow-x:auto;
+  overflow: hidden;
   max-width: 100%;
   min-width: 0;
   padding-bottom: 4px;
-  scroll-snap-type: x proximity;
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 14px minmax(90px, 120px) minmax(140px, 1fr);
+  grid-template-columns: 14px minmax(70px, 1fr) minmax(90px, 1.2fr);
   gap:8px;
   align-items:center;
   padding: 8px 10px;
   border-radius: 12px;
   border: 1px solid rgba(15,23,42,.10);
   background: rgba(255,255,255,.92);
-  min-width: max-content;
-  scroll-snap-align: start;
+  flex: 1 1 calc(33.333% - 6px);
+  min-width: 0;
 }
 .terms-classic-row .term-label{
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
   font-size:.74rem;
+  text-align:center;
+  line-height:1.15;
+  word-break:break-word;
 }
 .terms-classic-row .term-input{ margin-top:0; min-width:0; }
 .terms-classic-row input,
