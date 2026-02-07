@@ -758,7 +758,7 @@ input:focus, select:focus, textarea:focus{
 
 /* Per-plan inputs — compact + clean */
 .term-active-row .term-plan-input{
-  padding: 7px 7px;
+  padding: 8px 9px;
   border-radius: 12px;
   border: 1px solid rgba(15,23,42,.08);
   background: rgba(15,23,42,.02);
@@ -777,13 +777,15 @@ input:focus, select:focus, textarea:focus{
 /* Compact field controls */
 .term-active-row .term-plan-input input,
 .term-active-row .term-plan-input select{
-  height: 32px;
+  height: 34px;
   padding: 0 10px;
-  font-size: .86rem;
+  font-size: .88rem;
   border-radius: 10px;
   border: 1px solid rgba(15,23,42,.12);
   background: rgba(255,255,255,.98);
   box-shadow: none;
+  min-width: 0;
+  flex: 1 1 160px;
 }
 
 /* Stop oversized dropdown arrow spacing */
@@ -793,7 +795,7 @@ input:focus, select:focus, textarea:focus{
 
 /* Tighten grid spacing */
 .term-active-row .term-plan-grid{
-  gap: 7px;
+  gap: 9px;
 }
 
 /* Optional: make rows visually thinner overall */
@@ -814,7 +816,8 @@ input:focus, select:focus, textarea:focus{
     display:flex;
     align-items:center;
     gap:8px;
-    padding: 6px 8px;
+    padding: 8px 9px;
+    flex-wrap: wrap;
   }
   .term-active-row .term-plan-chip{
     margin:0;
@@ -1200,24 +1203,25 @@ input:focus, select:focus, textarea:focus{
 .term-plan-grid{
   display:grid;
   grid-template-columns: 1fr;
-  gap:6px; /* tighter */
+  gap:8px; /* slightly roomier */
 }
 
 @media (min-width: 760px){
-  .term-plan-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .term-plan-grid{ grid-template-columns: repeat(2, minmax(200px, 1fr)); }
 }
 
 @media (min-width: 1020px){
-  .term-plan-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .term-plan-grid{ grid-template-columns: repeat(3, minmax(220px, 1fr)); }
 }
 
 
 .term-plan-input{
   display:flex;
   align-items:center;
-  gap:6px;
-  padding: 6px 7px;
+  gap:8px;
+  padding: 8px 9px;
   border-radius: 12px;
+  flex-wrap: wrap;
 }
 
 .term-plan-chip{
@@ -1229,10 +1233,12 @@ input:focus, select:focus, textarea:focus{
 
 .term-plan-input input,
 .term-plan-input select{
-  height: 32px;
+  height: 34px;
   border-radius: 10px;
-  font-size: .84rem;
+  font-size: .86rem;
   padding: 0 10px;
+  min-width: 0;
+  flex: 1 1 160px;
 }
 
 .term-row--dragging{ opacity:.55; }
@@ -3057,7 +3063,9 @@ LNPresents Support`;
         clgPlatform: "",
         clgPriceCents: null,
         clgPrice: "",
-        clgContents: ""
+        clgContents: "",
+        clgCtaLabel: "",
+        clgCtaUrl: ""
       };
     }
 
@@ -3085,6 +3093,8 @@ LNPresents Support`;
       state.clgPlans = state.clgPlans.map(p => {
         if (!p || typeof p !== "object") p = {};
         if (!p.__id) p.__id = "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+        if (p.clgCtaLabel == null) p.clgCtaLabel = "";
+        if (p.clgCtaUrl == null) p.clgCtaUrl = "";
         return p;
       });
     }
@@ -4037,8 +4047,7 @@ LNPresents Support`;
               <button type="button" data-cmd="underline" title="Underline (⌘/Ctrl+U)"><u>U</u></button>
               <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">• • •</button>
               <button type="button" data-cmd="insertOrderedList" title="Numbered list">1.</button>
-              <button type="button" data-cmd="createLink" title="Add link (⌘/Ctrl+K)">Link</button>
-              <button type="button" class="rte-color-btn"></button>
+              <button type="button" data-cmd="createLink" title="Set plan CTA (⌘/Ctrl+K)">CTA Link</button>
               <input type="color" class="rte-color" aria-label="Text color">
               <select data-size-select class="rte-size-select" aria-label="Text size">
                 <option value="body">Body</option>
@@ -4050,11 +4059,14 @@ LNPresents Support`;
 
             <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
               data-plan-idx="${idx}" data-plan-field="clgContents"
-              placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets and links supported.">
+              placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets supported.">
               ${(plan.clgContents || '').trim() || '<p><br></p>'}
             </div>
 
-            <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K for links.</small>
+            <small class="muted-text" data-plan-cta-summary>
+              ${formatPlanCtaSummary(plan)}
+            </small>
+            <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K sets the plan CTA.</small>
           </div>
         `;
         plansContainer.appendChild(card);
@@ -4068,6 +4080,35 @@ LNPresents Support`;
       } else {
         addPlanBtn.disabled = false; addPlanBtn.textContent = "+ Add Plan";
       }
+    }
+
+    function formatPlanCtaSummary(plan) {
+      const label = (plan?.clgCtaLabel || "").trim();
+      const url = (plan?.clgCtaUrl || "").trim();
+      if (!label && !url) return "CTA button: Not set";
+      const displayLabel = label || "Learn more";
+      return url ? `CTA button: ${displayLabel} — ${url}` : `CTA button: ${displayLabel} (URL missing)`;
+    }
+
+    function updatePlanCtaSummary(card, plan) {
+      const summaryEl = card?.querySelector('[data-plan-cta-summary]');
+      if (!summaryEl) return;
+      summaryEl.textContent = formatPlanCtaSummary(plan);
+    }
+
+    function setPlanCtaFromPrompt(idx, card) {
+      const plan = state.clgPlans[idx];
+      if (!plan) return;
+      const currentUrl = plan.clgCtaUrl || "";
+      const currentLabel = plan.clgCtaLabel || "";
+      const urlInput = prompt("CTA URL (leave blank to clear):", currentUrl);
+      if (urlInput === null) return;
+      const labelInput = prompt("CTA button label:", currentLabel);
+      if (labelInput === null) return;
+      plan.clgCtaUrl = String(urlInput || "").trim();
+      plan.clgCtaLabel = String(labelInput || "").trim();
+      updatePlanCtaSummary(card, plan);
+      persistNow();
     }
 
     function buildAppConfigFromState(s) {
@@ -4143,7 +4184,10 @@ LNPresents Support`;
           title: plan.clgPlatform || `Plan ${idx + 1}`,
           price: plan.clgPrice || "",
           contentsHtml: plan.clgContents || "",
-          terms: planTerms
+          terms: planTerms,
+          cta: plan.clgCtaLabel || "",
+          ctaLabel: plan.clgCtaLabel || "",
+          ctaUrl: plan.clgCtaUrl || ""
         };
       });
 
@@ -4343,30 +4387,6 @@ try{
       persistNow();
     }
 
-
-    function insertLinkWithLabel(editor){
-      const url = prompt('Link URL:');
-      if (!url) return;
-      const label = prompt('Link label (text to show):');
-      if (!label) return;
-
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
-      let range = sel.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) return;
-
-      range.deleteContents();
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = label;
-      range.insertNode(a);
-
-      range = document.createRange();
-      range.setStartAfter(a); range.collapse(true);
-      sel.removeAllRanges(); sel.addRange(range);
-    }
 
     /* =========================
      * H) EVENT WIRING
@@ -4767,6 +4787,7 @@ function persistNow(){
     plansContainer.addEventListener('keydown', (e)=>{
       const editor = e.target.closest('.plan-contents[contenteditable]');
       if (!editor) return;
+      const planIdx = Number(editor.getAttribute('data-plan-idx'));
       const mod = e.ctrlKey || e.metaKey;
       if (!mod) return;
       const k = e.key.toLowerCase();
@@ -4776,15 +4797,11 @@ function persistNow(){
       if (k === 'i') document.execCommand('italic');
       if (k === 'u') document.execCommand('underline');
       if (k === 'k') {
-        const url = prompt('URL to link:');
-        if (url) {
-          document.execCommand('createLink', false, url);
-          editor.querySelectorAll('a').forEach(a=>{ a.target='_blank'; a.rel='noopener noreferrer'; });
-        }
+        const card = editor.closest('.plan-card');
+        setPlanCtaFromPrompt(planIdx, card);
       }
       convertFontTagsToSpan(editor);
-      const idx = Number(editor.getAttribute('data-plan-idx'));
-      if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
+      if (state.clgPlans[planIdx]) state.clgPlans[planIdx].clgContents = editor.innerHTML;
     });
 
     plansContainer.addEventListener('click', (e)=>{
@@ -4798,7 +4815,8 @@ function persistNow(){
       restoreSelectionFor(idx, editor);
       const cmd = btn.getAttribute('data-cmd');
       if (cmd === 'createLink') {
-        insertLinkWithLabel(editor);
+        const card = editor.closest('.plan-card');
+        setPlanCtaFromPrompt(Number(idx), card);
       } else if (cmd === 'removeFormat') {
         document.execCommand('removeFormat', false, null);
         editor.querySelectorAll('a').forEach(a=>{ a.replaceWith(document.createTextNode(a.textContent)); });
