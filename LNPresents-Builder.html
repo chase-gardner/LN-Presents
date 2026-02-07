@@ -602,7 +602,7 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 14px minmax(90px, 120px) minmax(150px, 200px);
+  grid-template-columns: 14px minmax(90px, 120px) minmax(140px, 1fr);
   gap:8px;
   align-items:center;
   padding: 8px 10px;
@@ -613,12 +613,12 @@ input:focus, select:focus, textarea:focus{
   scroll-snap-align: start;
 }
 .terms-classic-row .term-label{
-  white-space:normal;
-  overflow:visible;
-  text-overflow:clip;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
   font-size:.74rem;
 }
-.terms-classic-row .term-input{ margin-top:0; }
+.terms-classic-row .term-input{ margin-top:0; min-width:0; }
 .terms-classic-row input,
 .terms-classic-row select{
   width:100%;
@@ -3647,7 +3647,6 @@ LNPresents Support`;
         check.appendChild(cb);
         check.appendChild(box);
 
-        const right = document.createElement("div");
         const label = document.createElement("div");
         label.className = "term-label";
         label.textContent = def.label;
@@ -3660,11 +3659,9 @@ LNPresents Support`;
         input.value = value || "";
         inputWrap.appendChild(input);
 
-        right.appendChild(label);
-        right.appendChild(inputWrap);
-
         row.appendChild(check);
-        row.appendChild(right);
+        row.appendChild(label);
+        row.appendChild(inputWrap);
         grid.appendChild(row);
 
         cb.addEventListener("change", () => {
