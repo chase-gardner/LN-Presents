@@ -1201,17 +1201,11 @@ input:focus, select:focus, textarea:focus{
 .term-shared-input input:focus{ box-shadow: var(--ring); border-color: rgba(99,102,241,.55); }
 
 .term-plan-grid{
-  display:grid;
-  grid-template-columns: 1fr;
+  display:flex;
+  flex-wrap: nowrap;
   gap:8px; /* slightly roomier */
-}
-
-@media (min-width: 760px){
-  .term-plan-grid{ grid-template-columns: repeat(2, minmax(200px, 1fr)); }
-}
-
-@media (min-width: 1020px){
-  .term-plan-grid{ grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
 
@@ -1222,6 +1216,7 @@ input:focus, select:focus, textarea:focus{
   padding: 8px 9px;
   border-radius: 12px;
   flex-wrap: nowrap;
+  min-width: 220px;
 }
 
 .term-plan-chip{
