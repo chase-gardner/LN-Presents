@@ -412,38 +412,51 @@ h1,h2,h3{ margin:0; }
 .panel{ display:none; }
 .panel.active{ display:block; }
 
+.panel,
+.panel.active{
+  width: 100%;
+}
+
+#retentionTerms,
+#newBizTerms{
+  width: 100%;
+}
+
 /* 8) Grids */
 .top-grid{ display:grid; gap:12px; }
 .top-simple{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 10px 12px;
 }
+/* Top terms grid: slightly tighter + better responsive fit */
 .top-term-row{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 10px 12px;
+  gap: 8px 10px;
+  align-items: start;
 }
-.top-field{
-  display:grid;
-  gap:8px;
-  min-width: 180px;
-}
-.top-field label,
-.top-label{
-  font-size:.85rem;
-  font-weight: 650;
-  color:#0f172a;
-  letter-spacing:.02em;
-}
-.top-field.term-style{
-  grid-template-columns: 20px 1fr minmax(120px, 180px);
-  align-items:center;
-}
+
+/* Each term field becomes a small surface row */
+.top-field.term-style,
 .top-field.yoy-row{
-  grid-template-columns: 20px 1fr minmax(120px, 180px);
+  display:grid;
+  grid-template-columns: 18px 1fr minmax(140px, 200px);
   align-items:center;
-  padding: 4px 0;
+
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(255,255,255,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  gap: 10px;
+}
+
+/* Hover: subtle clarity */
+.top-field.term-style:hover,
+.top-field.yoy-row:hover{
+  border-color: rgba(99,102,241,.22);
+  background: rgba(255,255,255,.92);
 }
 
 /* 9) Inputs */
@@ -503,14 +516,726 @@ input:focus, select:focus, textarea:focus{
   border-color: rgba(99,102,241,.20);
   background: rgba(248,250,252,.98);
 }
-.term-label{
-  font-size:.82rem;
-  font-weight: 650;
+.top-field label,
+.top-label{
+  font-size: .78rem;
+  font-weight: 800;
+  color: rgba(15,23,42,.78);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Top row: library left, toggles right */
+.terms-tiles-toprow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+}
+
+/* Library should live along the top (horizontal, scroll if needed) */
+.terms-tiles-librarywrap{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Right side controls (Retention + New Biz) */
+.terms-tiles-controls{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:flex-end;
   white-space:nowrap;
+}
+
+/* Make the tab + content stack and stretch full width */
+.terms-tiles-toprow{
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* This is NOT a right-side strip anymore — it's the main content region */
+.terms-tiles-controls{
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  display: block;          /* important: don't keep it as a horizontal flex strip */
+  white-space: normal;     /* undo nowrap */
+  justify-content: unset;  /* undo end alignment */
+}
+
+/* 11.b) Terms Tiles (Plan-aware, drag-to-activate) */
+.yoy-row{ display:none; } /* moved into Terms Tiles library */
+
+/* Classic top panel unchanged */
+.terms-classic-panel{
+  margin: 10px 0 12px 0;
+  padding: 10px 10px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(15,23,42,.03);
+}
+.terms-classic-panel__head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+.terms-classic-panel__head h3{
+  margin:0;
+  font-size:.88rem;
+  font-weight:750;
+}
+.terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
+.terms-classic-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 880px){
+  .terms-classic-grid{ grid-template-columns: 1fr 1fr 1fr; }
+}
+.terms-classic-row{
+  display:grid;
+  grid-template-columns: 12px 1fr;
+  gap:10px;
+  align-items:start;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.92);
+}
+.terms-classic-row .term-label{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  font-size:.74rem;
+}
+.terms-classic-row .term-input{ margin-top:6px; }
+.terms-classic-row input,
+.terms-classic-row select{
+  width:100%;
+  height: 30px;
+  border-radius: 12px;
+  border:1px solid rgba(15,23,42,.12);
+  padding: 0 12px;
+  font-size: .82rem;
+  background: var(--input-bg);
+  outline:none;
+}
+.terms-classic-row input:focus,
+.terms-classic-row select:focus{
+  box-shadow: var(--ring);
+  border-color: rgba(99,102,241,.55);
+}
+
+/* --- NEW layout: top bar (library + toggles) then full-width dropzone --- */
+.terms-tiles-split{
+  display:grid;
+  grid-template-columns: 1fr;   /* no left/right split anymore */
+  gap:12px;
+  align-items:start;
+}
+
+/* Blocks: slightly quieter, less padding */
+.terms-tiles-block{
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(15,23,42,.03);
+  padding: 9px 9px;
+}
+.terms-tiles-block__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom: 8px;
+}
+.terms-tiles-block__head h3{
+  margin:0;
+  font-size:.84rem;
+  font-weight:800;
+}
+
+/* Library: horizontal strip across top */
+.terms-tile-library{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:.40rem;
+
+  max-height: none;
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  padding: 2px 2px;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* nicer horizontal scrollbar */
+.terms-tile-library::-webkit-scrollbar{ height: 10px; }
+.terms-tile-library::-webkit-scrollbar-thumb{
+  background: rgba(15,23,42,.18);
+  border-radius: 999px;
+  border: 3px solid rgba(255,255,255,.55);
+}
+.terms-tile-library::-webkit-scrollbar-track{ background: transparent; }
+
+/* Tiles: compact, refined chips */
+.term-tile{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+
+  padding: .26rem .46rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  border:1px solid rgba(15,23,42,.10);
+
+  font-size:.72rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color:#0b0f19;
+
+  cursor:grab;
+  user-select:none;
+  white-space:nowrap;
+  box-shadow: none;
+  transition: transform .08s ease, background .10s ease, border-color .10s ease, opacity .10s ease;
+}
+.term-tile:hover{
+  transform: translateY(-1px);
+  background: rgba(248,250,252,.98);
+  border-color: rgba(99,102,241,.28);
+}
+.term-tile:active{ cursor:grabbing; transform:none; }
+
+.term-tile.is-used{
+  opacity:.42;
+  cursor:not-allowed;
+  border-style:dashed;
+  background: rgba(15,23,42,.04);
+}
+
+/* Subtle dot only */
+.term-tile .dot{
+  width:6px; height:6px; border-radius:999px;
+  background: color-mix(in srgb, var(--accent-solid) 78%, white 0%);
+  box-shadow: none;
+  opacity:.75;
+}
+
+/* ===============================
+   TERMS: Compact input treatment (scoped)
+   - fixes “bulky” inputs inside the active Terms drop zone
+   =============================== */
+
+/* Remove the global "lift on focus" feel only inside term rows */
+.term-active-row input:focus,
+.term-active-row select:focus,
+.term-active-row textarea:focus{
+  transform: none !important;
+  box-shadow: var(--ring) !important;
+}
+
+/* Shared (Applies to All) input — compact */
+.term-active-row .term-shared-input input{
+  height: 32px;
+  padding: 0 10px;
+  font-size: .86rem;
+  border-radius: 10px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.98);
+  box-shadow: none;
+}
+
+/* Per-plan inputs — compact + clean */
+.term-active-row .term-plan-input{
+  padding: 7px 7px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(15,23,42,.02);
+}
+
+/* Plan chip: smaller and tighter */
+.term-active-row .term-plan-chip{
+  padding: .12rem .42rem;
+  font-size: .70rem;
+  font-weight: 750;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  background: rgba(224,231,255,.72);
+}
+
+/* Compact field controls */
+.term-active-row .term-plan-input input,
+.term-active-row .term-plan-input select{
+  height: 32px;
+  padding: 0 10px;
+  font-size: .86rem;
+  border-radius: 10px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.98);
+  box-shadow: none;
+}
+
+/* Stop oversized dropdown arrow spacing */
+.term-active-row .term-plan-input select{
+  padding-right: 28px;
+}
+
+/* Tighten grid spacing */
+.term-active-row .term-plan-grid{
+  gap: 7px;
+}
+
+/* Optional: make rows visually thinner overall */
+.term-active-row__body{
+  padding: 7px 9px 9px 9px;
+}
+.term-active-row__head{
+  padding: 7px 9px;
+}
+
+/* Optional: slightly reduce the active row card shadow */
+.term-active-row{
+  box-shadow: 0 8px 18px rgba(2,6,23,.06);
+}
+
+@media (min-width: 760px){
+  .term-active-row .term-plan-input{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 6px 8px;
+  }
+  .term-active-row .term-plan-chip{
+    margin:0;
+    flex: 0 0 auto;
+  }
+  .term-active-row .term-plan-input input,
+  .term-active-row .term-plan-input select{
+    flex: 1 1 auto;
+  }
+}
+
+.term-active-row .term-plan-input{
+  border-color: rgba(15,23,42,.06);
+  background: rgba(255,255,255,.70);
+}
+.term-active-row .term-plan-input input,
+.term-active-row .term-plan-input select{
+  border-color: rgba(15,23,42,.10);
+}
+
+/* Dropzone: calmer workspace */
+.terms-dropzone{
+  min-height: 120px;
+  width: 100%;
+  border:1px dashed rgba(99,102,241,.38);
+  border-radius: 16px;
+  padding: 10px 10px;
+  background: rgba(255,255,255,.88);
+  outline:none;
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+/* ===== Drop zone: strong "Drop here" affordance ===== */
+.terms-dropzone{
+  position: relative;
+  width: 100%;
+  min-height: 180px;                 /* bigger target */
+  border-radius: 18px;
+
+  /* layered background: soft + subtle diagonal pattern */
+  background:
+    radial-gradient(800px 220px at 50% 0%, rgba(99,102,241,.16), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(15,23,42,.045) 0px,
+      rgba(15,23,42,.045) 10px,
+      rgba(255,255,255,.0) 10px,
+      rgba(255,255,255,.0) 20px
+    ),
+    rgba(255,255,255,.92);
+
+  border: 2px dashed rgba(99,102,241,.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+
+/* ===== Drop zone: strong "Drop here" affordance ===== */
+.terms-dropzone{
+  position: relative;
+
+  /* bigger target */
+  min-height: 180px;
+
+  /* layered background: soft + subtle diagonal pattern */
+  background:
+    radial-gradient(800px 220px at 50% 0%, rgba(99,102,241,.16), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(15,23,42,.045) 0px,
+      rgba(15,23,42,.045) 10px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) 20px
+    ),
+    rgba(255,255,255,.92);
+
+  border: 2px dashed rgba(99,102,241,.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+
+/* Hover: subtle lift so it feels interactive */
+.terms-dropzone:hover{
+  border-color: rgba(99,102,241,.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 18px 44px rgba(2,6,23,.10);
+  transform: translateY(-1px);
+}
+
+/* Active drag-over: clear "accepting" state */
+.terms-dropzone.is-over{
+  border-style: solid;
+  border-color: rgba(99,102,241,.95);
+  background:
+    radial-gradient(900px 260px at 50% 0%, rgba(99,102,241,.26), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(99,102,241,.12) 0px,
+      rgba(99,102,241,.12) 10px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) 20px
+    ),
+    rgba(224,231,255,.50);
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,.18),
+    0 22px 60px rgba(2,6,23,.14);
+  transform: translateY(-2px);
+}
+
+/* Drop indicator (centered, feels like a real target) */
+.drop-indicator{
+  position:absolute;
+  inset: 0;
+  display:grid;
+  place-items:center;
+  gap:6px;
+  text-align:center;
+  pointer-events:none;
+  padding: 16px;
+}
+
+/* Icon bubble */
+.drop-indicator__icon{
+  width:44px; height:44px;
+  display:grid; place-items:center;
+  border-radius: 999px;
+  background: rgba(99,102,241,.12);
+  border: 1px solid rgba(99,102,241,.22);
+  font-size: 1.25rem;
+  font-weight: 950;
+  color: rgba(15,23,42,.85);
+}
+
+/* Text */
+.drop-indicator__text{
+  font-weight: 950;
+  font-size: .95rem;
+  color: rgba(15,23,42,.78);
+}
+.drop-indicator__sub{
+  font-size: .82rem;
+  font-weight: 700;
+  color: rgba(91,100,112,.9);
+}
+
+/* Keep your existing hint visible but toned down */
+.terms-dropzone__hint{
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px 0;
+  font-size: .78rem;
+  color: var(--ink);
+  opacity: .92;
+}
+
+/* Ensure active list sits above the indicator */
+.terms-active-list{
+  position: relative;
+  z-index: 1;
+}
+
+/* Auto-hide the indicator once any active term row exists */
+.terms-active-list:not(:empty) ~ .drop-indicator,
+.terms-dropzone:has(.terms-active-list:not(:empty)) .drop-indicator{
+  display:none;
+}
+
+/* Stronger indicator when dragging over */
+.terms-dropzone.is-over .drop-indicator__icon{
+  background: rgba(99,102,241,.18);
+  border-color: rgba(99,102,241,.42);
+  transform: scale(1.00);
+}
+
+/* Empty state message centered */
+.terms-dropzone:empty::before{
+  content: "Drop terms here";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: .95rem;
+  letter-spacing: .01em;
+  color: rgba(15,23,42,.72);
+  pointer-events: none;
+}
+
+/* Secondary helper line (only when empty) */
+.terms-dropzone:empty::after{
+  content: "Drag from the library above";
+  position: absolute;
+  inset: auto 0 18px 0;
+  text-align: center;
+  font-size: .82rem;
+  font-weight: 700;
+  color: rgba(91,100,112,.85);
+  pointer-events: none;
+}
+
+/* Little “+” badge in the corner (only when empty) */
+.terms-dropzone:empty .drop-badge{ display:none; } /* safe if not used */
+.terms-dropzone:empty{
+  outline-offset: 6px;
+}
+
+/* Hover: subtle lift so it feels interactive */
+.terms-dropzone:hover{
+  border-color: rgba(99,102,241,.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 18px 44px rgba(2,6,23,.10);
+  transform: translateY(-1px);
+}
+
+/* Active drag-over: clear "accepting" state */
+.terms-dropzone.is-over{
+  border-style: solid;
+  border-color: rgba(99,102,241,.95);
+  background:
+    radial-gradient(900px 260px at 50% 0%, rgba(99,102,241,.26), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(99,102,241,.12) 0px,
+      rgba(99,102,241,.12) 10px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) 20px
+    ),
+    rgba(224,231,255,.50);
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,.18),
+    0 22px 60px rgba(2,6,23,.14);
+  transform: translateY(-2px);
+}
+
+/* If it has content, keep it calmer and stop the big empty overlay */
+.terms-dropzone:not(:empty){
+  min-height: 120px; /* can be smaller once used */
+  background: rgba(255,255,255,.92);
+  border-style: dashed;
+}
+
+.terms-dropzone:focus{
+  box-shadow: var(--ring);
+  border-color: rgba(99,102,241,.65);
+}
+.terms-dropzone.is-over{
+  border-color: rgba(99,102,241,.92);
+  background: rgba(224,231,255,.45);
+  box-shadow: 0 14px 34px rgba(2,6,23,.10);
+}
+.terms-dropzone__hint{
+  font-size:.78rem;
+  color: var(--ink);
+}
+
+/* Active list: tighter vertical rhythm */
+.terms-active-list{
+  display:flex;
+  flex-direction:column;
+  gap:.55rem;
+}
+
+/* Active term row: smaller footprint */
+.term-active-row{
+  border-radius: 14px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 10px 24px rgba(2,6,23,.07);
+  overflow:hidden;
+}
+
+/* Header: slimmer */
+.term-active-row__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding: 8px 10px;
+  background: rgba(15,23,42,.03);
+}
+.term-active-row__title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight: 800;
+  font-size:.82rem;
+  min-width:0;
+}
+.term-active-row__title span{
   overflow:hidden;
   text-overflow:ellipsis;
-  color:#0f172a;
+  white-space:nowrap;
 }
+
+/* Controls smaller */
+.term-drag-handle{
+  width: 20px; height: 20px;
+  border-radius: 8px;
+  border:1px solid rgba(15,23,42,.12);
+  display:inline-flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,.92);
+  cursor:grab;
+  user-select:none;
+}
+.term-drag-handle:active{ cursor:grabbing; }
+
+.term-row-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.term-remove{
+  border:none;
+  background: transparent;
+  color: #b91c1c;
+  font-weight: 900;
+  cursor:pointer;
+  padding: 4px 6px;
+  border-radius: 10px;
+}
+.term-remove:hover{ background: rgba(185,28,28,.10); }
+
+/* Applies toggle more compact */
+.applies-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:.80rem;
+  color: var(--ink);
+  user-select:none;
+  border:none;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 10px;
+  cursor:pointer;
+}
+.applies-toggle:hover{ background: rgba(15,23,42,.05); }
+
+.switch{
+  position:relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(15,23,42,.14);
+  border:1px solid rgba(15,23,42,.14);
+  transition: background .12s ease, border-color .12s ease;
+  flex: 0 0 auto;
+}
+.switch::after{
+  content:"";
+  position:absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  background:#fff;
+  box-shadow: 0 10px 20px rgba(2,6,23,.12);
+  transition: transform .12s ease;
+}
+.switch.is-on{
+  background: color-mix(in srgb, var(--accent-solid) 75%, white 0%);
+  border-color: rgba(99,102,241,.55);
+}
+.switch.is-on::after{ transform: translateX(16px); }
+
+/* Body: tighter padding */
+.term-active-row__body{ padding: 8px 10px 10px 10px; }
+
+/* Shared input: shorter */
+.term-shared-input input{
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  border:1px solid rgba(15,23,42,.12);
+  padding: 0 10px;
+  font-size: .88rem;
+  background: var(--input-bg);
+  outline:none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.term-shared-input input:focus{ box-shadow: var(--ring); border-color: rgba(99,102,241,.55); }
+
+.term-plan-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:6px; /* tighter */
+}
+
+@media (min-width: 760px){
+  .term-plan-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1020px){
+  .term-plan-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+
+.term-plan-input{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 7px;
+  border-radius: 12px;
+}
+
+.term-plan-chip{
+  margin:0;
+  flex: 0 0 auto;
+  padding: .10rem .42rem;
+  font-size: .68rem;
+}
+
+.term-plan-input input,
+.term-plan-input select{
+  height: 32px;
+  border-radius: 10px;
+  font-size: .84rem;
+  padding: 0 10px;
+}
+
+.term-row--dragging{ opacity:.55; }
 
 /* 12) Buttons */
 .btn-clear,
@@ -1271,8 +1996,8 @@ input:focus, select:focus, textarea:focus{
     </label>
   </div>
 </div>
-
 <script>
+
 (function(){
   // CHANGE THIS:
   const PASSCODE = "937";
@@ -1410,9 +2135,17 @@ input:focus, select:focus, textarea:focus{
       Clear uploaded header
     </button>
 
-    <small class="muted-text">
-      This saves the image to <b>this device/browser</b> so the Presenter can use it.
-    </small>
+   <small class="muted-text">
+  Don’t have a header image yet?
+  <a
+    href="https://lexisnexislngglobal.seismic.com/Link/Content/DC2DVH3GCVQmpGQF6XfHq3VFHW8d"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="font-weight:900;"
+  >
+    CLICK HERE
+  </a>.
+</small>
   </div>
 </div>
           </div>
@@ -1477,47 +2210,28 @@ input:focus, select:focus, textarea:focus{
                 </div>
               </div>
 
-              <div class="top-term-row">
-                <div class="top-field term-style">
-                  <div class="term-check">
-                    <input type="checkbox" data-term-option="numAttorneys">
-                    <span class="box"></span>
-                  </div>
-                  <div class="top-label">Attorney Count</div>
-                  <div>
-                    <select data-key="clgNumAttorneys">
-                      <option value="">Select…</option>
-                      <option>1</option><option>2</option><option>3</option><option>4</option>
-                      <option>5</option><option>6</option><option>7</option><option>8</option>
-                      <option>9</option><option>10</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="top-field yoy-row">
-                  <div class="term-check">
-                    <input type="checkbox" data-term-option="yoyIncrease">
-                    <span class="box"></span>
-                  </div>
-                  <div class="top-label">Year over Year increase</div>
-                  <div><input type="text" data-key="clgYoyIncrease" placeholder="3%" class="input-style"></div>
+                <div id="classicTopTerms" class="terms-classic-panel"></div>
                 </div>
               </div>
-            </div>
-          </div>
 
           <!-- 2) Side-by-side panels -->
           <div class="form-panel-row">
             <div class="card">
               <h2>Terms</h2>
-              <div class="tab-row">
-                <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
-                <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
+              <div class="terms-tiles-toprow">
+                <div class="tab-row">
+                  <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
+                  <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
+                </div>
+
+                <div class="terms-tiles-controls">
+                  <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
+                  <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
+                </div>
               </div>
-              <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
-              <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
+
+              </div>
             </div>
-          </div>
 
           <!-- 3) Plans -->
           <div class="card" id="plansSection">
@@ -2198,6 +2912,138 @@ LNPresents Support`;
       { key: "termEndDate",    label: "Term End Date",   input: { type: "date", dataKey: "clgTermEndDate" }, defaultSelected: false },
       { key: "nbExtensionTerm",label: "Term Length",     input: { type: "select", dataKey: "clgnbExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] }, defaultSelected: false }
     ];
+    /* =========================
+     * C.1) TERMS V4 (Tiles + per-term Applies-to-All)
+     * - Classic terms: checkbox + single global value
+     * - Tile terms: drag to activate, per-plan by default, optional Applies-to-All
+     * ========================= */
+    const TERMS_TILES_STORAGE_KEY = "LNP_STATE_V4_TERMS_TILES";
+    const TERMS_TILES_SCHEMA = 4;
+
+    const classicTermsDefs = [
+      { id: "attorneyCount", label: "Attorney Count", type: "text", dataKey: "clgNumAttorneys", placeholder: "0" },
+      { id: "currentSpend",  label: "Current Spend",  type: "text", dataKey: "clgCurrentSpend", placeholder: "$0.00" },
+      { id: "currentTermEnd",label: "Current Term End",type: "date", dataKey: "clgCurrentTermEnd" }
+    ];
+
+    const tileTermsCatalog = {
+      retention: [
+        { id: "effectiveDate",     label: "Effective Date",      input: { type: "date", dataKey: "clgEffectiveDate" } },
+        { id: "extensionTermEnd",  label: "Extension Term End",  input: { type: "date", dataKey: "clgExtensionTermEnd" } },
+        { id: "extensionTerm",     label: "Term Extension",      input: { type: "select", dataKey: "clgExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] } },
+        { id: "yoyIncrease",       label: "Year over Year Increase", input: { type: "text", dataKey: "clgYoyIncrease", placeholder: "3%" } }
+      ],
+      newbiz: [
+        { id: "activationDate", label: "Activation Date", input: { type: "date", dataKey: "clgActivationDate" } },
+        { id: "introPrice",     label: "Promo Price",     input: { type: "text", dataKey: "clgIntroPrice", placeholder: "$0.00" } },
+        { id: "termStartDate",  label: "Promo End Date",  input: { type: "date", dataKey: "clgTermStartDate" } },
+        { id: "termEndDate",    label: "Term End Date",   input: { type: "date", dataKey: "clgTermEndDate" } },
+        { id: "nbExtensionTerm",label: "Term Length",     input: { type: "select", dataKey: "clgnbExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] } }
+      ]
+    };
+
+    const tileTermById = (() => {
+      const map = {};
+      Object.keys(tileTermsCatalog).forEach(g => {
+        tileTermsCatalog[g].forEach(t => { map[t.id] = { ...t, group: g }; });
+      });
+      return map;
+    })();
+
+    function defaultTermsTilesState() {
+      const classicSel = {};
+      const classicVals = {};
+      classicTermsDefs.forEach(d => { classicSel[d.id] = false; classicVals[d.id] = ""; });
+      return {
+        __schema: TERMS_TILES_SCHEMA,
+        classicTermsSelected: classicSel,
+        classicTermsValues: classicVals,
+        activeTileTermsOrder: { retention: [], newbiz: [] },
+        tileTermsState: {}
+      };
+    }
+
+    function loadTermsTilesState() {
+      let raw = null;
+      try { raw = JSON.parse(localStorage.getItem(TERMS_TILES_STORAGE_KEY) || "null"); } catch (e) { raw = null; }
+      if (raw && raw.__schema === TERMS_TILES_SCHEMA) return raw;
+
+      // Best-effort migration from legacy selection model (clgSelectedTerms + single values)
+      const migrated = defaultTermsTilesState();
+
+      const legacySelected = Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [];
+      // Classic terms
+      migrated.classicTermsSelected.attorneyCount = legacySelected.includes("numAttorneys");
+      migrated.classicTermsSelected.currentSpend  = legacySelected.includes("currentSpend");
+      migrated.classicTermsSelected.currentTermEnd= legacySelected.includes("currentTermEnd");
+
+      migrated.classicTermsValues.attorneyCount = saved.clgNumAttorneys || "";
+      migrated.classicTermsValues.currentSpend  = saved.clgCurrentSpend || "";
+      migrated.classicTermsValues.currentTermEnd= saved.clgCurrentTermEnd || "";
+
+      // Tile terms (previously global-only -> migrate as Applies-to-All ON)
+      function migrateTile(termId, dataKey, group) {
+        const isSel = legacySelected.includes(termId);
+        const hasVal = !!(saved[dataKey] != null && String(saved[dataKey]).trim() !== "");
+        if (!isSel && !hasVal) return;
+        if (!migrated.tileTermsState[termId]) {
+          migrated.tileTermsState[termId] = { active: false, appliesToAll: true, globalValue: "", perPlanValues: {} };
+        }
+        migrated.tileTermsState[termId].active = true;
+        migrated.tileTermsState[termId].appliesToAll = true;
+        migrated.tileTermsState[termId].globalValue = saved[dataKey] || "";
+        if (!migrated.activeTileTermsOrder[group].includes(termId)) migrated.activeTileTermsOrder[group].push(termId);
+      }
+
+      migrateTile("effectiveDate", "clgEffectiveDate", "retention");
+      migrateTile("extensionTermEnd", "clgExtensionTermEnd", "retention");
+      migrateTile("extensionTerm", "clgExtensionTerm", "retention");
+      migrateTile("yoyIncrease", "clgYoyIncrease", "retention");
+
+      migrateTile("activationDate", "clgActivationDate", "newbiz");
+      migrateTile("introPrice", "clgIntroPrice", "newbiz");
+      migrateTile("termStartDate", "clgTermStartDate", "newbiz");
+      migrateTile("termEndDate", "clgTermEndDate", "newbiz");
+      migrateTile("nbExtensionTerm", "clgnbExtensionTerm", "newbiz");
+
+      // Persist migrated state (do NOT delete legacy storage)
+      try { localStorage.setItem(TERMS_TILES_STORAGE_KEY, JSON.stringify(migrated)); } catch (e) {}
+      return migrated;
+    }
+
+    let termsTilesState = loadTermsTilesState();
+
+    function persistTermsTiles() {
+      try {
+        termsTilesState.__schema = TERMS_TILES_SCHEMA;
+        localStorage.setItem(TERMS_TILES_STORAGE_KEY, JSON.stringify(termsTilesState));
+      } catch (e) {}
+    }
+
+    function ensureTileTerm(termId) {
+      if (!termsTilesState.tileTermsState[termId]) {
+        termsTilesState.tileTermsState[termId] = { active: false, appliesToAll: false, globalValue: "", perPlanValues: {} };
+      }
+      return termsTilesState.tileTermsState[termId];
+    }
+
+    function currentPlanIds() {
+      return (state.clgPlans || []).map(p => p.__id).filter(Boolean);
+    }
+
+    function syncTileTermPlanSlots() {
+      const ids = new Set(currentPlanIds());
+      Object.keys(termsTilesState.tileTermsState || {}).forEach(termId => {
+        const st = ensureTileTerm(termId);
+        if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+        // Remove deleted plans
+        Object.keys(st.perPlanValues).forEach(pid => { if (!ids.has(pid)) delete st.perPlanValues[pid]; });
+        // Add new plans
+        ids.forEach(pid => { if (!(pid in st.perPlanValues)) st.perPlanValues[pid] = ""; });
+      });
+      persistTermsTiles();
+    }
+
 
     /* =========================
      * D) PERSISTED & STATE
@@ -2261,7 +3107,8 @@ LNPresents Support`;
         clgnbExtensionTerm: state.clgnbExtensionTerm,
         clgIntroPrice: state.clgIntroPrice,
         clgTermStartDate: state.clgTermStartDate,
-        clgPlans: state.clgPlans
+        clgPlans: state.clgPlans,
+        lnpTermsTiles: termsTilesState
       };
     }
 
@@ -2309,7 +3156,23 @@ LNPresents Support`;
       state.clgPlans = Array.isArray(data.clgPlans) && data.clgPlans.length ? data.clgPlans : [makeEmptyPlan()];
 
       ensurePlanIds();
+      if (data.lnpTermsTiles && typeof data.lnpTermsTiles === "object") {
+        termsTilesState = data.lnpTermsTiles;
+        // normalize / defaults
+        if (!termsTilesState || typeof termsTilesState !== "object") termsTilesState = defaultTermsTilesState();
+        if (!termsTilesState.activeTileTermsOrder) termsTilesState.activeTileTermsOrder = { retention: [], newbiz: [] };
+        if (!termsTilesState.tileTermsState) termsTilesState.tileTermsState = {};
+        if (!termsTilesState.classicTermsSelected) termsTilesState.classicTermsSelected = defaultTermsTilesState().classicTermsSelected;
+        if (!termsTilesState.classicTermsValues) termsTilesState.classicTermsValues = defaultTermsTilesState().classicTermsValues;
+        persistTermsTiles();
+      }
+
       hydrateFormFromState();
+
+      renderClassicTopTerms();
+      renderTermsTilesPanel("retention", retentionHost);
+      renderTermsTilesPanel("newbiz", newBizHost);
+      syncTileTermPlanSlots();
       renderPlans();
       persistNow();
 
@@ -2747,50 +3610,393 @@ LNPresents Support`;
     /* =========================
      * F) RENDERERS
      * ========================= */
-    function renderTermPanel(host, termList) {
-      host.innerHTML = "";
-      termList.forEach(term => {
-        const row = document.createElement("div");
-        row.className = "term-row";
+    function renderClassicTopTerms() {
+      const host = document.getElementById("classicTopTerms");
+      if (!host) return;
 
-        const checkWrap = document.createElement("div");
-        checkWrap.className = "term-check";
+      host.innerHTML = `
+        <div class="terms-classic-panel__head">
+        <div class="terms-classic-grid" id="classicTermsGrid"></div>
+      `;
+
+      const grid = host.querySelector("#classicTermsGrid");
+      classicTermsDefs.forEach(def => {
+        const selected = !!termsTilesState.classicTermsSelected?.[def.id];
+        const value = termsTilesState.classicTermsValues?.[def.id] ?? "";
+
+        const row = document.createElement("div");
+        row.className = "terms-classic-row";
+
+        const check = document.createElement("div");
+        check.className = "term-check";
         const cb = document.createElement("input");
         cb.type = "checkbox";
-        cb.setAttribute("data-term-option", term.key);
+        cb.checked = selected;
+        cb.setAttribute("aria-label", "Select " + def.label);
         const box = document.createElement("span");
         box.className = "box";
-        cb.checked = Array.isArray(state.clgSelectedTerms) && state.clgSelectedTerms.includes(term.key);
-        checkWrap.appendChild(cb);
-        checkWrap.appendChild(box);
+        check.appendChild(cb);
+        check.appendChild(box);
 
+        const right = document.createElement("div");
         const label = document.createElement("div");
         label.className = "term-label";
-        label.textContent = term.label;
+        label.textContent = def.label;
 
-        let inputEl;
-        if (term.input.type === "select") {
-          inputEl = document.createElement("select");
-          inputEl.setAttribute("data-key", term.input.dataKey);
-          term.input.options.forEach(opt => {
-            const o = document.createElement("option");
-            o.value = opt; o.textContent = opt === "" ? "-- choose --" : opt;
-            inputEl.appendChild(o);
-          });
-        } else {
-          inputEl = document.createElement("input");
-          inputEl.type = term.input.type;
-          inputEl.setAttribute("data-key", term.input.dataKey);
-          if (term.input.placeholder) inputEl.placeholder = term.input.placeholder;
+        const inputWrap = document.createElement("div");
+        inputWrap.className = "term-input";
+        const input = document.createElement("input");
+        input.type = def.type;
+        if (def.placeholder) input.placeholder = def.placeholder;
+        input.value = value || "";
+        inputWrap.appendChild(input);
+
+        right.appendChild(label);
+        right.appendChild(inputWrap);
+
+        row.appendChild(check);
+        row.appendChild(right);
+        grid.appendChild(row);
+
+        cb.addEventListener("change", () => {
+          termsTilesState.classicTermsSelected[def.id] = !!cb.checked;
+          // Keep legacy state mirrors (compat only)
+          if (def.dataKey) {
+            if (!state.clgSelectedTerms) state.clgSelectedTerms = [];
+            const legacyKey = def.id === "attorneyCount" ? "numAttorneys" : def.id;
+            const idx = state.clgSelectedTerms.indexOf(legacyKey);
+            if (cb.checked && idx === -1) state.clgSelectedTerms.push(legacyKey);
+            if (!cb.checked && idx !== -1) state.clgSelectedTerms.splice(idx, 1);
+          }
+          persistTermsTiles();
+          persistNow();
+        });
+
+        input.addEventListener("input", () => {
+          termsTilesState.classicTermsValues[def.id] = input.value;
+          if (def.dataKey) state[def.dataKey] = input.value; // mirror for exports/compat
+          persistTermsTiles();
+          persistNow();
+        });
+      });
+    }
+
+    function buildInputElForTile(termDef) {
+      let inputEl;
+      const t = termDef.input.type;
+      if (t === "select") {
+        inputEl = document.createElement("select");
+        (termDef.input.options || []).forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt === "" ? "-- choose --" : opt;
+          inputEl.appendChild(o);
+        });
+      } else {
+        inputEl = document.createElement("input");
+        inputEl.type = t;
+        if (termDef.input.placeholder) inputEl.placeholder = termDef.input.placeholder;
+      }
+      return inputEl;
+    }
+
+    function renderTermsTilesPanel(group, host) {
+      const catalog = tileTermsCatalog[group] || [];
+      if (!host) return;
+
+      const groupLabel = group === "retention" ? "Retention" : "New Business";
+
+      host.innerHTML = `
+        <div class="terms-tiles-split">
+          <div class="terms-tiles-block">
+            <div class="terms-tiles-block__head">
+              <h3>Available Terms — ${groupLabel}</h3>
+            </div>
+            <div class="terms-tile-library" id="${group}TileLibrary" aria-label="${groupLabel} available terms"></div>
+          </div>
+
+          <div class="terms-tiles-block">
+            <div class="terms-tiles-block__head">
+              <h3>Active Terms — ${groupLabel}</h3>
+            </div>
+<div class="terms-dropzone" id="${group}Dropzone" tabindex="0" aria-label="${groupLabel} active terms drop zone">
+  <!-- Empty-state drop indicator (auto-hides once terms exist) -->
+  <div class="drop-indicator" aria-hidden="true">
+    <span class="drop-indicator__icon">＋</span>
+    <span class="drop-indicator__text">Drop terms here</span>
+    <span class="drop-indicator__sub">Drag from the library above</span>
+  </div>
+  <div class="terms-active-list" id="${group}ActiveList"></div>
+</div>
+
+          </div>
+        </div>
+      `;
+
+      const lib = host.querySelector(`#${group}TileLibrary`);
+      const dropzone = host.querySelector(`#${group}Dropzone`);
+      const activeList = host.querySelector(`#${group}ActiveList`);
+
+      const activeOrder = (termsTilesState.activeTileTermsOrder[group] || []).slice();
+
+      // Library tiles
+      catalog.forEach(term => {
+        const st = ensureTileTerm(term.id);
+        const tile = document.createElement("div");
+        tile.className = "term-tile" + (st.active ? " is-used" : "");
+        tile.setAttribute("role", "button");
+        tile.setAttribute("tabindex", st.active ? "-1" : "0");
+        tile.setAttribute("draggable", st.active ? "false" : "true");
+        tile.dataset.termId = term.id;
+        tile.innerHTML = `<span class="dot"></span><span>${term.label}</span>`;
+
+        function activateFromUI() {
+          const s = ensureTileTerm(term.id);
+          if (s.active) return;
+          s.active = true;
+          // default OFF (per-plan)
+          if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+          // inherit from any legacy global value if present
+          if (!s.globalValue) {
+            const dk = term.input?.dataKey;
+            if (dk && state[dk]) s.globalValue = state[dk];
+          }
+          // seed per-plan keys
+          syncTileTermPlanSlots();
+          if (!termsTilesState.activeTileTermsOrder[group].includes(term.id)) {
+            termsTilesState.activeTileTermsOrder[group].push(term.id);
+          }
+          persistTermsTiles();
+          persistNow();
+          renderTermsTilesPanel(group, host);
         }
 
-        if (saved[term.input.dataKey]) inputEl.value = saved[term.input.dataKey];
+        tile.addEventListener("click", () => { if (!st.active) activateFromUI(); });
+        tile.addEventListener("keydown", (e) => {
+          if (st.active) return;
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateFromUI(); }
+        });
 
-        row.appendChild(checkWrap);
-        row.appendChild(label);
-        row.appendChild(inputEl);
-        host.appendChild(row);
+        tile.addEventListener("dragstart", (e) => {
+          if (st.active) { e.preventDefault(); return; }
+          e.dataTransfer.setData("text/plain", term.id);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+
+        lib.appendChild(tile);
       });
+
+      // Dropzone
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("is-over");
+        e.dataTransfer.dropEffect = "copy";
+      });
+      dropzone.addEventListener("dragleave", () => dropzone.classList.remove("is-over"));
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("is-over");
+        const termId = e.dataTransfer.getData("text/plain");
+        if (!termId || !tileTermById[termId]) return;
+        const termDef = tileTermById[termId];
+        const s = ensureTileTerm(termId);
+        if (s.active) return;
+        s.active = true;
+        if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+        if (!s.globalValue) {
+          const dk = termDef.input?.dataKey;
+          if (dk && state[dk]) s.globalValue = state[dk];
+        }
+        syncTileTermPlanSlots();
+        if (!termsTilesState.activeTileTermsOrder[group].includes(termId)) {
+          termsTilesState.activeTileTermsOrder[group].push(termId);
+        }
+        persistTermsTiles();
+        persistNow();
+        renderTermsTilesPanel(group, host);
+      });
+
+      // Active rows
+      function renderActiveRows() {
+        activeList.innerHTML = "";
+        const order = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => ensureTileTerm(id).active);
+
+        order.forEach(termId => {
+          const termDef = tileTermById[termId];
+          if (!termDef) return;
+          const st = ensureTileTerm(termId);
+
+          const row = document.createElement("div");
+          row.className = "term-active-row";
+          row.dataset.termId = termId;
+
+          const head = document.createElement("div");
+          head.className = "term-active-row__head";
+
+          const title = document.createElement("div");
+          title.className = "term-active-row__title";
+
+          const handle = document.createElement("div");
+          handle.className = "term-drag-handle";
+          handle.textContent = "⋮⋮";
+          handle.setAttribute("title", "Drag to reorder");
+          handle.setAttribute("draggable", "true");
+
+          const name = document.createElement("div");
+          name.textContent = termDef.label;
+
+          title.appendChild(handle);
+          title.appendChild(name);
+
+          const actions = document.createElement("div");
+          actions.className = "term-row-actions";
+
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "applies-toggle";
+          toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>Applies to All</span>`;
+
+          toggleBtn.addEventListener("click", () => {
+            st.appliesToAll = !st.appliesToAll;
+            // Keep globalValue in sync when turning ON (use first non-empty per-plan if global is empty)
+            if (st.appliesToAll && (!st.globalValue || String(st.globalValue).trim() === "")) {
+              const ids = currentPlanIds();
+              for (const pid of ids) {
+                const v = st.perPlanValues?.[pid];
+                if (v && String(v).trim() !== "") { st.globalValue = v; break; }
+              }
+            }
+            persistTermsTiles();
+            persistNow();
+            renderTermsTilesPanel(group, host);
+          });
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "term-remove";
+          removeBtn.textContent = "Remove";
+          removeBtn.addEventListener("click", () => {
+            st.active = false;
+            // Remove from order list
+            termsTilesState.activeTileTermsOrder[group] = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => id !== termId);
+            persistTermsTiles();
+            persistNow();
+            renderTermsTilesPanel(group, host);
+          });
+
+          actions.appendChild(toggleBtn);
+          actions.appendChild(removeBtn);
+
+          head.appendChild(title);
+          head.appendChild(actions);
+
+          const body = document.createElement("div");
+          body.className = "term-active-row__body";
+
+          // Shared or per-plan inputs
+          if (st.appliesToAll) {
+            const wrap = document.createElement("div");
+            wrap.className = "term-shared-input";
+            const inputEl = buildInputElForTile(termDef);
+            inputEl.value = st.globalValue || "";
+            wrap.appendChild(inputEl);
+            body.appendChild(wrap);
+
+            inputEl.addEventListener("input", () => {
+              st.globalValue = inputEl.value;
+              // Mirror to legacy state (for export placeholders)
+              const dk = termDef.input?.dataKey;
+              if (dk) state[dk] = inputEl.value;
+              persistTermsTiles();
+              persistNow();
+            });
+
+            if (termDef.input?.type === "select") {
+              inputEl.addEventListener("change", () => {
+                st.globalValue = inputEl.value;
+                const dk = termDef.input?.dataKey;
+                if (dk) state[dk] = inputEl.value;
+                persistTermsTiles();
+                persistNow();
+              });
+            }
+          } else {
+            syncTileTermPlanSlots();
+            const grid = document.createElement("div");
+            grid.className = "term-plan-grid";
+
+            (state.clgPlans || []).forEach((plan, idx) => {
+              const pid = plan.__id;
+              const planName = plan.clgPlatform || `Plan ${idx + 1}`;
+
+              const card = document.createElement("div");
+              card.className = "term-plan-input";
+
+              const chip = document.createElement("div");
+              chip.className = "term-plan-chip";
+              chip.textContent = planName;
+
+              const inputEl = buildInputElForTile(termDef);
+              inputEl.value = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
+
+              card.appendChild(chip);
+              card.appendChild(inputEl);
+              grid.appendChild(card);
+
+              const onUpdate = () => {
+                if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+                st.perPlanValues[pid] = inputEl.value;
+                persistTermsTiles();
+                persistNow();
+              };
+              inputEl.addEventListener("input", onUpdate);
+              if (termDef.input?.type === "select") inputEl.addEventListener("change", onUpdate);
+            });
+
+            body.appendChild(grid);
+          }
+
+          row.appendChild(head);
+          row.appendChild(body);
+          activeList.appendChild(row);
+
+          // Reorder drag
+          handle.addEventListener("dragstart", (e) => {
+            row.classList.add("term-row--dragging");
+            e.dataTransfer.setData("text/plain", termId);
+            e.dataTransfer.effectAllowed = "move";
+          });
+          handle.addEventListener("dragend", () => row.classList.remove("term-row--dragging"));
+          row.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+          });
+          row.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const movingId = e.dataTransfer.getData("text/plain");
+            if (!movingId || movingId === termId) return;
+            const arr = (termsTilesState.activeTileTermsOrder[group] || []).slice();
+            const from = arr.indexOf(movingId);
+            const to = arr.indexOf(termId);
+            if (from === -1 || to === -1) return;
+
+            // Decide before/after based on cursor position
+            const rect = row.getBoundingClientRect();
+            const before = (e.clientY - rect.top) < rect.height / 2;
+
+            arr.splice(from, 1);
+            const insertAt = before ? (to > from ? to - 1 : to) : (to > from ? to : to + 1);
+            arr.splice(insertAt, 0, movingId);
+            termsTilesState.activeTileTermsOrder[group] = arr;
+
+            persistTermsTiles();
+            persistNow();
+            renderTermsTilesPanel(group, host);
+          });
+        });
+      }
+
+      renderActiveRows();
     }
 
     function renderPlans() {
@@ -2864,39 +4070,81 @@ LNPresents Support`;
     }
 
     function buildAppConfigFromState(s) {
-      const termMap = {};
-      termMap.numAttorneys = { key: "numAttorneys", label: s.clgNumAttorneys ? "Number of Attorneys: " + s.clgNumAttorneys : "Number of Attorneys" };
-      termMap.yoyIncrease =  { key: "yoyIncrease",  label: s.clgYoyIncrease  ? "Year over Year increase: " + s.clgYoyIncrease : "Year over Year increase" };
+      // TERM DELIVERY RULES (V4):
+      // - Classic terms: show in regular terms area if selected
+      // - Tile terms: only show if active; if appliesToAll => regular terms area, else => per-plan terms
 
-      function makeLabelFromTermDef(termDef) {
-        const dataKey = termDef.input?.dataKey;
-        const baseLabel = termDef.label;
-        const rawVal = dataKey ? s[dataKey] : "";
-        if (termDef.input?.type === "date") {
-          return { key: termDef.key, label: rawVal ? baseLabel + ": " + fmtDate(rawVal) : baseLabel };
+      const deliveredRegular = [];
+
+      // Classic terms
+      const ctSel = termsTilesState.classicTermsSelected || {};
+      const ctVal = termsTilesState.classicTermsValues || {};
+
+      function pushRegular(key, label, rawVal, type) {
+        if (!label) return;
+        let finalLabel = label;
+        if (rawVal && String(rawVal).trim() !== "") {
+          finalLabel = type === "date" ? `${label}: ${fmtDate(rawVal)}` : `${label}: ${rawVal}`;
         }
-        if (rawVal && rawVal !== "") {
-          const needsColon = !baseLabel.endsWith(":");
-          return { key: termDef.key, label: baseLabel + (needsColon ? ": " : " ") + rawVal };
-        }
-        return { key: termDef.key, label: baseLabel };
+        deliveredRegular.push({ key, label: finalLabel });
       }
 
-      retentionTerms.forEach(termDef => { termMap[termDef.key] = makeLabelFromTermDef(termDef); });
-      newBizTerms.forEach(termDef => { termMap[termDef.key] = makeLabelFromTermDef(termDef); });
+      if (ctSel.attorneyCount) pushRegular("attorneyCount", "Attorney Count", ctVal.attorneyCount, "text");
+      if (ctSel.currentSpend)  pushRegular("currentSpend",  "Current Spend",  ctVal.currentSpend,  "text");
+      if (ctSel.currentTermEnd)pushRegular("currentTermEnd","Current Term End",ctVal.currentTermEnd,"date");
 
-      const delivered = [];
-      for (const key of s.clgSelectedTerms || []) {
-        if (termMap[key]) delivered.push(termMap[key]);
-        if (delivered.length >= 6) break;
+      // Tile terms that are active + appliesToAll
+      const ttState = termsTilesState.tileTermsState || {};
+      const activeOrders = termsTilesState.activeTileTermsOrder || { retention: [], newbiz: [] };
+
+      function maybePushTileRegular(termId) {
+        const def = tileTermById[termId];
+        if (!def) return;
+        const st = ttState[termId];
+        if (!st || !st.active || !st.appliesToAll) return;
+        const val = st.globalValue || (def.input?.dataKey ? (s[def.input.dataKey] || "") : "");
+        pushRegular(termId, def.label, val, def.input?.type === "date" ? "date" : "text");
       }
 
-      const plans = (s.clgPlans || []).map((plan, idx) => ({
-        id: idx + 1,
-        title: plan.clgPlatform || `Plan ${idx + 1}`,
-        price: plan.clgPrice || "",
-        contentsHtml: plan.clgContents || ""
-      }));
+      activeOrders.retention.forEach(maybePushTileRegular);
+      activeOrders.newbiz.forEach(maybePushTileRegular);
+
+      // Cap for regular area (legacy behavior)
+      const delivered = deliveredRegular.slice(0, MAX_TERM_SELECTIONS);
+
+      // Plans + plan terms
+      const plans = (s.clgPlans || []).map((plan, idx) => {
+        const planId = plan.__id;
+        const planTerms = [];
+
+        function maybePushPlanTerm(termId) {
+          const def = tileTermById[termId];
+          if (!def) return;
+          const st = ttState[termId];
+          if (!st || !st.active || st.appliesToAll) return;
+
+          let rawVal = "";
+          if (st.perPlanValues && planId && planId in st.perPlanValues) rawVal = st.perPlanValues[planId] || "";
+          if (!rawVal) rawVal = st.globalValue || ""; // fallback
+
+          let label = def.label;
+          if (rawVal && String(rawVal).trim() !== "") {
+            label = def.input?.type === "date" ? `${def.label}: ${fmtDate(rawVal)}` : `${def.label}: ${rawVal}`;
+          }
+          planTerms.push({ key: termId, label });
+        }
+
+        activeOrders.retention.forEach(maybePushPlanTerm);
+        activeOrders.newbiz.forEach(maybePushPlanTerm);
+
+        return {
+          id: idx + 1,
+          title: plan.clgPlatform || `Plan ${idx + 1}`,
+          price: plan.clgPrice || "",
+          contentsHtml: plan.clgContents || "",
+          terms: planTerms
+        };
+      });
 
       // Keep Rep header selection available to the Presenter (raw + label)
       let repFile = "";
@@ -3130,9 +4378,11 @@ try{
     });
 
     // Render term panels
-    renderTermPanel(retentionHost, retentionTerms);
-    renderTermPanel(newBizHost, newBizTerms);
+    renderClassicTopTerms();
+    renderTermsTilesPanel("retention", retentionHost);
+    renderTermsTilesPanel("newbiz", newBizHost);
     hydrateFormFromState();
+    syncTileTermPlanSlots();
 
     const STORAGE_KEY = "clgFormVars";
 const STORAGE_SCHEMA = 1;
@@ -3333,6 +4583,9 @@ function persistNow(){
         state.clgPlans.splice(Number(rem), 1);
         if (state.clgPlans.length === 0) state.clgPlans.push(makeEmptyPlan());
         renderPlans();
+        syncTileTermPlanSlots();
+        renderTermsTilesPanel("retention", retentionHost);
+        renderTermsTilesPanel("newbiz", newBizHost);
       }
     });
 
@@ -3341,6 +4594,9 @@ function persistNow(){
       if (state.clgPlans.length >= MAX_PLANS) return;
       state.clgPlans.push(makeEmptyPlan());
       renderPlans();
+      syncTileTermPlanSlots();
+      renderTermsTilesPanel("retention", retentionHost);
+      renderTermsTilesPanel("newbiz", newBizHost);
     });
 
     // Form input (top-level)
