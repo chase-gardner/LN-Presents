@@ -142,6 +142,8 @@ function buildUiPlans() {
           "<p>Core primary law collection for your jurisdiction.</p><p>Includes citator and Shepardizing.</p>",
         features: [],
         cta: "This Month Only",
+        ctaLabel: "This Month Only",
+        ctaUrl: "",
         terms: []
       }
     ];
@@ -220,6 +222,8 @@ function buildUiPlans() {
       bodyHtml: p.clgContents || "",
       features: [],
       cta: "This Month Only",
+      ctaLabel: p.clgCtaLabel || "",
+      ctaUrl: p.clgCtaUrl || "",
       terms: planTerms
     };
   });
