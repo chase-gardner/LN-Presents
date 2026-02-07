@@ -2950,6 +2950,8 @@ LNPresents Support`;
       return map;
     })();
 
+    const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
+
     function defaultTermsTilesState() {
       const classicSel = {};
       const classicVals = {};
@@ -3048,7 +3050,6 @@ LNPresents Support`;
     /* =========================
      * D) PERSISTED & STATE
      * ========================= */
-    const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
 
     function makeEmptyPlan() {
       return {
@@ -4428,6 +4429,12 @@ function persistNow(){
       state.clgTermStartDate = "";
       state.clgPlans = [makeEmptyPlan()];
       renderPlans();
+      termsTilesState = defaultTermsTilesState();
+      try { localStorage.removeItem(TERMS_TILES_STORAGE_KEY); } catch (e) {}
+      renderClassicTopTerms();
+      renderTermsTilesPanel("retention", retentionHost);
+      renderTermsTilesPanel("newbiz", newBizHost);
+      syncTileTermPlanSlots();
       localStorage.removeItem("clgFormVars");
       buildAppConfigFromState(state);
     }
