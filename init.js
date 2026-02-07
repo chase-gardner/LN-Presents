@@ -122,6 +122,19 @@
       const ctaEl = frag.querySelector('.plan-card__cta');
       if (ctaEl) ctaEl.textContent = p.cta || 'Select plan';
 
+      const termsWrap = frag.querySelector('.plan-card__terms');
+      const termsList = frag.querySelector('.plan-card__terms-list');
+      if (termsWrap && termsList) {
+        const terms = Array.isArray(p.terms) ? p.terms : [];
+        if (terms.length) {
+          termsList.innerHTML = terms.map(term => `<li>${escapeHtml(term.label)}</li>`).join('');
+          termsWrap.hidden = false;
+        } else {
+          termsList.innerHTML = '';
+          termsWrap.hidden = true;
+        }
+      }
+
       container.appendChild(frag);
     });
   }
