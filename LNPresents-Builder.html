@@ -1204,7 +1204,7 @@ input:focus, select:focus, textarea:focus{
   display:flex;
   flex-wrap: nowrap;
   gap:8px; /* slightly roomier */
-  overflow-x: auto;
+  overflow-x: hidden;
   padding-bottom: 2px;
 }
 
@@ -1215,8 +1215,9 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   padding: 8px 9px;
   border-radius: 12px;
+  flex: 1 1 0;
   flex-wrap: nowrap;
-  min-width: 220px;
+  min-width: 0;
 }
 
 .term-plan-chip{
