@@ -126,14 +126,17 @@
         const ctaLabel = (p.ctaLabel || p.cta || '').trim() || fallbackLabel;
         ctaEl.textContent = ctaLabel;
         if (ctaUrl) {
-          ctaEl.dataset.href = ctaUrl;
+          ctaEl.setAttribute('href', ctaUrl);
           ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
-          ctaEl.addEventListener('click', () => {
-            window.open(ctaUrl, '_blank', 'noopener');
-          });
+          ctaEl.setAttribute('target', '_blank');
+          ctaEl.setAttribute('rel', 'noopener noreferrer');
+          ctaEl.removeAttribute('aria-disabled');
         } else {
-          ctaEl.removeAttribute('data-href');
+          ctaEl.removeAttribute('href');
           ctaEl.removeAttribute('aria-label');
+          ctaEl.removeAttribute('target');
+          ctaEl.removeAttribute('rel');
+          ctaEl.setAttribute('aria-disabled', 'true');
         }
       }
 
@@ -570,6 +573,7 @@
     const opt = {
       margin,
       filename,
+      enableLinks: true,
       image: { type: 'jpeg', quality: 0.95 },
       html2canvas: {
         scale,
