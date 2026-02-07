@@ -122,8 +122,9 @@
       const ctaEl = frag.querySelector('.plan-card__cta');
       if (ctaEl) {
         const ctaUrl = (p.ctaUrl || '').trim();
-        const ctaLabel = (p.ctaLabel || p.cta || (ctaUrl ? 'Learn more' : 'Select plan')).trim();
-        ctaEl.textContent = ctaLabel || 'Select plan';
+        const fallbackLabel = 'This Month Only';
+        const ctaLabel = (p.ctaLabel || p.cta || '').trim() || fallbackLabel;
+        ctaEl.textContent = ctaLabel;
         if (ctaUrl) {
           ctaEl.dataset.href = ctaUrl;
           ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);

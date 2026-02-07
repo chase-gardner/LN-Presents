@@ -1221,7 +1221,7 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   padding: 8px 9px;
   border-radius: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .term-plan-chip{
@@ -1238,7 +1238,7 @@ input:focus, select:focus, textarea:focus{
   font-size: .86rem;
   padding: 0 10px;
   min-width: 0;
-  flex: 1 1 160px;
+  flex: 1 1 auto;
 }
 
 .term-row--dragging{ opacity:.55; }
@@ -4083,11 +4083,12 @@ LNPresents Support`;
     }
 
     function formatPlanCtaSummary(plan) {
+      const defaultLabel = "This Month Only";
       const label = (plan?.clgCtaLabel || "").trim();
       const url = (plan?.clgCtaUrl || "").trim();
-      if (!label && !url) return "CTA button: Not set";
-      const displayLabel = label || "Learn more";
-      return url ? `CTA button: ${displayLabel} — ${url}` : `CTA button: ${displayLabel} (URL missing)`;
+      const displayLabel = label || defaultLabel;
+      if (!url) return `CTA button: ${displayLabel} (no link)`;
+      return `CTA button: ${displayLabel} — ${url}`;
     }
 
     function updatePlanCtaSummary(card, plan) {
