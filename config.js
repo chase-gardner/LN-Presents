@@ -86,7 +86,7 @@ function formatPercentValue(value) {
 
 function normalizeTermValue(termKey, value) {
   if (value == null) return "";
-  const currencyKeys = new Set(["currentSpend", "introPrice"]);
+  const currencyKeys = new Set(["currentSpend", "introPrice", "costPerAttorney"]);
   const percentKeys = new Set(["yoyIncrease"]);
 
   if (currencyKeys.has(termKey)) return formatCurrencyValue(value);
@@ -94,35 +94,81 @@ function normalizeTermValue(termKey, value) {
   return value;
 }
 
+const termDefinitions = {
+  effectiveDate:     { id: "effectiveDate", label: "Effective Date", input: { type: "date", dataKey: "clgEffectiveDate" } },
+  extensionTermEnd:  { id: "extensionTermEnd", label: "Extension Term End", input: { type: "date", dataKey: "clgExtensionTermEnd" } },
+  extensionTerm:     { id: "extensionTerm", label: "Term Extension", input: { type: "select", dataKey: "clgExtensionTerm" } },
+  yoyIncrease:       { id: "yoyIncrease", label: "Year over Year Increase", input: { type: "text", dataKey: "clgYoyIncrease" } },
+  activationDate:    { id: "activationDate", label: "Activation Date", input: { type: "date", dataKey: "clgActivationDate" } },
+  introPrice:        { id: "introPrice", label: "Promotion Price", input: { type: "text", dataKey: "clgIntroPrice" } },
+  termStartDate:     { id: "termStartDate", label: "Promotion End Date", input: { type: "date", dataKey: "clgTermStartDate" } },
+  termEndDate:       { id: "termEndDate", label: "Term End Date", input: { type: "date", dataKey: "clgTermEndDate" } },
+  nbExtensionTerm:   { id: "nbExtensionTerm", label: "Term Length", input: { type: "select", dataKey: "clgnbExtensionTerm" } },
+  promotion:         { id: "promotion", label: "Promotion", input: { type: "text", dataKey: "clgPromotion" } },
+  freeTimeAvailable: { id: "freeTimeAvailable", label: "Free Time Available", input: { type: "range", dataKey: "clgFreeTimeAvailable", suffix: "days" } },
+  costPerAttorney:   { id: "costPerAttorney", label: "Cost Per Attorney", input: { type: "text", dataKey: "clgCostPerAttorney" } },
+  representativeNotes: { id: "representativeNotes", label: "Representative Notes", input: { type: "text", dataKey: "clgRepresentativeNotes" } },
+  importantChangesMade: { id: "importantChangesMade", label: "Important Changes Made", input: { type: "text", dataKey: "clgImportantChangesMade" } }
+};
+
+const tileTermsCatalog = {
+  retention: [
+    termDefinitions.effectiveDate,
+    termDefinitions.extensionTerm,
+    termDefinitions.extensionTermEnd,
+    termDefinitions.yoyIncrease
+  ],
+  newbiz: [
+    termDefinitions.activationDate,
+    termDefinitions.introPrice,
+    termDefinitions.termStartDate,
+    termDefinitions.termEndDate,
+    termDefinitions.nbExtensionTerm
+  ],
+  datesTimes: [
+    termDefinitions.activationDate,
+    termDefinitions.effectiveDate,
+    termDefinitions.extensionTermEnd,
+    termDefinitions.termStartDate,
+    termDefinitions.termEndDate
+  ],
+  pricingPromos: [
+    termDefinitions.introPrice,
+    termDefinitions.promotion,
+    termDefinitions.freeTimeAvailable,
+    termDefinitions.costPerAttorney
+  ],
+  representative: [
+    termDefinitions.representativeNotes,
+    termDefinitions.importantChangesMade
+  ]
+};
+
+const tileTermById = (() => {
+  const map = {};
+  Object.keys(tileTermsCatalog).forEach(group => {
+    tileTermsCatalog[group].forEach(t => { map[t.id] = { ...t, group }; });
+  });
+  return map;
+})();
+
+const tileTermGroups = Object.keys(tileTermsCatalog);
+
+function formatTileTermValue(def, rawValue) {
+  if (rawValue == null || String(rawValue).trim() === "") return "";
+  if (def?.input?.type === "date") return formatIsoToShort(rawValue);
+  if (def?.input?.suffix) {
+    const suffix = def.input.suffix;
+    return String(rawValue).includes(suffix) ? rawValue : `${rawValue} ${suffix}`;
+  }
+  return normalizeTermValue(def.id, rawValue);
+}
+
 // Build terms array using current saved config (max 6, honoring selection)
 function buildUiTerms() {
   const termsTilesState = stored.lnpTermsTiles && typeof stored.lnpTermsTiles === "object"
     ? stored.lnpTermsTiles
     : null;
-
-  const tileTermsCatalog = {
-    retention: [
-      { id: "effectiveDate", label: "Effective Date", input: { type: "date", dataKey: "clgEffectiveDate" } },
-      { id: "extensionTermEnd", label: "Extension Term End", input: { type: "date", dataKey: "clgExtensionTermEnd" } },
-      { id: "extensionTerm", label: "Term Extension", input: { type: "select", dataKey: "clgExtensionTerm" } },
-      { id: "yoyIncrease", label: "Year over Year Increase", input: { type: "text", dataKey: "clgYoyIncrease" } }
-    ],
-    newbiz: [
-      { id: "activationDate", label: "Activation Date", input: { type: "date", dataKey: "clgActivationDate" } },
-      { id: "introPrice", label: "Promo Price", input: { type: "text", dataKey: "clgIntroPrice" } },
-      { id: "termStartDate", label: "Promo End Date", input: { type: "date", dataKey: "clgTermStartDate" } },
-      { id: "termEndDate", label: "Term End Date", input: { type: "date", dataKey: "clgTermEndDate" } },
-      { id: "nbExtensionTerm", label: "Term Length", input: { type: "select", dataKey: "clgnbExtensionTerm" } }
-    ]
-  };
-
-  const tileTermById = (() => {
-    const map = {};
-    Object.keys(tileTermsCatalog).forEach(group => {
-      tileTermsCatalog[group].forEach(t => { map[t.id] = { ...t, group }; });
-    });
-    return map;
-  })();
 
   function formatLabel(base, value, type) {
     if (type === "date" && value) return `${base}: ${formatIsoToShort(value)}`;
@@ -138,10 +184,10 @@ function buildUiTerms() {
     const ctSel = termsTilesState.classicTermsSelected || {};
     const ctVal = termsTilesState.classicTermsValues || {};
 
-    function pushRegular(key, label, rawVal, type) {
+    function pushRegular(key, label, rawVal, type, def) {
       if (!label) return;
-      const normalizedValue = normalizeTermValue(key, rawVal);
-      const finalLabel = formatLabel(label, normalizedValue, type);
+      const normalizedValue = def ? formatTileTermValue(def, rawVal) : normalizeTermValue(key, rawVal);
+      const finalLabel = formatLabel(label, normalizedValue, def ? "text" : type);
       deliveredRegular.push({ key, label: finalLabel });
     }
 
@@ -150,19 +196,23 @@ function buildUiTerms() {
     if (ctSel.currentTermEnd) pushRegular("currentTermEnd", "Current Term End", ctVal.currentTermEnd, "date");
 
     const ttState = termsTilesState.tileTermsState || {};
-    const activeOrders = termsTilesState.activeTileTermsOrder || { retention: [], newbiz: [] };
+    const activeOrders = termsTilesState.activeTileTermsOrder || {};
+    const seenTileTerms = new Set();
 
     function maybePushTileRegular(termId) {
+      if (seenTileTerms.has(termId)) return;
       const def = tileTermById[termId];
       if (!def) return;
       const st = ttState[termId];
       if (!st || !st.active || !st.appliesToAll) return;
       const val = st.globalValue || (def.input?.dataKey ? (stored[def.input.dataKey] || "") : "");
-      pushRegular(termId, def.label, val, def.input?.type === "date" ? "date" : "text");
+      pushRegular(termId, def.label, val, def.input?.type === "date" ? "date" : "text", def);
+      seenTileTerms.add(termId);
     }
 
-    activeOrders.retention.forEach(maybePushTileRegular);
-    activeOrders.newbiz.forEach(maybePushTileRegular);
+    tileTermGroups.forEach(group => {
+      (activeOrders[group] || []).forEach(maybePushTileRegular);
+    });
 
     return deliveredRegular.slice(0, 6);
   }
@@ -180,8 +230,8 @@ function buildUiTerms() {
     { key: "extensionTermEnd", labelBase: "Extension Term End", value: stored.clgExtensionTermEnd || "", type: "date" },
     { key: "extensionTerm", labelBase: "Term Extension", value: stored.clgExtensionTerm || "", type: "text" },
     { key: "ActivationDate", labelBase: "Activation Date", value: stored.clgActivationDate || "", type: "date" },
-    { key: "introPrice", labelBase: "Promo Price", value: stored.clgIntroPrice || "", type: "text" },
-    { key: "termStartDate", labelBase: "Promo End Date", value: stored.clgTermStartDate || "", type: "date" },
+    { key: "introPrice", labelBase: "Promotion Price", value: stored.clgIntroPrice || "", type: "text" },
+    { key: "termStartDate", labelBase: "Promotion End Date", value: stored.clgTermStartDate || "", type: "date" },
     { key: "termEndDate", labelBase: "Term End Date", value: stored.clgTermEndDate || "", type: "date" },
     { key: "nbExtensionTerm", labelBase: "Term Length", value: stored.clgnbExtensionTerm || "", type: "text" }
   ];
@@ -224,48 +274,27 @@ function buildUiPlans() {
     ? stored.lnpTermsTiles
     : null;
 
-  const tileTermsCatalog = {
-    retention: [
-      { id: "effectiveDate", label: "Effective Date", input: { type: "date" } },
-      { id: "extensionTermEnd", label: "Extension Term End", input: { type: "date" } },
-      { id: "extensionTerm", label: "Term Extension", input: { type: "select" } },
-      { id: "yoyIncrease", label: "Year over Year Increase", input: { type: "text" } }
-    ],
-    newbiz: [
-      { id: "activationDate", label: "Activation Date", input: { type: "date" } },
-      { id: "introPrice", label: "Promo Price", input: { type: "text" } },
-      { id: "termStartDate", label: "Promo End Date", input: { type: "date" } },
-      { id: "termEndDate", label: "Term End Date", input: { type: "date" } },
-      { id: "nbExtensionTerm", label: "Term Length", input: { type: "select" } }
-    ]
-  };
-
-  const tileTermById = (() => {
-    const map = {};
-    Object.keys(tileTermsCatalog).forEach(group => {
-      tileTermsCatalog[group].forEach(t => { map[t.id] = { ...t, group }; });
-    });
-    return map;
-  })();
-
   function formatPlanTermLabel(label, value, type, key) {
     if (value && String(value).trim() !== "") {
       if (type === "date") return `${label}: ${formatIsoToShort(value)}`;
-      const normalizedValue = normalizeTermValue(key, value);
+      const def = tileTermById[key];
+      const normalizedValue = def ? formatTileTermValue(def, value) : normalizeTermValue(key, value);
       return `${label}: ${normalizedValue}`;
     }
     return label;
   }
 
   const ttState = termsTilesState?.tileTermsState || {};
-  const activeOrders = termsTilesState?.activeTileTermsOrder || { retention: [], newbiz: [] };
+  const activeOrders = termsTilesState?.activeTileTermsOrder || {};
 
   return rawPlans.map((p, idx) => {
     const planTerms = [];
     const planId = p.__id;
+    const seenPlanTerms = new Set();
 
     if (termsTilesState) {
       function maybePushPlanTerm(termId) {
+        if (seenPlanTerms.has(termId)) return;
         const def = tileTermById[termId];
         if (!def) return;
         const st = ttState[termId];
@@ -281,10 +310,12 @@ function buildUiPlans() {
           key: termId,
           label: formatPlanTermLabel(def.label, rawVal, def.input?.type, termId)
         });
+        seenPlanTerms.add(termId);
       }
 
-      activeOrders.retention.forEach(maybePushPlanTerm);
-      activeOrders.newbiz.forEach(maybePushPlanTerm);
+      tileTermGroups.forEach(group => {
+        (activeOrders[group] || []).forEach(maybePushPlanTerm);
+      });
     }
 
     return {
