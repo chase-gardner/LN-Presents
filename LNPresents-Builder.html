@@ -787,10 +787,12 @@ input:focus, select:focus, textarea:focus{
 
 /* Per-plan inputs — compact + clean */
 .term-active-row .term-plan-input{
+  --plan-tint: rgba(148,163,184,.08);
+  --plan-tint-strong: rgba(148,163,184,.18);
   padding: 8px 9px;
   border-radius: 12px;
-  border: 1px solid rgba(15,23,42,.08);
-  background: rgba(15,23,42,.02);
+  border: 1px solid color-mix(in srgb, var(--plan-tint-strong) 55%, rgba(15,23,42,.08));
+  background: color-mix(in srgb, var(--plan-tint) 62%, rgba(255,255,255,.98));
 }
 
 /* Plan chip: smaller and tighter */
@@ -800,7 +802,7 @@ input:focus, select:focus, textarea:focus{
   font-weight: 750;
   border-radius: 999px;
   margin-bottom: 6px;
-  background: rgba(224,231,255,.72);
+  background: color-mix(in srgb, var(--plan-tint-strong) 65%, rgba(255,255,255,.95));
 }
 
 /* Compact field controls */
@@ -859,8 +861,8 @@ input:focus, select:focus, textarea:focus{
 }
 
 .term-active-row .term-plan-input{
-  border-color: rgba(15,23,42,.06);
-  background: rgba(255,255,255,.70);
+  border-color: color-mix(in srgb, var(--plan-tint-strong) 42%, rgba(15,23,42,.08));
+  background: color-mix(in srgb, var(--plan-tint) 50%, rgba(255,255,255,.9));
 }
 .term-active-row .term-plan-input input,
 .term-active-row .term-plan-input select{
@@ -1603,7 +1605,11 @@ input:focus, select:focus, textarea:focus{
 
 /* 15) Plan cards */
 .plan-card{
-  background: rgba(255,255,255,.96);
+  --plan-tint: rgba(59,130,246,.06);
+  --plan-tint-strong: rgba(59,130,246,.14);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.94)),
+    var(--plan-tint);
   border: 1px solid rgba(15,23,42,.10);
   border-radius: var(--radius-lg);
   padding: 12px 12px;
@@ -1681,6 +1687,32 @@ input:focus, select:focus, textarea:focus{
 .plan-card.drop-target{
   outline: 2px dashed rgba(99,102,241,.85);
   outline-offset: 4px;
+}
+
+/* Plan tint mapping (by plan index) */
+.plan-card[data-plan-idx="0"],
+.term-plan-input[data-plan-idx="0"],
+.term-plan-chip[data-plan-idx="0"]{
+  --plan-tint: rgba(59,130,246,.08);
+  --plan-tint-strong: rgba(59,130,246,.18);
+}
+.plan-card[data-plan-idx="1"],
+.term-plan-input[data-plan-idx="1"],
+.term-plan-chip[data-plan-idx="1"]{
+  --plan-tint: rgba(16,185,129,.08);
+  --plan-tint-strong: rgba(16,185,129,.18);
+}
+.plan-card[data-plan-idx="2"],
+.term-plan-input[data-plan-idx="2"],
+.term-plan-chip[data-plan-idx="2"]{
+  --plan-tint: rgba(139,92,246,.08);
+  --plan-tint-strong: rgba(139,92,246,.18);
+}
+.plan-card[data-plan-idx="3"],
+.term-plan-input[data-plan-idx="3"],
+.term-plan-chip[data-plan-idx="3"]{
+  --plan-tint: rgba(245,158,11,.10);
+  --plan-tint-strong: rgba(245,158,11,.20);
 }
 
 /* 16) Toolbar */
@@ -4192,9 +4224,11 @@ LNPresents Support`;
 
               const card = document.createElement("div");
               card.className = "term-plan-input";
+              card.dataset.planIdx = idx;
 
               const chip = document.createElement("div");
               chip.className = "term-plan-chip";
+              chip.dataset.planIdx = idx;
               chip.textContent = planName;
 
               const inputEl = buildInputElForTile(termDef);
@@ -4284,6 +4318,7 @@ LNPresents Support`;
         card.className = "plan-card";
         card.setAttribute("draggable", "true");       /* enable drag on card */
         card.dataset.planId = plan.__id;
+        card.dataset.planIdx = idx;
 
         card.innerHTML = `
           <div class="plan-card-header">
