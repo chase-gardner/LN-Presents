@@ -192,6 +192,12 @@ h1,h2,h3{ margin:0; }
   letter-spacing:.01em;
   margin: 0 0 10px;
 }
+.terms-card h2{
+  margin-bottom: 4px;
+}
+.terms-card .terms-description{
+  margin: 2px 0 8px;
+}
 .lede{
   margin:0 0 10px;
   color:#334155;
@@ -2357,13 +2363,13 @@ input:focus, select:focus, textarea:focus{
 
           <!-- 2) Side-by-side panels -->
           <div class="form-panel-row">
-          <div class="card">
+          <div class="card terms-card">
             <h2>Terms</h2>
-            <p class="muted-text">
+            <p class="muted-text terms-description">
               Drag terms from Available to Active, then expand each term to enter values. Use <b>Applies to All</b> for top terms (max 6 total with classic terms),
               or keep per-plan values to show inside each plan.
             </p>
-            <div class="terms-tiles-toprow">
+          <div class="terms-tiles-toprow">
                 <div class="tab-row">
                   <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
                   <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
