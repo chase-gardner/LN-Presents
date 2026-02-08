@@ -122,16 +122,31 @@
       const ctaEl = frag.querySelector('.plan-card__cta');
       if (ctaEl) {
         const ctaUrl = (p.ctaUrl || '').trim();
-        const fallbackLabel = 'This Month Only';
-        const ctaLabel = (p.ctaLabel || p.cta || '').trim() || fallbackLabel;
-        ctaEl.textContent = ctaLabel;
-        if (ctaUrl) {
-          ctaEl.setAttribute('href', ctaUrl);
-          ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
-          ctaEl.setAttribute('target', '_blank');
-          ctaEl.setAttribute('rel', 'noopener noreferrer');
-          ctaEl.removeAttribute('aria-disabled');
+        const ctaLabel = (p.ctaLabel || p.cta || '').trim();
+        const hasCta = Boolean(ctaLabel || ctaUrl);
+        const footerEl = ctaEl.closest('.plan-card__footer');
+
+        if (footerEl) {
+          footerEl.hidden = !hasCta;
+        }
+
+        if (hasCta) {
+          ctaEl.textContent = ctaLabel || ctaUrl;
+          if (ctaUrl) {
+            ctaEl.setAttribute('href', ctaUrl);
+            ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
+            ctaEl.setAttribute('target', '_blank');
+            ctaEl.setAttribute('rel', 'noopener noreferrer');
+            ctaEl.removeAttribute('aria-disabled');
+          } else {
+            ctaEl.removeAttribute('href');
+            ctaEl.removeAttribute('aria-label');
+            ctaEl.removeAttribute('target');
+            ctaEl.removeAttribute('rel');
+            ctaEl.setAttribute('aria-disabled', 'true');
+          }
         } else {
+          ctaEl.textContent = '';
           ctaEl.removeAttribute('href');
           ctaEl.removeAttribute('aria-label');
           ctaEl.removeAttribute('target');
