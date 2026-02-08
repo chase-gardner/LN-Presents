@@ -480,8 +480,14 @@ a { color: inherit; text-decoration: none; }
   justify-content:center;
   gap:.75rem;
   padding: 14px 16px;
+  min-height: 52px;
   border-top: 1px solid var(--border);
   background: linear-gradient(180deg, transparent, rgba(0,0,0,.02));
+}
+
+.plan-card__footer--empty .plan-card__cta{
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .btn-primary,

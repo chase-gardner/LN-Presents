@@ -127,11 +127,13 @@
         const footerEl = ctaEl.closest('.plan-card__footer');
 
         if (footerEl) {
-          footerEl.hidden = !hasCta;
+          footerEl.classList.toggle('plan-card__footer--empty', !hasCta);
         }
 
         if (hasCta) {
           ctaEl.textContent = ctaLabel || ctaUrl;
+          ctaEl.removeAttribute('aria-hidden');
+          ctaEl.removeAttribute('tabindex');
           if (ctaUrl) {
             ctaEl.setAttribute('href', ctaUrl);
             ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
@@ -152,13 +154,17 @@
           ctaEl.removeAttribute('target');
           ctaEl.removeAttribute('rel');
           ctaEl.setAttribute('aria-disabled', 'true');
+          ctaEl.setAttribute('aria-hidden', 'true');
+          ctaEl.setAttribute('tabindex', '-1');
         }
       }
 
       const termsWrap = frag.querySelector('.plan-card__terms');
       const termsList = frag.querySelector('.plan-card__terms-list');
       if (termsWrap && termsList) {
-        const terms = Array.isArray(p.terms) ? p.terms : [];
+        const terms = Array.isArray(p.terms)
+          ? p.terms.filter(term => term && String(term.label || '').trim() !== '')
+          : [];
         if (terms.length) {
           termsList.innerHTML = terms.map(term => `<li>${escapeHtml(term.label)}</li>`).join('');
           termsWrap.hidden = false;

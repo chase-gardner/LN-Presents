@@ -281,7 +281,7 @@ function buildUiPlans() {
       const normalizedValue = def ? formatTileTermValue(def, value) : normalizeTermValue(key, value);
       return `${label}: ${normalizedValue}`;
     }
-    return label;
+    return "";
   }
 
   const ttState = termsTilesState?.tileTermsState || {};
@@ -305,6 +305,7 @@ function buildUiPlans() {
           rawVal = st.perPlanValues[planId] || "";
         }
         if (!rawVal) rawVal = st.globalValue || "";
+        if (!rawVal || String(rawVal).trim() === "") return;
 
         planTerms.push({
           key: termId,
