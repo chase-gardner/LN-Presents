@@ -773,8 +773,8 @@ input:focus, select:focus, textarea:focus{
 .term-tile:active{ cursor:grabbing; transform:none; }
 
 .term-tile.is-used{
-  opacity:.42;
-  cursor:not-allowed;
+  opacity:.55;
+  cursor:pointer;
   border-style:dashed;
   background: rgba(15,23,42,.04);
 }
@@ -1640,13 +1640,122 @@ input:focus, select:focus, textarea:focus{
 
 /* 14) Plans grid */
 #plansContainer{
-  display:grid;
-  gap:14px;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  align-items:start;
+  display:block;
 }
-@media (max-width:820px){
-  #plansContainer{ grid-template-columns: 1fr; }
+
+.plan-tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom: 12px;
+}
+
+.plan-tab{
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,.12);
+  background: rgba(255,255,255,.95);
+  padding: 6px 14px;
+  font-size: .82rem;
+  font-weight: 800;
+  color:#0b0f19;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease, border-color .12s ease;
+  box-shadow: 0 12px 30px rgba(2,6,23,.08);
+}
+.plan-tab:hover{
+  transform: translateY(-1px);
+  border-color: rgba(99,102,241,.35);
+  box-shadow: 0 18px 44px rgba(2,6,23,.12);
+}
+.plan-tab.is-active{
+  background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(255,255,255,.98));
+  border-color: rgba(99,102,241,.55);
+}
+.plan-tab__num{
+  font-size:.70rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#475569;
+}
+.plan-tab__name{
+  font-size:.84rem;
+  font-weight: 800;
+  color:#0b0f19;
+}
+.plan-tab--add{
+  background: linear-gradient(135deg,#6d28d9,#4f46e5);
+  color:#fff;
+  border-color: rgba(255,255,255,.25);
+  padding: 6px 12px;
+  font-size: 1rem;
+  line-height: 1;
+}
+.plan-tab--add:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
+
+.plan-sheet{
+  display:grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap:16px;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.96);
+  box-shadow: var(--shadow-2);
+}
+@media (max-width:900px){
+  .plan-sheet{ grid-template-columns: 1fr; }
+}
+
+.plan-sheet__left{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.plan-sheet__right{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.plan-sheet__right .plan-contents{
+  min-height: 220px;
+}
+.plan-sheet__meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.plan-remove{
+  border-radius: 999px;
+  border: 1px solid rgba(185,28,28,.28);
+  background: rgba(254,242,242,.92);
+  color:#b91c1c;
+  padding: 6px 12px;
+  font-size: .78rem;
+  font-weight: 800;
+  cursor:pointer;
+}
+.plan-remove:hover{ filter: brightness(1.02); box-shadow: 0 10px 24px rgba(185,28,28,.16); }
+
+.term-plan-input.is-empty{
+  opacity:.4;
+  filter: grayscale(.2);
+}
+.term-plan-input.is-empty .term-plan-chip{
+  opacity:.7;
+}
+.term-plan-input.is-empty input,
+.term-plan-input.is-empty select{
+  pointer-events:none;
 }
 
 /* 15) Plan cards */
@@ -2521,7 +2630,9 @@ input:focus, select:focus, textarea:focus{
               </div>
             </div>
 
-            <button type="button" id="addPlanBtn" class="addPlanbtn btn-pill" style="addPlanbtn">+ Add Plan</button>
+            <div id="planTabs" class="plan-tabs" role="tablist" aria-label="Plan tabs">
+              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add" aria-label="Add plan">+</button>
+            </div>
             <div id="plansContainer"></div>
           </div>
         </form>
@@ -2712,6 +2823,7 @@ input:focus, select:focus, textarea:focus{
       representative: representativeHost
     };
     const plansContainer = document.getElementById("plansContainer");
+    const planTabs = document.getElementById("planTabs");
     const addPlanBtn = document.getElementById("addPlanBtn");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
@@ -2744,6 +2856,7 @@ const clearUploadedHeaderBtn  = document.getElementById("clearUploadedHeaderBtn"
     const MAX_PLANS = 4;
     const MAX_TERM_SELECTIONS = 6;
     const currencyFmt = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+    let activePlanId = null;
 
     /* =========================
      * B.1) LN REP (HEADER) STATE
@@ -4172,18 +4285,20 @@ LNPresents Support`;
       // Library tiles
       catalog.forEach(term => {
         const st = ensureTileTerm(term.id);
+        const isInGroupOrder = (termsTilesState.activeTileTermsOrder[group] || []).includes(term.id);
         const tile = document.createElement("div");
         tile.className = "term-tile" + (st.active ? " is-used" : "");
         tile.setAttribute("role", "button");
-        tile.setAttribute("tabindex", st.active ? "-1" : "0");
-        tile.setAttribute("draggable", st.active ? "false" : "true");
+        tile.setAttribute("tabindex", "0");
+        tile.setAttribute("draggable", isInGroupOrder ? "false" : "true");
         tile.dataset.termId = term.id;
         tile.innerHTML = `<span class="dot"></span><span>${term.label}</span>`;
 
         function activateFromUI() {
           const s = ensureTileTerm(term.id);
-          if (s.active) return;
-          s.active = true;
+          const alreadyInGroup = (termsTilesState.activeTileTermsOrder[group] || []).includes(term.id);
+          if (alreadyInGroup) return;
+          if (!s.active) s.active = true;
           // default OFF (per-plan)
           if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
           // inherit from any legacy global value if present
@@ -4201,14 +4316,13 @@ LNPresents Support`;
           renderTermsTilesPanel(group, host);
         }
 
-        tile.addEventListener("click", () => { if (!st.active) activateFromUI(); });
+        tile.addEventListener("click", activateFromUI);
         tile.addEventListener("keydown", (e) => {
-          if (st.active) return;
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateFromUI(); }
         });
 
         tile.addEventListener("dragstart", (e) => {
-          if (st.active) { e.preventDefault(); return; }
+          if ((termsTilesState.activeTileTermsOrder[group] || []).includes(term.id)) { e.preventDefault(); return; }
           e.dataTransfer.setData("text/plain", term.id);
           e.dataTransfer.effectAllowed = "copy";
         });
@@ -4230,8 +4344,9 @@ LNPresents Support`;
         if (!termId || !tileTermById[termId]) return;
         const termDef = tileTermById[termId];
         const s = ensureTileTerm(termId);
-        if (s.active) return;
-        s.active = true;
+        const alreadyInGroup = (termsTilesState.activeTileTermsOrder[group] || []).includes(termId);
+        if (alreadyInGroup) return;
+        if (!s.active) s.active = true;
         if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
         if (!s.globalValue) {
           const dk = termDef.input?.dataKey;
@@ -4431,9 +4546,10 @@ LNPresents Support`;
             const grid = document.createElement("div");
             grid.className = "term-plan-grid";
 
-            (state.clgPlans || []).forEach((plan, idx) => {
-              const pid = plan.__id;
-              const planName = plan.clgPlatform || `Plan ${idx + 1}`;
+            for (let idx = 0; idx < MAX_PLANS; idx += 1) {
+              const plan = state.clgPlans[idx];
+              const pid = plan?.__id || null;
+              const planName = plan ? getPlanDisplayName(plan, idx) : `Plan ${idx + 1}`;
 
               const card = document.createElement("div");
               card.className = "term-plan-input";
@@ -4445,6 +4561,18 @@ LNPresents Support`;
               chip.textContent = planName;
 
               const inputEl = buildInputElForTile(termDef);
+
+              if (!plan) {
+                card.classList.add("is-empty");
+                inputEl.disabled = true;
+                inputEl.value = "";
+                card.appendChild(chip);
+                card.appendChild(inputEl);
+                addRangeOutputIfNeeded(card, inputEl, termDef);
+                grid.appendChild(card);
+                continue;
+              }
+
               const perPlanValue = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
               if (termDef.input?.type === "range") {
                 const minVal = termDef.input?.min ?? 1;
@@ -4483,7 +4611,7 @@ LNPresents Support`;
                   persistNow();
                 });
               }
-            });
+            }
 
             body.appendChild(grid);
           }
@@ -4532,39 +4660,78 @@ LNPresents Support`;
       updateTermCategoryBadges();
     }
 
+    function getPlanDisplayName(plan, idx) {
+      const name = (plan?.clgPlatform || "").trim();
+      return name || `Plan ${idx + 1}`;
+    }
+
+    function getActivePlanIndex() {
+      if (!state.clgPlans.length) return -1;
+      const idx = state.clgPlans.findIndex(p => p.__id === activePlanId);
+      if (idx !== -1) return idx;
+      activePlanId = state.clgPlans[0]?.__id || null;
+      return 0;
+    }
+
+    function updatePlanTabLabel(idx) {
+      if (!planTabs || !state.clgPlans[idx]) return;
+      const plan = state.clgPlans[idx];
+      const label = planTabs.querySelector(`.plan-tab[data-plan-id="${plan.__id}"] .plan-tab__name`);
+      if (label) label.textContent = getPlanDisplayName(plan, idx);
+    }
+
     function renderPlans() {
       plansContainer.innerHTML = "";
-      state.clgPlans.forEach((plan, idx) => {
-        const card = document.createElement("div");
-        card.className = "plan-card";
-        card.setAttribute("draggable", "true");       /* enable drag on card */
-        card.dataset.planId = plan.__id;
-        card.dataset.planIdx = idx;
+      if (planTabs) planTabs.innerHTML = "";
 
-        card.innerHTML = `
-          <div class="plan-card-header">
-            <div class="plan-card-title">Plan ${idx + 1}</div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <!-- FIXED: handle is real + visible -->
-              <button type="button" class="secondary" data-remove="${idx}">Remove</button>
+      // keep ids stable
+      ensurePlanIds();
+
+      const activeIdx = getActivePlanIndex();
+      const activePlan = state.clgPlans[activeIdx] || null;
+
+      if (planTabs) {
+        state.clgPlans.forEach((plan, idx) => {
+          const tab = document.createElement("button");
+          tab.type = "button";
+          tab.className = "plan-tab" + (idx === activeIdx ? " is-active" : "");
+          tab.dataset.planId = plan.__id;
+          tab.setAttribute("role", "tab");
+          tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
+          tab.innerHTML = `
+            <span class="plan-tab__num">Plan ${idx + 1}</span>
+            <span class="plan-tab__name">${escapeHtml(getPlanDisplayName(plan, idx))}</span>
+          `;
+          planTabs.appendChild(tab);
+        });
+
+        if (addPlanBtn) {
+          planTabs.appendChild(addPlanBtn);
+        }
+      }
+
+      if (activePlan) {
+        const sheet = document.createElement("div");
+        sheet.className = "plan-sheet";
+        sheet.dataset.planId = activePlan.__id;
+        sheet.dataset.planIdx = activeIdx;
+
+        sheet.innerHTML = `
+          <div class="plan-sheet__left">
+            <div class="plan-sheet__meta">
+              <div class="plan-card-title">Plan ${activeIdx + 1}</div>
+              <button type="button" class="plan-remove" data-remove="${activeIdx}">Remove</button>
             </div>
-          </div>
-
-          <div class="plan-card-topfields">
             <div class="field">
-              <label>Platform</label>
-              <input type="text" data-plan-idx="${idx}" data-plan-field="clgPlatform" value="${plan.clgPlatform || ""}">
+              <label>Plan Title</label>
+              <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPlatform" value="${escapeHtml(activePlan.clgPlatform || "")}">
             </div>
             <div class="field">
               <label>Plan Price</label>
-              <input type="text" data-plan-idx="${idx}" data-plan-field="clgPrice" value="${plan.clgPrice || ""}" placeholder="$0.00">
+              <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
             </div>
-          </div>
 
-          <div class="field">
-            <label>Plan Contents</label>
-
-            <div class="plan-toolbar" data-plan-idx="${idx}" role="toolbar" aria-label="Formatting">
+            <div class="plan-toolbar" data-plan-idx="${activeIdx}" role="toolbar" aria-label="Formatting">
               <button type="button" data-cmd="bold" title="Bold (⌘/Ctrl+B)"><b>B</b></button>
               <button type="button" data-cmd="italic" title="Italic (⌘/Ctrl+I)"><i>I</i></button>
               <button type="button" data-cmd="underline" title="Underline (⌘/Ctrl+U)"><u>U</u></button>
@@ -4580,28 +4747,31 @@ LNPresents Support`;
               <button type="button" data-cmd="removeFormat" title="Clear formatting">Clear</button>
             </div>
 
-            <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
-              data-plan-idx="${idx}" data-plan-field="clgContents"
-              placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets supported.">
-              ${(plan.clgContents || '').trim() || '<p><br></p>'}
-            </div>
-
             <small class="muted-text" data-plan-cta-summary>
-              ${formatPlanCtaSummary(plan)}
+              ${formatPlanCtaSummary(activePlan)}
             </small>
-            <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K sets the plan CTA.</small>
+          </div>
+
+          <div class="plan-sheet__right">
+            <div class="field plan-sheet__contents">
+              <label>Plan Contents</label>
+              <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
+                data-plan-idx="${activeIdx}" data-plan-field="clgContents"
+                placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets supported.">
+                ${(activePlan.clgContents || '').trim() || '<p><br></p>'}
+              </div>
+              <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K sets the plan CTA.</small>
+            </div>
           </div>
         `;
-        plansContainer.appendChild(card);
-      });
+        plansContainer.appendChild(sheet);
+      }
 
-      // keep ids stable
-      ensurePlanIds();
-
-      if (state.clgPlans.length >= MAX_PLANS) {
-        addPlanBtn.disabled = true; addPlanBtn.textContent = "Max plans reached";
-      } else {
-        addPlanBtn.disabled = false; addPlanBtn.textContent = "+ Add Plan";
+      if (addPlanBtn) {
+        const isMax = state.clgPlans.length >= MAX_PLANS;
+        addPlanBtn.disabled = isMax;
+        addPlanBtn.setAttribute("title", isMax ? "Max plans reached" : "Add plan");
+        addPlanBtn.setAttribute("aria-label", isMax ? "Max plans reached" : "Add plan");
       }
     }
 
@@ -4851,7 +5021,7 @@ try{
         const colorInput = e.target.closest('.plan-toolbar input[type="color"].rte-color');
         if (!colorInput) return;
 
-        const card = colorInput.closest('.plan-card');
+        const card = colorInput.closest('.plan-sheet');
         const editor = card?.querySelector('.plan-contents.rte');
         if (!editor) return;
 
@@ -4997,6 +5167,7 @@ function persistNow(){
       state.clgRepresentativeNotes = "";
       state.clgImportantChangesMade = "";
       state.clgPlans = [makeEmptyPlan()];
+      activePlanId = null;
       renderPlans();
       termsTilesState = defaultTermsTilesState();
       termsTilesExpandedByGroup = TERMS_TILE_GROUPS.reduce((acc, group) => {
@@ -5011,6 +5182,15 @@ function persistNow(){
       buildAppConfigFromState(state);
     }
     clearBtn.addEventListener("click", clearForm);
+
+    if (planTabs) {
+      planTabs.addEventListener("click", (e) => {
+        const tab = e.target.closest(".plan-tab[data-plan-id]");
+        if (!tab) return;
+        activePlanId = tab.dataset.planId;
+        renderPlans();
+      });
+    }
 
     // Plans initial render
     renderPlans();
@@ -5132,6 +5312,8 @@ function persistNow(){
 
       if (field === "clgPlatform") {
         state.clgPlans[idx].clgPlatform = val;
+        updatePlanTabLabel(idx);
+        renderAllTermsTiles();
         return;
       }
 
@@ -5159,8 +5341,14 @@ function persistNow(){
     plansContainer.addEventListener("click", function (e) {
       const rem = e.target.getAttribute("data-remove");
       if (rem != null) {
-        state.clgPlans.splice(Number(rem), 1);
+        const removeIdx = Number(rem);
+        const removedId = state.clgPlans[removeIdx]?.__id;
+        state.clgPlans.splice(removeIdx, 1);
         if (state.clgPlans.length === 0) state.clgPlans.push(makeEmptyPlan());
+        if (removedId && removedId === activePlanId) {
+          const nextIdx = Math.min(removeIdx, state.clgPlans.length - 1);
+          activePlanId = state.clgPlans[nextIdx]?.__id || null;
+        }
         renderPlans();
         syncTileTermPlanSlots();
         renderAllTermsTiles();
@@ -5171,6 +5359,8 @@ function persistNow(){
     addPlanBtn.addEventListener("click", function () {
       if (state.clgPlans.length >= MAX_PLANS) return;
       state.clgPlans.push(makeEmptyPlan());
+      ensurePlanIds();
+      activePlanId = state.clgPlans[state.clgPlans.length - 1]?.__id || null;
       renderPlans();
       syncTileTermPlanSlots();
       renderAllTermsTiles();
@@ -5367,7 +5557,7 @@ function persistNow(){
       if (k === 'i') document.execCommand('italic');
       if (k === 'u') document.execCommand('underline');
       if (k === 'k') {
-        const card = editor.closest('.plan-card');
+        const card = editor.closest('.plan-sheet');
         setPlanCtaFromPrompt(planIdx, card);
       }
       convertFontTagsToSpan(editor);
@@ -5385,7 +5575,7 @@ function persistNow(){
       restoreSelectionFor(idx, editor);
       const cmd = btn.getAttribute('data-cmd');
       if (cmd === 'createLink') {
-        const card = editor.closest('.plan-card');
+        const card = editor.closest('.plan-sheet');
         setPlanCtaFromPrompt(Number(idx), card);
       } else if (cmd === 'removeFormat') {
         document.execCommand('removeFormat', false, null);
