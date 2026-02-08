@@ -212,8 +212,8 @@ function buildUiPlans() {
         bodyHtml:
           "<p>Core primary law collection for your jurisdiction.</p><p>Includes citator and Shepardizing.</p>",
         features: [],
-        cta: "This Month Only",
-        ctaLabel: "This Month Only",
+        cta: "",
+        ctaLabel: "",
         ctaUrl: "",
         terms: []
       }
@@ -293,7 +293,7 @@ function buildUiPlans() {
       description: formatCurrencyValue(p.clgPrice) || "Contact for pricing",
       bodyHtml: p.clgContents || "",
       features: [],
-      cta: "This Month Only",
+      cta: "",
       ctaLabel: p.clgCtaLabel || "",
       ctaUrl: p.clgCtaUrl || "",
       terms: planTerms
