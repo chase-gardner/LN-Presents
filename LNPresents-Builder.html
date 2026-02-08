@@ -196,7 +196,28 @@ h1,h2,h3{ margin:0; }
   margin-bottom: 4px;
 }
 .terms-card .terms-description{
-  margin: 2px 0 8px;
+  margin: 6px 0 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(99,102,241,.18);
+  background: linear-gradient(135deg, rgba(99,102,241,.10), rgba(255,255,255,.92));
+  color: #475569;
+  line-height: 1.5;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.terms-card .terms-description__label{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  margin: 0 8px 4px 0;
+  border-radius: 999px;
+  background: rgba(99,102,241,.12);
+  color: #4f46e5;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 .lede{
   margin:0 0 10px;
@@ -2366,8 +2387,9 @@ input:focus, select:focus, textarea:focus{
           <div class="card terms-card">
             <h2>Terms</h2>
             <p class="muted-text terms-description">
-              Drag terms from Available to Active, then expand each term to enter values. Use <b>Applies to All</b> for top terms (max 6 total with classic terms),
-              or keep per-plan values to show inside each plan.
+              <span class="terms-description__label">Guidance</span>
+              Drag terms from Available to Active, expand to add values, and use <b>Applies to All</b> for top-line terms (max 6 including classic).
+              Leave it off to keep values inside each plan.
             </p>
           <div class="terms-tiles-toprow">
                 <div class="tab-row">
