@@ -1211,18 +1211,20 @@ input:focus, select:focus, textarea:focus{
 .switch::after{
   content:"";
   position:absolute;
-  top: 2px; left: 2px;
+  top: 50%;
+  left: 2px;
   width: 16px; height: 16px;
   border-radius: 999px;
   background:#fff;
   box-shadow: 0 10px 20px rgba(2,6,23,.12);
+  transform: translateY(-50%);
   transition: transform .12s ease;
 }
 .switch.is-on{
   background: color-mix(in srgb, var(--accent-solid) 75%, white 0%);
   border-color: rgba(99,102,241,.55);
 }
-.switch.is-on::after{ transform: translateX(16px); }
+.switch.is-on::after{ transform: translate(16px, -50%); }
 
 /* Body: tighter padding */
 .term-active-row__body{ padding: 8px 10px 10px 10px; }
@@ -3916,7 +3918,7 @@ LNPresents Support`;
           const toggleBtn = document.createElement("button");
           toggleBtn.type = "button";
           toggleBtn.className = "applies-toggle";
-          toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>Applies to All</span>`;
+          toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>One Value for All Plans</span>`;
 
           toggleBtn.addEventListener("click", () => {
             st.appliesToAll = !st.appliesToAll;
