@@ -397,34 +397,39 @@ h1,h2,h3{ margin:0; }
 /* Sidebar “control panel” feel */
 .builder-sidebar .card{ background: rgba(255,255,255,.92); }
 
-/* 7) Tabs */
-.tab-row{
+/* 7) Notebook tabs */
+.notebook-tabs{
   display:flex;
-  gap:8px;
-  margin-bottom:8px;
+  gap:6px;
+  margin-bottom:10px;
   flex-wrap:wrap;
-  padding: 2px;
-  border-radius: 999px;
-  background: rgba(15,23,42,.06);
-  border: 1px solid rgba(15,23,42,.08);
+  padding: 6px;
+  border-radius: 18px 18px 14px 14px;
+  background: linear-gradient(180deg, rgba(15,23,42,.08), rgba(15,23,42,.03));
+  border: 1px solid rgba(15,23,42,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
-.tab-btn{
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
+.notebook-tab{
+  padding: 9px 16px;
+  border-radius: 12px 12px 8px 8px;
+  border: 1px solid rgba(15,23,42,.12);
+  border-bottom: 0;
+  background: rgba(255,255,255,.86);
   font-size:.82rem;
   cursor:pointer;
-  font-weight: 750;
+  font-weight: 760;
   color:#0b0f19;
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease;
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
   position: relative;
+  box-shadow: 0 8px 18px rgba(2,6,23,.08);
 }
-.tab-btn:hover{ transform: translateY(-1px); filter: brightness(1.02); }
-.tab-btn.active{
-  background: var(--accent);
-  color:#fff;
-  box-shadow: 0 14px 30px rgba(2,6,23,.18);
+.notebook-tab:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.notebook-tab.active,
+.notebook-tab.is-active{
+  background: #fff;
+  color:#0b0f19;
+  border-color: rgba(99,102,241,.45);
+  box-shadow: 0 14px 30px rgba(2,6,23,.12);
 }
 .tab-count{
   position:absolute;
@@ -444,7 +449,7 @@ h1,h2,h3{ margin:0; }
   transition:opacity .12s ease, transform .12s ease;
   pointer-events:none;
 }
-.tab-btn.has-count .tab-count{
+.notebook-tab.has-count .tab-count{
   opacity:1;
   transform:scale(1);
 }
@@ -1644,36 +1649,13 @@ input:focus, select:focus, textarea:focus{
 }
 
 .plan-tabs{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
   margin-bottom: 12px;
 }
 
 .plan-tab{
-  border-radius: 999px;
-  border: 1px solid rgba(15,23,42,.12);
-  background: rgba(255,255,255,.95);
-  padding: 6px 14px;
-  font-size: .82rem;
-  font-weight: 800;
-  color:#0b0f19;
   display:inline-flex;
   align-items:center;
   gap:8px;
-  cursor:pointer;
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease, border-color .12s ease;
-  box-shadow: 0 12px 30px rgba(2,6,23,.08);
-}
-.plan-tab:hover{
-  transform: translateY(-1px);
-  border-color: rgba(99,102,241,.35);
-  box-shadow: 0 18px 44px rgba(2,6,23,.12);
-}
-.plan-tab.is-active{
-  background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(255,255,255,.98));
-  border-color: rgba(99,102,241,.55);
 }
 .plan-tab__num{
   font-size:.70rem;
@@ -1690,7 +1672,7 @@ input:focus, select:focus, textarea:focus{
   background: linear-gradient(135deg,#6d28d9,#4f46e5);
   color:#fff;
   border-color: rgba(255,255,255,.25);
-  padding: 6px 12px;
+  padding: 7px 12px;
   font-size: 1rem;
   line-height: 1;
 }
@@ -2577,24 +2559,24 @@ input:focus, select:focus, textarea:focus{
               Choose from various categories and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
             </p>
           <div class="terms-tiles-toprow">
-                <div class="tab-row">
-                  <button type="button" class="tab-btn active" data-panel="retentionPanel" data-group="retention">
+                <div class="tab-row notebook-tabs">
+                  <button type="button" class="tab-btn notebook-tab active" data-panel="retentionPanel" data-group="retention">
                     Retention
                     <span class="tab-count" data-group="retention" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="tab-btn" data-panel="newBizPanel" data-group="newbiz">
+                  <button type="button" class="tab-btn notebook-tab" data-panel="newBizPanel" data-group="newbiz">
                     New Business
                     <span class="tab-count" data-group="newbiz" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="tab-btn" data-panel="datesTimesPanel" data-group="datesTimes">
+                  <button type="button" class="tab-btn notebook-tab" data-panel="datesTimesPanel" data-group="datesTimes">
                     Dates/Times
                     <span class="tab-count" data-group="datesTimes" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="tab-btn" data-panel="pricingPromosPanel" data-group="pricingPromos">
+                  <button type="button" class="tab-btn notebook-tab" data-panel="pricingPromosPanel" data-group="pricingPromos">
                     Pricing/Promos
                     <span class="tab-count" data-group="pricingPromos" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="tab-btn" data-panel="representativePanel" data-group="representative">
+                  <button type="button" class="tab-btn notebook-tab" data-panel="representativePanel" data-group="representative">
                     Representative
                     <span class="tab-count" data-group="representative" aria-hidden="true"></span>
                   </button>
@@ -2630,8 +2612,8 @@ input:focus, select:focus, textarea:focus{
               </div>
             </div>
 
-            <div id="planTabs" class="plan-tabs" role="tablist" aria-label="Plan tabs">
-              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add" aria-label="Add plan">+</button>
+            <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
+              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
             </div>
             <div id="plansContainer"></div>
           </div>
@@ -4694,7 +4676,7 @@ LNPresents Support`;
         state.clgPlans.forEach((plan, idx) => {
           const tab = document.createElement("button");
           tab.type = "button";
-          tab.className = "plan-tab" + (idx === activeIdx ? " is-active" : "");
+          tab.className = "plan-tab notebook-tab" + (idx === activeIdx ? " is-active" : "");
           tab.dataset.planId = plan.__id;
           tab.setAttribute("role", "tab");
           tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
