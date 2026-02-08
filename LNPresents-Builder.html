@@ -1138,6 +1138,34 @@ input:focus, select:focus, textarea:focus{
 }
 .term-drag-handle:active{ cursor:grabbing; }
 
+.term-expand-toggle{
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border:1px solid rgba(15,23,42,.12);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,.92);
+  cursor:pointer;
+  padding: 0;
+  color: rgba(15,23,42,.78);
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+}
+.term-expand-toggle__icon{
+  display:inline-block;
+  transform: rotate(-90deg);
+  font-size: .8rem;
+  line-height: 1;
+}
+.term-active-row.is-expanded .term-expand-toggle__icon{
+  transform: rotate(0deg);
+}
+.term-expand-toggle:hover{
+  background: rgba(99,102,241,.10);
+  color: rgba(15,23,42,.92);
+}
+
 .term-row-actions{
   display:flex;
   align-items:center;
@@ -1198,6 +1226,7 @@ input:focus, select:focus, textarea:focus{
 
 /* Body: tighter padding */
 .term-active-row__body{ padding: 8px 10px 10px 10px; }
+.term-active-row.is-collapsed .term-active-row__body{ display:none; }
 
 /* Shared input: shorter */
 .term-shared-input input{
@@ -3029,6 +3058,7 @@ LNPresents Support`;
     }
 
     let termsTilesState = loadTermsTilesState();
+    let termsTilesExpandedByGroup = { retention: null, newbiz: null };
 
     function persistTermsTiles() {
       try {
@@ -3842,9 +3872,11 @@ LNPresents Support`;
           const termDef = tileTermById[termId];
           if (!termDef) return;
           const st = ensureTileTerm(termId);
+          const expandedTermId = termsTilesExpandedByGroup[group] || null;
+          const isExpanded = expandedTermId === termId;
 
           const row = document.createElement("div");
-          row.className = "term-active-row";
+          row.className = `term-active-row ${isExpanded ? "is-expanded" : "is-collapsed"}`;
           row.dataset.termId = termId;
 
           const head = document.createElement("div");
@@ -3859,10 +3891,23 @@ LNPresents Support`;
           handle.setAttribute("title", "Drag to reorder");
           handle.setAttribute("draggable", "true");
 
+          const expandBtn = document.createElement("button");
+          expandBtn.type = "button";
+          expandBtn.className = "term-expand-toggle";
+          expandBtn.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+          expandBtn.setAttribute("aria-label", isExpanded ? "Collapse term values" : "Expand term values");
+          expandBtn.innerHTML = `<span class="term-expand-toggle__icon">▾</span>`;
+
+          expandBtn.addEventListener("click", () => {
+            termsTilesExpandedByGroup[group] = isExpanded ? null : termId;
+            renderTermsTilesPanel(group, host);
+          });
+
           const name = document.createElement("div");
           name.textContent = termDef.label;
 
           title.appendChild(handle);
+          title.appendChild(expandBtn);
           title.appendChild(name);
 
           const actions = document.createElement("div");
@@ -3896,6 +3941,7 @@ LNPresents Support`;
             st.active = false;
             // Remove from order list
             termsTilesState.activeTileTermsOrder[group] = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => id !== termId);
+            if (termsTilesExpandedByGroup[group] === termId) termsTilesExpandedByGroup[group] = null;
             persistTermsTiles();
             persistNow();
             renderTermsTilesPanel(group, host);
