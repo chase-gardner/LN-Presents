@@ -215,33 +215,15 @@ h1,h2,h3{ margin:0; }
   background: rgba(255,255,255,.92);
   padding: 10px;
   box-shadow: 0 14px 30px rgba(2,6,23,.06);
-  overflow:flex;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 .clearUploadedHeaderBtn{
-  background: var(--accent-solid);
-  color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin: 0;
 }
 .downloadProfileBtn{
-  background: var(--accent-solid);
-  color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin: 0;
 }
 
 .header-preview-meta{
@@ -317,7 +299,7 @@ h1,h2,h3{ margin:0; }
 /* Optional icon (future-safe) */
 .profile-upload span::before{
   content:"⬆";
-  font-size:.1.2rem;
+  font-size:1.2rem;
   opacity:.75;
 }
 
@@ -376,6 +358,13 @@ h1,h2,h3{ margin:0; }
   flex-direction:column;
   gap:.6rem;
   min-height: 130px;
+}
+
+.profile-card-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
 }
 
 /* Sidebar “control panel” feel */
@@ -1342,19 +1331,36 @@ input:focus, select:focus, textarea:focus{
 .btn-copy{  background:linear-gradient(135deg,#0f766e,#0e7490); color:#fff; border-color:rgba(255,255,255,.12); }
 .btn-open{  background:linear-gradient(135deg,#be123c,#9f1239); color:#fff; border-color:rgba(255,255,255,.12); padding:.72rem 1rem; }
 
-/* Add plan */
-.addPlanbtn{
+/* Unified pill buttons */
+.btn-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding: 8px 12px;
+  font-size:.80rem;
+  font-weight: 750;
+  letter-spacing:.01em;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  cursor:pointer;
+  line-height:1.1;
+  white-space:nowrap;
   background: var(--accent);
   color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  box-shadow: 0 18px 44px rgba(2,6,23,.18);
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+.btn-pill:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 26px 70px rgba(2,6,23,.22);
+}
+.btn-pill:active{ transform: translateY(0); }
+
+/* Add plan */
+.addPlanbtn{
+  margin: 0;
 }
 
 .addPlanbtn:hover{ transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 30px 80px rgba(2,6,23,.22); }
@@ -1835,6 +1841,82 @@ input:focus, select:focus, textarea:focus{
   }
 }
 
+@media (max-width: 720px){
+  .page-header{
+    margin: 18px auto 10px;
+    align-items:flex-start;
+  }
+  .page-header-left{ flex: 1 1 auto; }
+  .form-top-actions{
+    justify-content:flex-start;
+  }
+  .builder-layout{
+    padding: 10px;
+  }
+  .card{
+    padding: 12px;
+  }
+  .terms-tiles-block{
+    padding: 8px;
+  }
+  .plan-toolbar{
+    gap:8px;
+  }
+}
+
+@media (max-width: 520px){
+  :root{
+    --pad: 12px;
+  }
+  .form-top-actions{
+    gap:8px;
+  }
+  .form-top-actions > button{
+    flex: 1 1 100%;
+    justify-content:center;
+  }
+  .top-simple{
+    grid-template-columns: 1fr;
+  }
+  .terms-classic-row{
+    flex: 1 1 100%;
+  }
+  .term-row{
+    grid-template-columns: 1fr;
+    gap:8px;
+  }
+  .term-row .term-check{
+    justify-content:flex-start;
+  }
+  .term-active-row__head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .term-row-actions{
+    width:100%;
+    justify-content:flex-end;
+  }
+  .term-plan-grid{
+    flex-wrap:wrap;
+  }
+  .term-plan-input{
+    flex: 1 1 100%;
+  }
+  .plan-toolbar button,
+  .plan-toolbar select,
+  .plan-toolbar input[type="color"]{
+    flex: 1 1 100%;
+  }
+  .plan-card-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .sidebar-toggle{
+    width: 100%;
+    justify-content:center;
+  }
+}
+
 /* ===============================
    NEW: First-time Demo / Tour Modal
    =============================== */
@@ -2190,7 +2272,7 @@ input:focus, select:focus, textarea:focus{
       </div>
       <img id="headerPreviewImg" alt="Header preview" />
     </div>
-        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn" style="padding:.55rem .85rem; font-size:.78rem;">
+        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn btn-pill" style="padding:.55rem .85rem; font-size:.78rem;">
       Clear uploaded header
     </button>
 
@@ -2215,7 +2297,7 @@ input:focus, select:focus, textarea:focus{
           <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
           <div class="card-info">
             <div class="profile-card-controls">
-              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn">
+              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn btn-pill">
                 Download Profile
               </button>
 
@@ -2310,7 +2392,7 @@ input:focus, select:focus, textarea:focus{
               </div>
             </div>
 
-            <button type="button" id="addPlanBtn" class="addPlanbtn" style="addPlanbtn">+ Add Plan</button>
+            <button type="button" id="addPlanBtn" class="addPlanbtn btn-pill" style="addPlanbtn">+ Add Plan</button>
             <div id="plansContainer"></div>
           </div>
         </form>
