@@ -855,7 +855,7 @@ input:focus, select:focus, textarea:focus{
 .terms-dropzone{
   min-height: 120px;
   width: 100%;
-  border:1px dashed rgba(99,102,241,.38);
+  border:1px solid rgba(30,41,59,.24);
   border-radius: 16px;
   padding: 10px 10px;
   background: rgba(255,255,255,.88);
@@ -882,8 +882,10 @@ input:focus, select:focus, textarea:focus{
     ),
     rgba(255,255,255,.92);
 
-  border: 2px dashed rgba(99,102,241,.45);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  border: 2px solid rgba(30,41,59,.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px rgba(99,102,241,.12);
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
 }
 
@@ -906,24 +908,26 @@ input:focus, select:focus, textarea:focus{
     ),
     rgba(255,255,255,.92);
 
-  border: 2px dashed rgba(99,102,241,.45);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  border: 2px solid rgba(30,41,59,.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px rgba(99,102,241,.12);
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
 }
 
 /* Hover: subtle lift so it feels interactive */
 .terms-dropzone:hover{
-  border-color: rgba(99,102,241,.62);
+  border-color: rgba(30,41,59,.45);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px rgba(99,102,241,.22),
     0 18px 44px rgba(2,6,23,.10);
   transform: translateY(-1px);
 }
 
 /* Active drag-over: clear "accepting" state */
 .terms-dropzone.is-over{
-  border-style: solid;
-  border-color: rgba(99,102,241,.95);
+  border-color: rgba(99,102,241,.85);
   background:
     radial-gradient(900px 260px at 50% 0%, rgba(99,102,241,.26), transparent 60%),
     repeating-linear-gradient(
@@ -1070,7 +1074,7 @@ input:focus, select:focus, textarea:focus{
 .terms-dropzone:not(:empty){
   min-height: 120px; /* can be smaller once used */
   background: rgba(255,255,255,.92);
-  border-style: dashed;
+  border-style: solid;
 }
 
 .terms-dropzone:focus{
