@@ -162,11 +162,13 @@
       const termsWrap = frag.querySelector('.plan-card__terms');
       const termsList = frag.querySelector('.plan-card__terms-list');
       if (termsWrap && termsList) {
-        const terms = Array.isArray(p.terms)
-          ? p.terms.filter(term => term && String(term.label || '').trim() !== '')
-          : [];
-        if (terms.length) {
-          termsList.innerHTML = terms.map(term => `<li>${escapeHtml(term.label)}</li>`).join('');
+        const terms = Array.isArray(p.terms) ? p.terms : [];
+        const displayTerms = terms.map(term => {
+          const label = term && typeof term.label === 'string' ? term.label.trim() : '';
+          return label || 'N/A';
+        });
+        if (displayTerms.length) {
+          termsList.innerHTML = displayTerms.map(term => `<li>${escapeHtml(term)}</li>`).join('');
           termsWrap.hidden = false;
         } else {
           termsList.innerHTML = '';
