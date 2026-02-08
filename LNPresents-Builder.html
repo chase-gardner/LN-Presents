@@ -3466,6 +3466,42 @@ LNPresents Support`;
       return Math.round(pct * 100);
     }
 
+    const INPUT_FORMAT_PATTERNS = {
+      currency: /(spend|price|cost|amount|fee|charge)/i,
+      percent: /(percent|percentage|increase|growth|yoy)/i,
+      number: /(count|number|qty|quantity|attorney)/i
+    };
+
+    function inferInputFormat({ label, dataKey, type }) {
+      if (type === "date" || type === "select") return null;
+      const haystack = `${label || ""} ${dataKey || ""}`.trim();
+      if (!haystack) return null;
+      if (INPUT_FORMAT_PATTERNS.currency.test(haystack)) return "currency";
+      if (INPUT_FORMAT_PATTERNS.percent.test(haystack)) return "percent";
+      if (INPUT_FORMAT_PATTERNS.number.test(haystack)) return "number";
+      return null;
+    }
+
+    function formatValueForInput(rawValue, format) {
+      const raw = String(rawValue ?? "");
+      if (!raw.trim()) return "";
+      if (format === "currency") {
+        const cents = parseCurrencyToCents(raw);
+        return cents == null ? raw : currencyFmt.format(cents / 100);
+      }
+      if (format === "percent") {
+        const bps = parsePercentToBps(raw);
+        return bps == null ? raw : (bps / 100).toFixed(2).replace(/\.00$/, "") + "%";
+      }
+      if (format === "number") {
+        const normalized = raw.replace(/[^0-9\-]/g, "");
+        if (!normalized) return "";
+        const num = Number(normalized);
+        return Number.isNaN(num) ? raw : String(Math.trunc(num));
+      }
+      return raw;
+    }
+
     function normalizePlan(raw) {
       if (!raw) return {};
       return {
@@ -3727,6 +3763,17 @@ LNPresents Support`;
           persistTermsTiles();
           persistNow();
         });
+
+        input.addEventListener("blur", () => {
+          const format = inferInputFormat({ label: def.label, dataKey: def.dataKey, type: def.type });
+          if (!format) return;
+          const formatted = formatValueForInput(input.value, format);
+          if (formatted !== input.value) input.value = formatted;
+          termsTilesState.classicTermsValues[def.id] = formatted;
+          if (def.dataKey) state[def.dataKey] = formatted;
+          persistTermsTiles();
+          persistNow();
+        });
       });
     }
 
@@ -3984,6 +4031,22 @@ LNPresents Support`;
                 persistTermsTiles();
                 persistNow();
               });
+            } else {
+              inputEl.addEventListener("blur", () => {
+                const format = inferInputFormat({
+                  label: termDef.label,
+                  dataKey: termDef.input?.dataKey,
+                  type: termDef.input?.type
+                });
+                if (!format) return;
+                const formatted = formatValueForInput(inputEl.value, format);
+                if (formatted !== inputEl.value) inputEl.value = formatted;
+                st.globalValue = formatted;
+                const dk = termDef.input?.dataKey;
+                if (dk) state[dk] = formatted;
+                persistTermsTiles();
+                persistNow();
+              });
             }
           } else {
             syncTileTermPlanSlots();
@@ -4015,7 +4078,24 @@ LNPresents Support`;
                 persistNow();
               };
               inputEl.addEventListener("input", onUpdate);
-              if (termDef.input?.type === "select") inputEl.addEventListener("change", onUpdate);
+              if (termDef.input?.type === "select") {
+                inputEl.addEventListener("change", onUpdate);
+              } else {
+                inputEl.addEventListener("blur", () => {
+                  const format = inferInputFormat({
+                    label: termDef.label,
+                    dataKey: termDef.input?.dataKey,
+                    type: termDef.input?.type
+                  });
+                  if (!format) return;
+                  const formatted = formatValueForInput(inputEl.value, format);
+                  if (formatted !== inputEl.value) inputEl.value = formatted;
+                  if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+                  st.perPlanValues[pid] = formatted;
+                  persistTermsTiles();
+                  persistNow();
+                });
+              }
             });
 
             body.appendChild(grid);
@@ -4701,6 +4781,26 @@ function persistNow(){
       state[key] = e.target.value;
       persistNow();
     });
+
+    form.addEventListener("blur", function (e) {
+      const key = e.target.getAttribute("data-key");
+      if (!key) return;
+      const labelText = e.target.closest(".field")?.querySelector("label")?.textContent || "";
+      const format = inferInputFormat({ label: labelText, dataKey: key, type: e.target.type });
+      if (!format) return;
+      const formatted = formatValueForInput(e.target.value, format);
+      if (formatted !== e.target.value) e.target.value = formatted;
+      if (key === "clgCurrentSpend" || key === "clgIntroPrice") {
+        const cents = parseCurrencyToCents(formatted);
+        state[key] = cents == null ? formatted : currencyFmt.format(cents / 100);
+      } else if (key === "clgYoyIncrease") {
+        const bps = parsePercentToBps(formatted);
+        state.clgYoyIncrease = bps == null ? formatted : (bps / 100).toFixed(2).replace(/\.00$/, "") + "%";
+      } else {
+        state[key] = formatted;
+      }
+      persistNow();
+    }, true);
 
     // Term checkbox selection
     form.addEventListener("change", function (e) {
