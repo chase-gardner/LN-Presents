@@ -25,6 +25,75 @@ function formatIsoToShort(iso) {
   }
 }
 
+function formatCurrencyValue(value) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+
+  const match = raw.match(/-?\d[\d,]*(?:\.\d+)?/);
+  if (!match) return raw;
+
+  const prefix = raw.slice(0, match.index).trim();
+  if (prefix && /[a-z]/i.test(prefix)) return raw;
+
+  const suffix = raw.slice(match.index + match[0].length).trim();
+  const normalized = match[0].replace(/,/g, "");
+  const num = Number(normalized);
+  if (Number.isNaN(num)) return raw;
+
+  const decimalPart = normalized.split(".")[1];
+  const decimals = decimalPart ? decimalPart.length : 0;
+  const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+
+  const formatted = `$${formatter.format(num)}`;
+  const suffixText = suffix ? ` ${suffix}` : "";
+  const prefixText = prefix && prefix !== "$" ? `${prefix} ` : "";
+  return `${prefixText}${formatted}${suffixText}`;
+}
+
+function formatPercentValue(value) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  if (/%/.test(raw)) return raw;
+
+  const match = raw.match(/-?\d[\d,]*(?:\.\d+)?/);
+  if (!match) return raw;
+
+  const prefix = raw.slice(0, match.index).trim();
+  if (prefix && /[a-z]/i.test(prefix)) return raw;
+
+  const suffix = raw.slice(match.index + match[0].length).trim();
+  const normalized = match[0].replace(/,/g, "");
+  const num = Number(normalized);
+  if (Number.isNaN(num)) return raw;
+
+  const decimalPart = normalized.split(".")[1];
+  const decimals = decimalPart ? decimalPart.length : 0;
+  const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+
+  const formatted = `${formatter.format(num)}%`;
+  const suffixText = suffix ? ` ${suffix}` : "";
+  const prefixText = prefix ? `${prefix} ` : "";
+  return `${prefixText}${formatted}${suffixText}`;
+}
+
+function normalizeTermValue(termKey, value) {
+  if (value == null) return "";
+  const currencyKeys = new Set(["currentSpend", "introPrice"]);
+  const percentKeys = new Set(["yoyIncrease"]);
+
+  if (currencyKeys.has(termKey)) return formatCurrencyValue(value);
+  if (percentKeys.has(termKey)) return formatPercentValue(value);
+  return value;
+}
+
 // Build terms array using current saved config (max 6, honoring selection)
 function buildUiTerms() {
   const termsTilesState = stored.lnpTermsTiles && typeof stored.lnpTermsTiles === "object"
@@ -71,7 +140,8 @@ function buildUiTerms() {
 
     function pushRegular(key, label, rawVal, type) {
       if (!label) return;
-      const finalLabel = formatLabel(label, rawVal, type);
+      const normalizedValue = normalizeTermValue(key, rawVal);
+      const finalLabel = formatLabel(label, normalizedValue, type);
       deliveredRegular.push({ key, label: finalLabel });
     }
 
@@ -121,7 +191,8 @@ function buildUiTerms() {
     const def = termDefs.find(t => t.key === key);
     if (!def) continue;
 
-    const label = formatLabel(def.labelBase, def.value, def.type);
+    const normalizedValue = normalizeTermValue(def.key, def.value);
+    const label = formatLabel(def.labelBase, normalizedValue, def.type);
     picked.push({ key: def.key, label });
     if (picked.length >= 6) break;
   }
@@ -177,10 +248,11 @@ function buildUiPlans() {
     return map;
   })();
 
-  function formatPlanTermLabel(label, value, type) {
+  function formatPlanTermLabel(label, value, type, key) {
     if (value && String(value).trim() !== "") {
       if (type === "date") return `${label}: ${formatIsoToShort(value)}`;
-      return `${label}: ${value}`;
+      const normalizedValue = normalizeTermValue(key, value);
+      return `${label}: ${normalizedValue}`;
     }
     return label;
   }
@@ -207,7 +279,7 @@ function buildUiPlans() {
 
         planTerms.push({
           key: termId,
-          label: formatPlanTermLabel(def.label, rawVal, def.input?.type)
+          label: formatPlanTermLabel(def.label, rawVal, def.input?.type, termId)
         });
       }
 
@@ -218,7 +290,7 @@ function buildUiPlans() {
     return {
       id: idx + 1,
       tier: p.clgPlatform || `Plan ${idx + 1}`,
-      description: p.clgPrice || "Contact for pricing",
+      description: formatCurrencyValue(p.clgPrice) || "Contact for pricing",
       bodyHtml: p.clgContents || "",
       features: [],
       cta: "This Month Only",
