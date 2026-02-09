@@ -1763,6 +1763,26 @@ input:focus, select:focus, textarea:focus{
   .plan-sheet{ grid-template-columns: 1fr; }
 }
 
+.plan-sheet__header{
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  align-items:center;
+  gap:16px;
+}
+@media (max-width:900px){
+  .plan-sheet__header{ grid-template-columns: 1fr; }
+}
+
+.plan-sheet__contents-title{
+  margin:0;
+  font-weight: 700;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(15,23,42,.66);
+}
+
 .plan-sheet__left{
   display:flex;
   flex-direction:column;
@@ -4746,11 +4766,14 @@ LNPresents Support`;
         sheet.dataset.planIdx = activeIdx;
 
         sheet.innerHTML = `
-          <div class="plan-sheet__left">
+          <div class="plan-sheet__header">
             <div class="plan-sheet__meta">
               <div class="plan-card-title">Plan ${activeIdx + 1}</div>
               <button type="button" class="plan-remove" data-remove="${activeIdx}">Remove</button>
             </div>
+            <label class="plan-sheet__contents-title">Plan Contents</label>
+          </div>
+          <div class="plan-sheet__left">
             <div class="field">
               <label>Plan Title</label>
               <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPlatform" value="${escapeHtml(activePlan.clgPlatform || "")}">
@@ -4771,7 +4794,6 @@ LNPresents Support`;
 
           <div class="plan-sheet__right">
             <div class="field plan-sheet__contents">
-              <label>Plan Contents</label>
               <div class="plan-toolbar" data-plan-idx="${activeIdx}" role="toolbar" aria-label="Formatting">
                 <button type="button" data-cmd="bold" title="Bold (⌘/Ctrl+B)"><b>B</b></button>
                 <button type="button" data-cmd="italic" title="Italic (⌘/Ctrl+I)"><i>I</i></button>
