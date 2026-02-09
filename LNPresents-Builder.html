@@ -453,6 +453,14 @@ h1,h2,h3{ margin:0; }
   opacity:1;
   transform:scale(1);
 }
+.tab-action-btn{
+  margin-left:auto;
+  padding: 9px 14px;
+  font-weight: 760;
+}
+.tab-action-btn.notebook-tab{
+  border-bottom: 0;
+}
 .panel{ display:none; }
 .panel.active{ display:block; }
 
@@ -619,6 +627,9 @@ input:focus, select:focus, textarea:focus{
   white-space: normal;     /* undo nowrap */
   justify-content: unset;  /* undo end alignment */
 }
+.terms-tiles-shared{
+  margin-top: 10px;
+}
 
 /* 11.b) Terms Tiles (Plan-aware, drag-to-activate) */
 .yoy-row{ display:none; } /* moved into Terms Tiles library */
@@ -769,6 +780,13 @@ input:focus, select:focus, textarea:focus{
   white-space:nowrap;
   box-shadow: none;
   transition: transform .08s ease, background .10s ease, border-color .10s ease, opacity .10s ease;
+}
+.term-tile span:last-child{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+  display: block;
 }
 .term-tile:hover{
   transform: translateY(-1px);
@@ -2600,6 +2618,23 @@ input:focus, select:focus, textarea:focus{
                     Representative
                     <span class="tab-count" data-group="representative" aria-hidden="true"></span>
                   </button>
+                  <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
+                </div>
+
+                <div class="terms-tiles-shared">
+                  <div class="terms-tiles-block">
+                    <div class="terms-tiles-block__head">
+                      <h3>Active Terms — All Categories</h3>
+                    </div>
+                    <div class="terms-dropzone" id="termsDropzone" tabindex="0" aria-label="Active terms drop zone">
+                      <div class="drop-indicator" aria-hidden="true">
+                        <span class="drop-indicator__icon">＋</span>
+                        <span class="drop-indicator__text">Drop terms here</span>
+                        <span class="drop-indicator__sub">Drag from the library above</span>
+                      </div>
+                      <div class="terms-active-list" id="termsActiveList"></div>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="terms-tiles-controls">
@@ -2634,6 +2669,7 @@ input:focus, select:focus, textarea:focus{
 
             <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
               <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
+              <button type="button" id="clearPlansBtn" class="notebook-tab tab-action-btn" aria-label="Clear plans">Clear Plans</button>
             </div>
             <div id="plansContainer"></div>
           </div>
@@ -2827,8 +2863,10 @@ input:focus, select:focus, textarea:focus{
     const plansContainer = document.getElementById("plansContainer");
     const planTabs = document.getElementById("planTabs");
     const addPlanBtn = document.getElementById("addPlanBtn");
+    const clearPlansBtn = document.getElementById("clearPlansBtn");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const clearTermsBtn = document.getElementById("clearTermsBtn");
     const tabs = document.querySelectorAll(".tab-btn");
     const panels = document.querySelectorAll(".panel");
     const exportBtn = document.getElementById('exportEmailBtn');
@@ -2859,6 +2897,7 @@ const clearUploadedHeaderBtn  = document.getElementById("clearUploadedHeaderBtn"
     const MAX_TERM_SELECTIONS = 6;
     const currencyFmt = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
     let activePlanId = null;
+    const SHARED_TERMS_GROUP = "all";
 
     /* =========================
      * B.1) LN REP (HEADER) STATE
@@ -3396,6 +3435,7 @@ LNPresents Support`;
         acc[group.id] = [];
         return acc;
       }, {});
+      emptyOrders[SHARED_TERMS_GROUP] = [];
       return {
         __schema: TERMS_TILES_SCHEMA,
         classicTermsSelected: classicSel,
@@ -3458,6 +3498,7 @@ LNPresents Support`;
       acc[group.id] = new Set();
       return acc;
     }, {});
+    termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
 
     function persistTermsTiles() {
       try {
@@ -3620,6 +3661,9 @@ LNPresents Support`;
           termsTilesState.activeTileTermsOrder[group.id] = [];
         }
       });
+      if (!Array.isArray(termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP])) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = [];
+      }
       if (!termsTilesState.tileTermsState) termsTilesState.tileTermsState = {};
       if (!termsTilesState.classicTermsSelected) termsTilesState.classicTermsSelected = defaultTermsTilesState().classicTermsSelected;
       if (!termsTilesState.classicTermsValues) termsTilesState.classicTermsValues = defaultTermsTilesState().classicTermsValues;
@@ -4239,293 +4283,267 @@ LNPresents Support`;
       });
     }
 
-    function renderAllTermsTiles() {
+    function buildSharedActiveOrder() {
+      const order = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => ensureTileTerm(id).active);
+      let didUpdate = false;
       TERMS_TILE_GROUPS.forEach(group => {
-        renderTermsTilesPanel(group.id, termsTileHosts[group.id]);
+        (termsTilesState.activeTileTermsOrder[group.id] || []).forEach(id => {
+          if (ensureTileTerm(id).active && !order.includes(id)) {
+            order.push(id);
+            didUpdate = true;
+          }
+        });
       });
+      Object.keys(termsTilesState.tileTermsState || {}).forEach(id => {
+        if (ensureTileTerm(id).active && !order.includes(id)) {
+          order.push(id);
+          didUpdate = true;
+        }
+      });
+      if (didUpdate) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = order.slice();
+        persistTermsTiles();
+      }
+      return order;
     }
 
-    function renderTermsTilesPanel(group, host) {
-      const catalog = tileTermsCatalog[group] || [];
-      if (!host) return;
+    function addTermToOrders(termId, group) {
+      if (!termsTilesState.activeTileTermsOrder[group]) termsTilesState.activeTileTermsOrder[group] = [];
+      if (!termsTilesState.activeTileTermsOrder[group].includes(termId)) {
+        termsTilesState.activeTileTermsOrder[group].push(termId);
+      }
+      if (!termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP].includes(termId)) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP].push(termId);
+      }
+    }
 
-      const groupLabel = getTermGroupLabel(group);
+    function removeTermFromOrders(termId) {
+      TERMS_TILE_GROUPS.forEach(group => {
+        termsTilesState.activeTileTermsOrder[group] = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => id !== termId);
+      });
+      termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] =
+        (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => id !== termId);
+    }
 
-      host.innerHTML = `
-        <div class="terms-tiles-split">
-          <div class="terms-tiles-block">
-            <div class="terms-tiles-block__head">
-              <h3>Terms Library — ${groupLabel}</h3>
-            </div>
-            <div class="terms-tile-library" id="${group}TileLibrary" aria-label="${groupLabel} available terms"></div>
-          </div>
+    function renderSharedActiveTerms() {
+      const dropzone = document.getElementById("termsDropzone");
+      const activeList = document.getElementById("termsActiveList");
+      if (!dropzone || !activeList) return;
+      activeList.innerHTML = "";
 
-          <div class="terms-tiles-block">
-            <div class="terms-tiles-block__head">
-              <h3>Active Terms — ${groupLabel}</h3>
-            </div>
-<div class="terms-dropzone" id="${group}Dropzone" tabindex="0" aria-label="${groupLabel} active terms drop zone">
-  <!-- Empty-state drop indicator (auto-hides once terms exist) -->
-  <div class="drop-indicator" aria-hidden="true">
-    <span class="drop-indicator__icon">＋</span>
-    <span class="drop-indicator__text">Drop terms here</span>
-    <span class="drop-indicator__sub">Drag from the library above</span>
-  </div>
-  <div class="terms-active-list" id="${group}ActiveList"></div>
-</div>
+      const order = buildSharedActiveOrder();
+      const expandedSet = termsTilesExpandedByGroup[SHARED_TERMS_GROUP] || new Set();
 
-          </div>
-        </div>
-      `;
+      order.forEach(termId => {
+        const termDef = tileTermById[termId];
+        if (!termDef) return;
+        const st = ensureTileTerm(termId);
+        const isExpanded = expandedSet.has(termId);
 
-      const lib = host.querySelector(`#${group}TileLibrary`);
-      const dropzone = host.querySelector(`#${group}Dropzone`);
-      const activeList = host.querySelector(`#${group}ActiveList`);
+        const row = document.createElement("div");
+        row.className = `term-active-row ${isExpanded ? "is-expanded" : "is-collapsed"}`;
+        row.dataset.termId = termId;
 
-      const activeOrder = (termsTilesState.activeTileTermsOrder[group] || []).slice();
+        const head = document.createElement("div");
+        head.className = "term-active-row__head";
 
-      // Library tiles
-      catalog.forEach(term => {
-        const st = ensureTileTerm(term.id);
-        const isInGroupOrder = (termsTilesState.activeTileTermsOrder[group] || []).includes(term.id);
-        const tile = document.createElement("div");
-        tile.className = "term-tile" + (st.active ? " is-used" : "");
-        tile.setAttribute("role", "button");
-        tile.setAttribute("tabindex", "0");
-        tile.setAttribute("draggable", isInGroupOrder ? "false" : "true");
-        tile.dataset.termId = term.id;
-        tile.innerHTML = `<span class="dot"></span><span>${term.label}</span>`;
+        const title = document.createElement("div");
+        title.className = "term-active-row__title";
 
-        function activateFromUI() {
-          const s = ensureTileTerm(term.id);
-          const alreadyInGroup = (termsTilesState.activeTileTermsOrder[group] || []).includes(term.id);
-          if (alreadyInGroup) return;
-          if (!s.active) s.active = true;
-          // default OFF (per-plan)
-          if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
-          // inherit from any legacy global value if present
-          if (!s.globalValue) {
-            const dk = term.input?.dataKey;
-            if (dk && state[dk]) s.globalValue = state[dk];
+        const handle = document.createElement("div");
+        handle.className = "term-drag-handle";
+        handle.textContent = "⋮⋮";
+        handle.setAttribute("title", "Drag to reorder");
+        handle.setAttribute("draggable", "true");
+
+        const expandBtn = document.createElement("button");
+        expandBtn.type = "button";
+        expandBtn.className = "term-expand-toggle";
+        expandBtn.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+        expandBtn.setAttribute("aria-label", isExpanded ? "Collapse term values" : "Expand term values");
+        expandBtn.innerHTML = `<span class="term-expand-toggle__icon">▾</span>`;
+
+        const toggleExpanded = () => {
+          if (expandedSet.has(termId)) {
+            expandedSet.delete(termId);
+          } else {
+            expandedSet.add(termId);
           }
-          // seed per-plan keys
-          syncTileTermPlanSlots();
-          if (!termsTilesState.activeTileTermsOrder[group].includes(term.id)) {
-            termsTilesState.activeTileTermsOrder[group].push(term.id);
+          termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = expandedSet;
+          renderSharedActiveTerms();
+        };
+
+        expandBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          toggleExpanded();
+        });
+
+        const name = document.createElement("div");
+        name.textContent = termDef.label;
+
+        title.appendChild(handle);
+        title.appendChild(expandBtn);
+        title.appendChild(name);
+
+        const actions = document.createElement("div");
+        actions.className = "term-row-actions";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "applies-toggle";
+        toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>One Value for All Plans</span>`;
+
+        toggleBtn.addEventListener("click", () => {
+          st.appliesToAll = !st.appliesToAll;
+          if (st.appliesToAll && (!st.globalValue || String(st.globalValue).trim() === "")) {
+            const ids = currentPlanIds();
+            for (const pid of ids) {
+              const v = st.perPlanValues?.[pid];
+              if (v && String(v).trim() !== "") { st.globalValue = v; break; }
+            }
           }
           persistTermsTiles();
           persistNow();
-          renderTermsTilesPanel(group, host);
-        }
-
-        tile.addEventListener("click", activateFromUI);
-        tile.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateFromUI(); }
+          renderSharedActiveTerms();
         });
 
-        tile.addEventListener("dragstart", (e) => {
-          if ((termsTilesState.activeTileTermsOrder[group] || []).includes(term.id)) { e.preventDefault(); return; }
-          e.dataTransfer.setData("text/plain", term.id);
-          e.dataTransfer.effectAllowed = "copy";
-        });
-
-        lib.appendChild(tile);
-      });
-
-      // Dropzone
-      dropzone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropzone.classList.add("is-over");
-        e.dataTransfer.dropEffect = "copy";
-      });
-      dropzone.addEventListener("dragleave", () => dropzone.classList.remove("is-over"));
-      dropzone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropzone.classList.remove("is-over");
-        const termId = e.dataTransfer.getData("text/plain");
-        if (!termId || !tileTermById[termId]) return;
-        const termDef = tileTermById[termId];
-        const s = ensureTileTerm(termId);
-        const alreadyInGroup = (termsTilesState.activeTileTermsOrder[group] || []).includes(termId);
-        if (alreadyInGroup) return;
-        if (!s.active) s.active = true;
-        if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
-        if (!s.globalValue) {
-          const dk = termDef.input?.dataKey;
-          if (dk && state[dk]) s.globalValue = state[dk];
-        }
-        syncTileTermPlanSlots();
-        if (!termsTilesState.activeTileTermsOrder[group].includes(termId)) {
-          termsTilesState.activeTileTermsOrder[group].push(termId);
-        }
-        persistTermsTiles();
-        persistNow();
-        renderTermsTilesPanel(group, host);
-      });
-
-      // Active rows
-      function renderActiveRows() {
-        activeList.innerHTML = "";
-        const order = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => ensureTileTerm(id).active);
-        const catalogIds = Array.from(new Set(catalog.map(term => term.id)));
-        let didUpdateOrder = false;
-        catalogIds.forEach(id => {
-          if (ensureTileTerm(id).active && !order.includes(id)) {
-            order.push(id);
-            didUpdateOrder = true;
-          }
-        });
-        if (didUpdateOrder) {
-          termsTilesState.activeTileTermsOrder[group] = order.slice();
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "term-remove";
+        removeBtn.setAttribute("aria-label", "Remove term");
+        removeBtn.title = "Remove term";
+        removeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M9 3h6l1 2h4a1 1 0 1 1 0 2h-1l-1.1 12.4A3 3 0 0 1 14.9 22h-5.8a3 3 0 0 1-2.99-2.6L5 7H4a1 1 0 1 1 0-2h4l1-2zm2 0-.5 1h3L13 3h-2zM7 7l1.05 12.1a1 1 0 0 0 .99.9h5.8a1 1 0 0 0 .99-.9L17 7H7zM10 10a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7zm4 0a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7z"/>
+          </svg>
+        `;
+        removeBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          st.active = false;
+          removeTermFromOrders(termId);
+          expandedSet.delete(termId);
+          termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = expandedSet;
           persistTermsTiles();
-        }
+          persistNow();
+          renderAllTermsTiles();
+        });
 
-        order.forEach(termId => {
-          const termDef = tileTermById[termId];
-          if (!termDef) return;
-          const st = ensureTileTerm(termId);
-          const expandedSet = termsTilesExpandedByGroup[group] || new Set();
-          const isExpanded = expandedSet.has(termId);
+        actions.appendChild(toggleBtn);
+        actions.appendChild(removeBtn);
 
-          const row = document.createElement("div");
-          row.className = `term-active-row ${isExpanded ? "is-expanded" : "is-collapsed"}`;
-          row.dataset.termId = termId;
+        head.appendChild(title);
+        head.appendChild(actions);
 
-          const head = document.createElement("div");
-          head.className = "term-active-row__head";
+        head.addEventListener("click", (event) => {
+          if (event.target.closest("button, input, select, textarea, .term-drag-handle")) return;
+          toggleExpanded();
+        });
 
-          const title = document.createElement("div");
-          title.className = "term-active-row__title";
+        const body = document.createElement("div");
+        body.className = "term-active-row__body";
 
-          const handle = document.createElement("div");
-          handle.className = "term-drag-handle";
-          handle.textContent = "⋮⋮";
-          handle.setAttribute("title", "Drag to reorder");
-          handle.setAttribute("draggable", "true");
+        if (st.appliesToAll) {
+          const wrap = document.createElement("div");
+          wrap.className = "term-shared-input";
+          const inputEl = buildInputElForTile(termDef);
+          const hasGlobal = st.globalValue != null && String(st.globalValue).trim() !== "";
+          if (termDef.input?.type === "range") {
+            const minVal = termDef.input?.min ?? 1;
+            inputEl.value = hasGlobal ? st.globalValue : minVal;
+          } else {
+            inputEl.value = st.globalValue || "";
+          }
+          wrap.appendChild(inputEl);
+          addRangeOutputIfNeeded(wrap, inputEl, termDef);
+          body.appendChild(wrap);
 
-          const expandBtn = document.createElement("button");
-          expandBtn.type = "button";
-          expandBtn.className = "term-expand-toggle";
-          expandBtn.setAttribute("aria-expanded", isExpanded ? "true" : "false");
-          expandBtn.setAttribute("aria-label", isExpanded ? "Collapse term values" : "Expand term values");
-          expandBtn.innerHTML = `<span class="term-expand-toggle__icon">▾</span>`;
-
-          const toggleExpanded = () => {
-            const set = termsTilesExpandedByGroup[group] || new Set();
-            if (set.has(termId)) {
-              set.delete(termId);
-            } else {
-              set.add(termId);
-            }
-            termsTilesExpandedByGroup[group] = set;
-            renderTermsTilesPanel(group, host);
-          };
-
-          expandBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            toggleExpanded();
-          });
-
-          const name = document.createElement("div");
-          name.textContent = termDef.label;
-
-          title.appendChild(handle);
-          title.appendChild(expandBtn);
-          title.appendChild(name);
-
-          const actions = document.createElement("div");
-          actions.className = "term-row-actions";
-
-          const toggleBtn = document.createElement("button");
-          toggleBtn.type = "button";
-          toggleBtn.className = "applies-toggle";
-          toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>One Value for All Plans</span>`;
-
-          toggleBtn.addEventListener("click", () => {
-            st.appliesToAll = !st.appliesToAll;
-            // Keep globalValue in sync when turning ON (use first non-empty per-plan if global is empty)
-            if (st.appliesToAll && (!st.globalValue || String(st.globalValue).trim() === "")) {
-              const ids = currentPlanIds();
-              for (const pid of ids) {
-                const v = st.perPlanValues?.[pid];
-                if (v && String(v).trim() !== "") { st.globalValue = v; break; }
-              }
-            }
+          inputEl.addEventListener("input", () => {
+            st.globalValue = inputEl.value;
+            const dk = termDef.input?.dataKey;
+            if (dk) state[dk] = inputEl.value;
             persistTermsTiles();
             persistNow();
-            renderTermsTilesPanel(group, host);
           });
 
-          const removeBtn = document.createElement("button");
-          removeBtn.type = "button";
-          removeBtn.className = "term-remove";
-          removeBtn.setAttribute("aria-label", "Remove term");
-          removeBtn.title = "Remove term";
-          removeBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path fill="currentColor" d="M9 3h6l1 2h4a1 1 0 1 1 0 2h-1l-1.1 12.4A3 3 0 0 1 14.9 22h-5.8a3 3 0 0 1-2.99-2.6L5 7H4a1 1 0 1 1 0-2h4l1-2zm2 0-.5 1h3L13 3h-2zM7 7l1.05 12.1a1 1 0 0 0 .99.9h5.8a1 1 0 0 0 .99-.9L17 7H7zM10 10a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7zm4 0a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7z"/>
-            </svg>
-          `;
-          removeBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            st.active = false;
-            // Remove from order list
-            termsTilesState.activeTileTermsOrder[group] = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => id !== termId);
-            const set = termsTilesExpandedByGroup[group] || new Set();
-            set.delete(termId);
-            termsTilesExpandedByGroup[group] = set;
-            persistTermsTiles();
-            persistNow();
-            renderTermsTilesPanel(group, host);
-          });
-
-          actions.appendChild(toggleBtn);
-          actions.appendChild(removeBtn);
-
-          head.appendChild(title);
-          head.appendChild(actions);
-
-          head.addEventListener("click", (event) => {
-            if (event.target.closest("button, input, select, textarea, .term-drag-handle")) return;
-            toggleExpanded();
-          });
-
-          const body = document.createElement("div");
-          body.className = "term-active-row__body";
-
-          // Shared or per-plan inputs
-          if (st.appliesToAll) {
-            const wrap = document.createElement("div");
-            wrap.className = "term-shared-input";
-            const inputEl = buildInputElForTile(termDef);
-            const hasGlobal = st.globalValue != null && String(st.globalValue).trim() !== "";
-            if (termDef.input?.type === "range") {
-              const minVal = termDef.input?.min ?? 1;
-              inputEl.value = hasGlobal ? st.globalValue : minVal;
-            } else {
-              inputEl.value = st.globalValue || "";
-            }
-            wrap.appendChild(inputEl);
-            addRangeOutputIfNeeded(wrap, inputEl, termDef);
-            body.appendChild(wrap);
-
-            inputEl.addEventListener("input", () => {
+          if (termDef.input?.type === "select") {
+            inputEl.addEventListener("change", () => {
               st.globalValue = inputEl.value;
-              // Mirror to legacy state (for export placeholders)
               const dk = termDef.input?.dataKey;
               if (dk) state[dk] = inputEl.value;
               persistTermsTiles();
               persistNow();
             });
-
-            if (termDef.input?.type === "select") {
-              inputEl.addEventListener("change", () => {
-                st.globalValue = inputEl.value;
-                const dk = termDef.input?.dataKey;
-                if (dk) state[dk] = inputEl.value;
-                persistTermsTiles();
-                persistNow();
+          } else {
+            inputEl.addEventListener("blur", () => {
+              const format = inferInputFormat({
+                label: termDef.label,
+                dataKey: termDef.input?.dataKey,
+                type: termDef.input?.type
               });
+              if (!format) return;
+              const formatted = formatValueForInput(inputEl.value, format);
+              if (formatted !== inputEl.value) inputEl.value = formatted;
+              st.globalValue = formatted;
+              const dk = termDef.input?.dataKey;
+              if (dk) state[dk] = formatted;
+              persistTermsTiles();
+              persistNow();
+            });
+          }
+        } else {
+          syncTileTermPlanSlots();
+          const grid = document.createElement("div");
+          grid.className = "term-plan-grid";
+
+          for (let idx = 0; idx < MAX_PLANS; idx += 1) {
+            const plan = state.clgPlans[idx];
+            const pid = plan?.__id || null;
+            const planName = plan ? getPlanDisplayName(plan, idx) : `Plan ${idx + 1}`;
+
+            const card = document.createElement("div");
+            card.className = "term-plan-input";
+            card.dataset.planIdx = idx;
+
+            const chip = document.createElement("div");
+            chip.className = "term-plan-chip";
+            chip.dataset.planIdx = idx;
+            chip.textContent = planName;
+
+            const inputEl = buildInputElForTile(termDef);
+
+            if (!plan) {
+              card.classList.add("is-empty");
+              inputEl.disabled = true;
+              inputEl.value = "";
+              card.appendChild(chip);
+              card.appendChild(inputEl);
+              addRangeOutputIfNeeded(card, inputEl, termDef);
+              grid.appendChild(card);
+              continue;
+            }
+
+            const perPlanValue = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
+            if (termDef.input?.type === "range") {
+              const minVal = termDef.input?.min ?? 1;
+              inputEl.value = perPlanValue || minVal;
+            } else {
+              inputEl.value = perPlanValue;
+            }
+
+            card.appendChild(chip);
+            card.appendChild(inputEl);
+            addRangeOutputIfNeeded(card, inputEl, termDef);
+            grid.appendChild(card);
+
+            const onUpdate = () => {
+              if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+              st.perPlanValues[pid] = inputEl.value;
+              persistTermsTiles();
+              persistNow();
+            };
+            inputEl.addEventListener("input", onUpdate);
+            if (termDef.input?.type === "select") {
+              inputEl.addEventListener("change", onUpdate);
             } else {
               inputEl.addEventListener("blur", () => {
                 const format = inferInputFormat({
@@ -4536,131 +4554,156 @@ LNPresents Support`;
                 if (!format) return;
                 const formatted = formatValueForInput(inputEl.value, format);
                 if (formatted !== inputEl.value) inputEl.value = formatted;
-                st.globalValue = formatted;
-                const dk = termDef.input?.dataKey;
-                if (dk) state[dk] = formatted;
+                if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+                st.perPlanValues[pid] = formatted;
                 persistTermsTiles();
                 persistNow();
               });
             }
-          } else {
-            syncTileTermPlanSlots();
-            const grid = document.createElement("div");
-            grid.className = "term-plan-grid";
-
-            for (let idx = 0; idx < MAX_PLANS; idx += 1) {
-              const plan = state.clgPlans[idx];
-              const pid = plan?.__id || null;
-              const planName = plan ? getPlanDisplayName(plan, idx) : `Plan ${idx + 1}`;
-
-              const card = document.createElement("div");
-              card.className = "term-plan-input";
-              card.dataset.planIdx = idx;
-
-              const chip = document.createElement("div");
-              chip.className = "term-plan-chip";
-              chip.dataset.planIdx = idx;
-              chip.textContent = planName;
-
-              const inputEl = buildInputElForTile(termDef);
-
-              if (!plan) {
-                card.classList.add("is-empty");
-                inputEl.disabled = true;
-                inputEl.value = "";
-                card.appendChild(chip);
-                card.appendChild(inputEl);
-                addRangeOutputIfNeeded(card, inputEl, termDef);
-                grid.appendChild(card);
-                continue;
-              }
-
-              const perPlanValue = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
-              if (termDef.input?.type === "range") {
-                const minVal = termDef.input?.min ?? 1;
-                inputEl.value = perPlanValue || minVal;
-              } else {
-                inputEl.value = perPlanValue;
-              }
-
-              card.appendChild(chip);
-              card.appendChild(inputEl);
-              addRangeOutputIfNeeded(card, inputEl, termDef);
-              grid.appendChild(card);
-
-              const onUpdate = () => {
-                if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
-                st.perPlanValues[pid] = inputEl.value;
-                persistTermsTiles();
-                persistNow();
-              };
-              inputEl.addEventListener("input", onUpdate);
-              if (termDef.input?.type === "select") {
-                inputEl.addEventListener("change", onUpdate);
-              } else {
-                inputEl.addEventListener("blur", () => {
-                  const format = inferInputFormat({
-                    label: termDef.label,
-                    dataKey: termDef.input?.dataKey,
-                    type: termDef.input?.type
-                  });
-                  if (!format) return;
-                  const formatted = formatValueForInput(inputEl.value, format);
-                  if (formatted !== inputEl.value) inputEl.value = formatted;
-                  if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
-                  st.perPlanValues[pid] = formatted;
-                  persistTermsTiles();
-                  persistNow();
-                });
-              }
-            }
-
-            body.appendChild(grid);
           }
 
-          row.appendChild(head);
-          row.appendChild(body);
-          activeList.appendChild(row);
+          body.appendChild(grid);
+        }
 
-          // Reorder drag
-          handle.addEventListener("dragstart", (e) => {
-            row.classList.add("term-row--dragging");
-            e.dataTransfer.setData("text/plain", termId);
-            e.dataTransfer.effectAllowed = "move";
-          });
-          handle.addEventListener("dragend", () => row.classList.remove("term-row--dragging"));
-          row.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-          });
-          row.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const movingId = e.dataTransfer.getData("text/plain");
-            if (!movingId || movingId === termId) return;
-            const arr = (termsTilesState.activeTileTermsOrder[group] || []).slice();
-            const from = arr.indexOf(movingId);
-            const to = arr.indexOf(termId);
-            if (from === -1 || to === -1) return;
+        row.appendChild(head);
+        row.appendChild(body);
+        activeList.appendChild(row);
 
-            // Decide before/after based on cursor position
-            const rect = row.getBoundingClientRect();
-            const before = (e.clientY - rect.top) < rect.height / 2;
-
-            arr.splice(from, 1);
-            const insertAt = before ? (to > from ? to - 1 : to) : (to > from ? to : to + 1);
-            arr.splice(insertAt, 0, movingId);
-            termsTilesState.activeTileTermsOrder[group] = arr;
-
-            persistTermsTiles();
-            persistNow();
-            renderTermsTilesPanel(group, host);
-          });
+        handle.addEventListener("dragstart", (e) => {
+          row.classList.add("term-row--dragging");
+          e.dataTransfer.setData("text/plain", termId);
+          e.dataTransfer.effectAllowed = "move";
         });
-      }
+        handle.addEventListener("dragend", () => row.classList.remove("term-row--dragging"));
+        row.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+        });
+        row.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const movingId = e.dataTransfer.getData("text/plain");
+          if (!movingId || movingId === termId) return;
+          const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).slice();
+          const from = arr.indexOf(movingId);
+          const to = arr.indexOf(termId);
+          if (from === -1 || to === -1) return;
 
-      renderActiveRows();
+          const rect = row.getBoundingClientRect();
+          const before = (e.clientY - rect.top) < rect.height / 2;
+
+          arr.splice(from, 1);
+          const insertAt = before ? (to > from ? to - 1 : to) : (to > from ? to : to + 1);
+          arr.splice(insertAt, 0, movingId);
+          termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = arr;
+
+          persistTermsTiles();
+          persistNow();
+          renderSharedActiveTerms();
+        });
+      });
+    }
+
+    function renderAllTermsTiles() {
+      TERMS_TILE_GROUPS.forEach(group => {
+        renderTermsTilesPanel(group.id, termsTileHosts[group.id]);
+      });
+      renderSharedActiveTerms();
       updateTermCategoryBadges();
     }
+
+    const sharedDropzone = document.getElementById("termsDropzone");
+    if (sharedDropzone) {
+      sharedDropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        sharedDropzone.classList.add("is-over");
+        e.dataTransfer.dropEffect = "copy";
+      });
+      sharedDropzone.addEventListener("dragleave", () => sharedDropzone.classList.remove("is-over"));
+      sharedDropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        sharedDropzone.classList.remove("is-over");
+        const termId = e.dataTransfer.getData("text/plain");
+        if (!termId || !tileTermById[termId]) return;
+        const termDef = tileTermById[termId];
+        const s = ensureTileTerm(termId);
+        if (s.active) return;
+        s.active = true;
+        if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+        if (!s.globalValue) {
+          const dk = termDef.input?.dataKey;
+          if (dk && state[dk]) s.globalValue = state[dk];
+        }
+        syncTileTermPlanSlots();
+        const group = activeTermsGroup || termDef.group || TERMS_TILE_GROUPS[0]?.id || "";
+        addTermToOrders(termId, group);
+        persistTermsTiles();
+        persistNow();
+        renderAllTermsTiles();
+      });
+    }
+
+    function renderTermsTilesPanel(group, host) {
+      const catalog = tileTermsCatalog[group] || [];
+      if (!host) return;
+
+      const groupLabel = getTermGroupLabel(group);
+
+      host.innerHTML = `
+        <div class="terms-tiles-block">
+          <div class="terms-tiles-block__head">
+            <h3>Terms Library — ${groupLabel}</h3>
+          </div>
+          <div class="terms-tile-library" id="${group}TileLibrary" aria-label="${groupLabel} available terms"></div>
+        </div>
+      `;
+
+      const lib = host.querySelector(`#${group}TileLibrary`);
+
+      // Library tiles
+      catalog.forEach(term => {
+        const st = ensureTileTerm(term.id);
+        const tile = document.createElement("div");
+        tile.className = "term-tile" + (st.active ? " is-used" : "");
+        tile.setAttribute("role", "button");
+        tile.setAttribute("tabindex", "0");
+        tile.setAttribute("draggable", st.active ? "false" : "true");
+        tile.dataset.termId = term.id;
+        tile.innerHTML = `<span class="dot"></span><span>${term.label}</span>`;
+
+        function activateFromUI() {
+          const s = ensureTileTerm(term.id);
+          if (s.active) return;
+          if (!s.active) s.active = true;
+          // default OFF (per-plan)
+          if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+          // inherit from any legacy global value if present
+          if (!s.globalValue) {
+            const dk = term.input?.dataKey;
+            if (dk && state[dk]) s.globalValue = state[dk];
+          }
+          // seed per-plan keys
+          syncTileTermPlanSlots();
+          addTermToOrders(term.id, group);
+          persistTermsTiles();
+          persistNow();
+          renderAllTermsTiles();
+        }
+
+        tile.addEventListener("click", activateFromUI);
+        tile.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateFromUI(); }
+        });
+
+        tile.addEventListener("dragstart", (e) => {
+          if (ensureTileTerm(term.id).active) { e.preventDefault(); return; }
+          e.dataTransfer.setData("text/plain", term.id);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+
+        lib.appendChild(tile);
+      });
+    }
+
 
     function getPlanDisplayName(plan, idx) {
       const name = (plan?.clgPlatform || "").trim();
@@ -4701,7 +4744,7 @@ LNPresents Support`;
           tab.setAttribute("role", "tab");
           tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
           tab.innerHTML = `
-            <span class="plan-tab__num">Plan ${idx + 1}</span>
+            <span class="plan-tab__num">${idx + 1}.</span>
             <span class="plan-tab__name">${escapeHtml(getPlanDisplayName(plan, idx))}</span>
           `;
           planTabs.appendChild(tab);
@@ -4709,6 +4752,9 @@ LNPresents Support`;
 
         if (addPlanBtn) {
           planTabs.appendChild(addPlanBtn);
+        }
+        if (clearPlansBtn) {
+          planTabs.appendChild(clearPlansBtn);
         }
       }
 
@@ -4732,6 +4778,10 @@ LNPresents Support`;
               <label>Plan Price</label>
               <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
             </div>
+            <div class="field">
+              <label>CTA Button Link</label>
+              <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
+            </div>
 
             <small class="muted-text" data-plan-cta-summary>
               ${formatPlanCtaSummary(activePlan)}
@@ -4747,7 +4797,6 @@ LNPresents Support`;
                 <button type="button" data-cmd="underline" title="Underline (⌘/Ctrl+U)"><u>U</u></button>
                 <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">• • •</button>
                 <button type="button" data-cmd="insertOrderedList" title="Numbered list">1.</button>
-                <button type="button" data-cmd="createLink" title="Set plan CTA (⌘/Ctrl+K)">Plan Label</button>
                 <input type="color" class="rte-color" aria-label="Text color">
                 <select data-size-select class="rte-size-select" aria-label="Text size">
                   <option value="body">Body</option>
@@ -5132,6 +5181,7 @@ function persistNow(){
 }
 
     // Tabs
+    let activeTermsGroup = TERMS_TILE_GROUPS[0]?.id || "";
     tabs.forEach(btn => {
       btn.addEventListener("click", () => {
         const target = btn.getAttribute("data-panel");
@@ -5139,6 +5189,7 @@ function persistNow(){
         btn.classList.add("active");
         panels.forEach(p => p.classList.remove("active"));
         document.getElementById(target).classList.add("active");
+        activeTermsGroup = btn.getAttribute("data-group") || activeTermsGroup;
       });
     });
 
@@ -5175,6 +5226,7 @@ function persistNow(){
         acc[group.id] = new Set();
         return acc;
       }, {});
+      termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
       try { localStorage.removeItem(TERMS_TILES_STORAGE_KEY); } catch (e) {}
       renderClassicTopTerms();
       renderAllTermsTiles();
@@ -5183,6 +5235,41 @@ function persistNow(){
       buildAppConfigFromState(state);
     }
     clearBtn.addEventListener("click", clearForm);
+
+    function clearPlansOnly() {
+      state.clgPlans = [makeEmptyPlan()];
+      activePlanId = null;
+      renderPlans();
+      syncTileTermPlanSlots();
+      persistNow();
+    }
+    if (clearPlansBtn) {
+      clearPlansBtn.addEventListener("click", clearPlansOnly);
+    }
+
+    function clearTermsOnly() {
+      termsTilesState = defaultTermsTilesState();
+      termsTilesExpandedByGroup = TERMS_TILE_GROUPS.reduce((acc, group) => {
+        acc[group.id] = new Set();
+        return acc;
+      }, {});
+      termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
+      state.clgSelectedTerms = [];
+      classicTermsDefs.forEach(def => {
+        if (def.dataKey) state[def.dataKey] = "";
+      });
+      Object.values(tileTermDefinitions).forEach(def => {
+        if (def.input?.dataKey) state[def.input.dataKey] = "";
+      });
+      try { localStorage.removeItem(TERMS_TILES_STORAGE_KEY); } catch (e) {}
+      renderClassicTopTerms();
+      renderAllTermsTiles();
+      syncTileTermPlanSlots();
+      persistNow();
+    }
+    if (clearTermsBtn) {
+      clearTermsBtn.addEventListener("click", clearTermsOnly);
+    }
 
     if (planTabs) {
       planTabs.addEventListener("click", (e) => {
@@ -5569,7 +5656,9 @@ function persistNow(){
       const btn = e.target.closest('[data-cmd]');
       if (!btn) return;
       const toolbar = btn.closest('.plan-toolbar');
-      const idx = toolbar?.getAttribute('data-plan-idx');
+      const idx = btn.getAttribute('data-plan-idx')
+        || toolbar?.getAttribute('data-plan-idx')
+        || btn.closest('.plan-sheet')?.getAttribute('data-plan-idx');
       if (idx == null) return;
       const editor = plansContainer.querySelector('.plan-contents[data-plan-idx="'+idx+'"]');
       if (!editor) return;
