@@ -2470,7 +2470,7 @@ input:focus, select:focus, textarea:focus{
         <div class="card">
           <p class="lede">Quick tips for using LNPresents:</p>
           <ul class="bullet-list">
-            <li>Up to <strong>six</strong> top terms (classic + Applies-to-All tiles) can show above your plans; per-plan terms appear inside each plan.</li>
+            <li>Activate terms from the <strong>Term Library</strong> and add plan specific and general proposal terms</li>
             <li>You may show up to <strong>four</strong> plans at once.</li>
             <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
             <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
@@ -4700,11 +4700,11 @@ LNPresents Support`;
     }
 
     function formatPlanCtaSummary(plan) {
-      const defaultLabel = "This Month Only";
+      const defaultLabel = "None";
       const label = (plan?.clgCtaLabel || "").trim();
       const url = (plan?.clgCtaUrl || "").trim();
       const displayLabel = label || defaultLabel;
-      if (!url) return `CTA button: ${displayLabel} (no link)`;
+      if (!url) return `Current Label: ${displayLabel} (no link)`;
       return `CTA button: ${displayLabel} — ${url}`;
     }
 
@@ -4719,9 +4719,9 @@ LNPresents Support`;
       if (!plan) return;
       const currentUrl = plan.clgCtaUrl || "";
       const currentLabel = plan.clgCtaLabel || "";
-      const urlInput = prompt("CTA URL (leave blank to clear):", currentUrl);
+      const urlInput = prompt("(Optional Link) - You may put a link to be embedded in the Plan Label:", currentUrl);
       if (urlInput === null) return;
-      const labelInput = prompt("CTA button label:", currentLabel);
+      const labelInput = prompt("Plan Label Message:", currentLabel);
       if (labelInput === null) return;
       plan.clgCtaUrl = String(urlInput || "").trim();
       plan.clgCtaLabel = String(labelInput || "").trim();
