@@ -4735,9 +4735,9 @@ LNPresents Support`;
               <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
             </div>
             <div class="field">
-              <label>CTA Button Link</label>
-              <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
+              <label>Click the button below to create a <b>Plan Label</b> where you can put a link or attach a label.</label>
             </div>
+            <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
 
             <small class="muted-text" data-plan-cta-summary>
               ${formatPlanCtaSummary(activePlan)}
