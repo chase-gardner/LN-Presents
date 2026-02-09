@@ -453,6 +453,14 @@ h1,h2,h3{ margin:0; }
   opacity:1;
   transform:scale(1);
 }
+.terms-tiles-toprow .tab-count{
+  display:none;
+}
+.terms-tiles-toprow .tab-btn.active{
+  background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(224,231,255,.92));
+  border-color: rgba(139,92,246,.45);
+  color:#1f2937;
+}
 .tab-action-btn{
   margin-left:auto;
   padding: 9px 14px;
@@ -862,6 +870,11 @@ input:focus, select:focus, textarea:focus{
   border-radius: 999px;
   margin-bottom: 6px;
   background: color-mix(in srgb, var(--plan-tint-strong) 65%, rgba(255,255,255,.95));
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Compact field controls */
@@ -1683,12 +1696,6 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   flex: 0 0 150px;
   max-width: 150px;
-}
-.plan-tab__num{
-  font-size:.70rem;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:#475569;
 }
 .plan-tab__name{
   font-size:.84rem;
@@ -2621,6 +2628,14 @@ input:focus, select:focus, textarea:focus{
                   <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
                 </div>
 
+                <div class="terms-tiles-controls">
+                  <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
+                  <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
+                  <div id="datesTimesPanel" class="panel"><div id="datesTimesTerms"></div></div>
+                  <div id="pricingPromosPanel" class="panel"><div id="pricingPromosTerms"></div></div>
+                  <div id="representativePanel" class="panel"><div id="representativeTerms"></div></div>
+                </div>
+
                 <div class="terms-tiles-shared">
                   <div class="terms-tiles-block">
                     <div class="terms-tiles-block__head">
@@ -2635,14 +2650,6 @@ input:focus, select:focus, textarea:focus{
                       <div class="terms-active-list" id="termsActiveList"></div>
                     </div>
                   </div>
-                </div>
-
-                <div class="terms-tiles-controls">
-                  <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
-                  <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
-                  <div id="datesTimesPanel" class="panel"><div id="datesTimesTerms"></div></div>
-                  <div id="pricingPromosPanel" class="panel"><div id="pricingPromosTerms"></div></div>
-                  <div id="representativePanel" class="panel"><div id="representativeTerms"></div></div>
                 </div>
               </div>
 
@@ -4495,7 +4502,8 @@ LNPresents Support`;
           const grid = document.createElement("div");
           grid.className = "term-plan-grid";
 
-          for (let idx = 0; idx < MAX_PLANS; idx += 1) {
+          const planCount = state.clgPlans.length;
+          for (let idx = 0; idx < planCount; idx += 1) {
             const plan = state.clgPlans[idx];
             const pid = plan?.__id || null;
             const planName = plan ? getPlanDisplayName(plan, idx) : `Plan ${idx + 1}`;
@@ -4510,17 +4518,6 @@ LNPresents Support`;
             chip.textContent = planName;
 
             const inputEl = buildInputElForTile(termDef);
-
-            if (!plan) {
-              card.classList.add("is-empty");
-              inputEl.disabled = true;
-              inputEl.value = "";
-              card.appendChild(chip);
-              card.appendChild(inputEl);
-              addRangeOutputIfNeeded(card, inputEl, termDef);
-              grid.appendChild(card);
-              continue;
-            }
 
             const perPlanValue = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
             if (termDef.input?.type === "range") {
@@ -4744,7 +4741,6 @@ LNPresents Support`;
           tab.setAttribute("role", "tab");
           tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
           tab.innerHTML = `
-            <span class="plan-tab__num">${idx + 1}.</span>
             <span class="plan-tab__name">${escapeHtml(getPlanDisplayName(plan, idx))}</span>
           `;
           planTabs.appendChild(tab);
