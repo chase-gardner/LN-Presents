@@ -744,27 +744,15 @@ input:focus, select:focus, textarea:focus{
 /* Library: horizontal strip across top */
 .terms-tile-library{
   display:flex;
-  flex-direction:row;
-  align-items:center;
+  flex-wrap: wrap;
+  align-items:flex-start;
   gap:.40rem;
 
   max-height: none;
-  overflow-x:auto;
-  overflow-y:hidden;
+  overflow: visible;
 
-  padding: 2px 2px;
-  scrollbar-gutter: stable;
-  -webkit-overflow-scrolling: touch;
+  padding: 2px 2px 6px;
 }
-
-/* nicer horizontal scrollbar */
-.terms-tile-library::-webkit-scrollbar{ height: 10px; }
-.terms-tile-library::-webkit-scrollbar-thumb{
-  background: rgba(15,23,42,.18);
-  border-radius: 999px;
-  border: 3px solid rgba(255,255,255,.55);
-}
-.terms-tile-library::-webkit-scrollbar-track{ background: transparent; }
 
 /* Tiles: compact, refined chips */
 .term-tile{
@@ -2601,39 +2589,15 @@ input:focus, select:focus, textarea:focus{
           <div class="card terms-card">
             <h2>Terms</h2>
             <p class="muted-text terms-description">
-              Choose from various categories and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
+              Choose from the available terms and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
             </p>
           <div class="terms-tiles-toprow">
                 <div class="tab-row notebook-tabs">
-                  <button type="button" class="tab-btn notebook-tab active" data-panel="retentionPanel" data-group="retention">
-                    Retention
-                    <span class="tab-count" data-group="retention" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="tab-btn notebook-tab" data-panel="newBizPanel" data-group="newbiz">
-                    New Business
-                    <span class="tab-count" data-group="newbiz" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="tab-btn notebook-tab" data-panel="datesTimesPanel" data-group="datesTimes">
-                    Dates/Times
-                    <span class="tab-count" data-group="datesTimes" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="tab-btn notebook-tab" data-panel="pricingPromosPanel" data-group="pricingPromos">
-                    Pricing/Promos
-                    <span class="tab-count" data-group="pricingPromos" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="tab-btn notebook-tab" data-panel="representativePanel" data-group="representative">
-                    Representative
-                    <span class="tab-count" data-group="representative" aria-hidden="true"></span>
-                  </button>
                   <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
                 </div>
 
                 <div class="terms-tiles-controls">
-                  <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
-                  <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
-                  <div id="datesTimesPanel" class="panel"><div id="datesTimesTerms"></div></div>
-                  <div id="pricingPromosPanel" class="panel"><div id="pricingPromosTerms"></div></div>
-                  <div id="representativePanel" class="panel"><div id="representativeTerms"></div></div>
+                  <div id="allTermsPanel" class="panel active"><div id="allTermsLibrary"></div></div>
                 </div>
 
                 <div class="terms-tiles-shared">
@@ -2855,18 +2819,7 @@ input:focus, select:focus, textarea:focus{
      * A) DOM REFERENCES
      * ========================= */
     const form = document.getElementById("clgForm");
-    const retentionHost = document.getElementById("retentionTerms");
-    const newBizHost = document.getElementById("newBizTerms");
-    const datesTimesHost = document.getElementById("datesTimesTerms");
-    const pricingPromosHost = document.getElementById("pricingPromosTerms");
-    const representativeHost = document.getElementById("representativeTerms");
-    const termsTileHosts = {
-      retention: retentionHost,
-      newbiz: newBizHost,
-      datesTimes: datesTimesHost,
-      pricingPromos: pricingPromosHost,
-      representative: representativeHost
-    };
+    const allTermsLibraryHost = document.getElementById("allTermsLibrary");
     const plansContainer = document.getElementById("plansContainer");
     const planTabs = document.getElementById("planTabs");
     const addPlanBtn = document.getElementById("addPlanBtn");
@@ -2874,8 +2827,6 @@ input:focus, select:focus, textarea:focus{
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
     const clearTermsBtn = document.getElementById("clearTermsBtn");
-    const tabs = document.querySelectorAll(".tab-btn");
-    const panels = document.querySelectorAll(".panel");
     const exportBtn = document.getElementById('exportEmailBtn');
     const emailProposalBtn = document.getElementById("emailProposalBtn");
     const copyProposalBtn = document.getElementById("copyProposalBtn");
@@ -4600,10 +4551,21 @@ LNPresents Support`;
       });
     }
 
-    function renderAllTermsTiles() {
+    function buildAllTermsCatalog() {
+      const seen = new Set();
+      const allTerms = [];
       TERMS_TILE_GROUPS.forEach(group => {
-        renderTermsTilesPanel(group.id, termsTileHosts[group.id]);
+        (tileTermsCatalog[group.id] || []).forEach(term => {
+          if (seen.has(term.id)) return;
+          seen.add(term.id);
+          allTerms.push({ ...term, group: group.id });
+        });
       });
+      return allTerms;
+    }
+
+    function renderAllTermsTiles() {
+      renderTermsTilesPanel(buildAllTermsCatalog(), allTermsLibraryHost);
       renderSharedActiveTerms();
       updateTermCategoryBadges();
     }
@@ -4631,7 +4593,7 @@ LNPresents Support`;
           if (dk && state[dk]) s.globalValue = state[dk];
         }
         syncTileTermPlanSlots();
-        const group = activeTermsGroup || termDef.group || TERMS_TILE_GROUPS[0]?.id || "";
+        const group = termDef.group || TERMS_TILE_GROUPS[0]?.id || "";
         addTermToOrders(termId, group);
         persistTermsTiles();
         persistNow();
@@ -4639,22 +4601,19 @@ LNPresents Support`;
       });
     }
 
-    function renderTermsTilesPanel(group, host) {
-      const catalog = tileTermsCatalog[group] || [];
+    function renderTermsTilesPanel(catalog, host) {
       if (!host) return;
-
-      const groupLabel = getTermGroupLabel(group);
 
       host.innerHTML = `
         <div class="terms-tiles-block">
           <div class="terms-tiles-block__head">
-            <h3>Terms Library — ${groupLabel}</h3>
+            <h3>Terms Library — All Available Terms</h3>
           </div>
-          <div class="terms-tile-library" id="${group}TileLibrary" aria-label="${groupLabel} available terms"></div>
+          <div class="terms-tile-library" id="allTermsTileLibrary" aria-label="All available terms"></div>
         </div>
       `;
 
-      const lib = host.querySelector(`#${group}TileLibrary`);
+      const lib = host.querySelector("#allTermsTileLibrary");
 
       // Library tiles
       catalog.forEach(term => {
@@ -4680,7 +4639,7 @@ LNPresents Support`;
           }
           // seed per-plan keys
           syncTileTermPlanSlots();
-          addTermToOrders(term.id, group);
+          addTermToOrders(term.id, term.group || TERMS_TILE_GROUPS[0]?.id || "");
           persistTermsTiles();
           persistNow();
           renderAllTermsTiles();
@@ -5175,19 +5134,6 @@ function persistNow(){
   };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e){}
 }
-
-    // Tabs
-    let activeTermsGroup = TERMS_TILE_GROUPS[0]?.id || "";
-    tabs.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const target = btn.getAttribute("data-panel");
-        tabs.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        panels.forEach(p => p.classList.remove("active"));
-        document.getElementById(target).classList.add("active");
-        activeTermsGroup = btn.getAttribute("data-group") || activeTermsGroup;
-      });
-    });
 
     // Clear (NOTE: does NOT clear LN_Rep)
     function clearForm() {
