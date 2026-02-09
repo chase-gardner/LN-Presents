@@ -1129,6 +1129,34 @@ input:focus, select:focus, textarea:focus{
   outline-offset: 6px;
 }
 
+.terms-dropzone:not(.has-terms)::before{
+  content: "Drop terms here";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: .95rem;
+  letter-spacing: .01em;
+  color: rgba(15,23,42,.72);
+  pointer-events: none;
+}
+
+.terms-dropzone:not(.has-terms)::after{
+  content: "Drag from the library above";
+  position: absolute;
+  inset: auto 0 18px 0;
+  text-align: center;
+  font-size: .82rem;
+  font-weight: 700;
+  color: rgba(91,100,112,.85);
+  pointer-events: none;
+}
+
+.terms-dropzone.has-terms .drop-indicator{
+  display:none;
+}
+
 /* Hover: subtle lift so it feels interactive */
 .terms-dropzone:hover{
   border-color: rgba(99,102,241,.62);
@@ -1684,6 +1712,11 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   flex: 0 0 150px;
   max-width: 150px;
+}
+.plan-tab.is-active{
+  background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(224,231,255,.92));
+  border-color: rgba(139,92,246,.45);
+  color:#1f2937;
 }
 .plan-tab__name{
   font-size:.84rem;
@@ -2593,10 +2626,6 @@ input:focus, select:focus, textarea:focus{
               Choose from the available terms and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
             </p>
           <div class="terms-tiles-toprow">
-                <div class="tab-row notebook-tabs">
-                  <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
-                </div>
-
                 <div class="terms-tiles-controls">
                   <div id="allTermsPanel" class="panel active"><div id="allTermsLibrary"></div></div>
                 </div>
@@ -2827,7 +2856,6 @@ input:focus, select:focus, textarea:focus{
     const clearPlansBtn = document.getElementById("clearPlansBtn");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
-    const clearTermsBtn = document.getElementById("clearTermsBtn");
     const exportBtn = document.getElementById('exportEmailBtn');
     const emailProposalBtn = document.getElementById("emailProposalBtn");
     const copyProposalBtn = document.getElementById("copyProposalBtn");
@@ -3316,8 +3344,7 @@ LNPresents Support`;
       { id: "retention", label: "Retention" },
       { id: "newbiz", label: "New Business" },
       { id: "datesTimes", label: "Dates/Times" },
-      { id: "pricingPromos", label: "Pricing/Promos" },
-      { id: "representative", label: "Representative" }
+      { id: "pricingPromos", label: "Pricing/Promos" }
     ];
 
     const classicTermsDefs = [
@@ -3338,9 +3365,7 @@ LNPresents Support`;
       nbExtensionTerm:   { id: "nbExtensionTerm", label: "Term Length", input: { type: "select", dataKey: "clgnbExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] } },
       promotion:         { id: "promotion", label: "Promotion", input: { type: "text", dataKey: "clgPromotion", placeholder: "Describe the promotion" } },
       freeTimeAvailable: { id: "freeTimeAvailable", label: "Free Time Available", input: { type: "range", dataKey: "clgFreeTimeAvailable", min: 1, max: 59, step: 1, suffix: "days" } },
-      costPerAttorney:   { id: "costPerAttorney", label: "Cost Per Attorney", input: { type: "text", dataKey: "clgCostPerAttorney", placeholder: "$0.00" } },
-      representativeNotes: { id: "representativeNotes", label: "Representative Notes", input: { type: "text", dataKey: "clgRepresentativeNotes", placeholder: "Enter notes" } },
-      importantChangesMade: { id: "importantChangesMade", label: "Important Changes Made", input: { type: "text", dataKey: "clgImportantChangesMade", placeholder: "Summarize updates" } }
+      costPerAttorney:   { id: "costPerAttorney", label: "Cost Per Attorney", input: { type: "text", dataKey: "clgCostPerAttorney", placeholder: "$0.00" } }
     };
 
     const tileTermsCatalog = {
@@ -3369,10 +3394,6 @@ LNPresents Support`;
         tileTermDefinitions.promotion,
         tileTermDefinitions.freeTimeAvailable,
         tileTermDefinitions.costPerAttorney
-      ],
-      representative: [
-        tileTermDefinitions.representativeNotes,
-        tileTermDefinitions.importantChangesMade
       ]
     };
 
@@ -3525,8 +3546,6 @@ LNPresents Support`;
       clgPromotion: saved.clgPromotion || "",
       clgFreeTimeAvailable: saved.clgFreeTimeAvailable || "",
       clgCostPerAttorney: saved.clgCostPerAttorney || "",
-      clgRepresentativeNotes: saved.clgRepresentativeNotes || "",
-      clgImportantChangesMade: saved.clgImportantChangesMade || "",
       clgSelectedTerms: Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [],
       clgPlans: Array.isArray(saved.clgPlans) && saved.clgPlans.length ? saved.clgPlans : [makeEmptyPlan()]
     };
@@ -4291,6 +4310,7 @@ LNPresents Support`;
       activeList.innerHTML = "";
 
       const order = buildSharedActiveOrder();
+      dropzone.classList.toggle("has-terms", order.length > 0);
       const expandedSet = termsTilesExpandedByGroup[SHARED_TERMS_GROUP] || new Set();
 
       order.forEach(termId => {
@@ -4609,12 +4629,17 @@ LNPresents Support`;
         <div class="terms-tiles-block">
           <div class="terms-tiles-block__head">
             <h3>Terms Library — All Available Terms</h3>
+            <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
           </div>
           <div class="terms-tile-library" id="allTermsTileLibrary" aria-label="All available terms"></div>
         </div>
       `;
 
       const lib = host.querySelector("#allTermsTileLibrary");
+      const clearTermsBtn = host.querySelector("#clearTermsBtn");
+      if (clearTermsBtn) {
+        clearTermsBtn.onclick = clearTermsOnly;
+      }
 
       // Library tiles
       catalog.forEach(term => {
@@ -5159,8 +5184,6 @@ function persistNow(){
       state.clgPromotion = "";
       state.clgFreeTimeAvailable = "";
       state.clgCostPerAttorney = "";
-      state.clgRepresentativeNotes = "";
-      state.clgImportantChangesMade = "";
       state.clgPlans = [makeEmptyPlan()];
       activePlanId = null;
       renderPlans();
@@ -5210,10 +5233,6 @@ function persistNow(){
       syncTileTermPlanSlots();
       persistNow();
     }
-    if (clearTermsBtn) {
-      clearTermsBtn.addEventListener("click", clearTermsOnly);
-    }
-
     if (planTabs) {
       planTabs.addEventListener("click", (e) => {
         const tab = e.target.closest(".plan-tab[data-plan-id]");
