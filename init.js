@@ -168,7 +168,7 @@
           return label || 'N/A';
         });
         if (displayTerms.length) {
-          termsList.innerHTML = displayTerms.map(term => `<li>${escapeHtml(term)}</li>`).join('');
+          termsList.innerHTML = displayTerms.map(term => `<li><span class="plan-term-label">${escapeHtml(term)}</span></li>`).join('');
           termsWrap.hidden = false;
         } else {
           termsList.innerHTML = '';

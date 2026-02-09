@@ -466,11 +466,20 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   gap: 6px;
   align-items: baseline;
+  min-width: 0;
 }
 
 .plan-card__terms-list li::before{
   content: "•";
   color: rgba(30,64,175,.9);
+}
+
+.plan-card__terms-list .plan-term-label{
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Footer / CTA */
