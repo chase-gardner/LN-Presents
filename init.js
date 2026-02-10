@@ -120,7 +120,61 @@
       }
 
       const ctaEl = frag.querySelector('.plan-card__cta');
-      if (ctaEl) ctaEl.textContent = p.cta || 'Select plan';
+      if (ctaEl) {
+        const ctaUrl = (p.ctaUrl || '').trim();
+        const ctaLabel = (p.ctaLabel || p.cta || '').trim();
+        const hasCta = Boolean(ctaLabel || ctaUrl);
+        const footerEl = ctaEl.closest('.plan-card__footer');
+
+        if (footerEl) {
+          footerEl.classList.toggle('plan-card__footer--empty', !hasCta);
+        }
+
+        if (hasCta) {
+          ctaEl.textContent = ctaLabel || ctaUrl;
+          ctaEl.removeAttribute('aria-hidden');
+          ctaEl.removeAttribute('tabindex');
+          if (ctaUrl) {
+            ctaEl.setAttribute('href', ctaUrl);
+            ctaEl.setAttribute('aria-label', `${ctaEl.textContent} (opens in a new tab)`);
+            ctaEl.setAttribute('target', '_blank');
+            ctaEl.setAttribute('rel', 'noopener noreferrer');
+            ctaEl.removeAttribute('aria-disabled');
+          } else {
+            ctaEl.removeAttribute('href');
+            ctaEl.removeAttribute('aria-label');
+            ctaEl.removeAttribute('target');
+            ctaEl.removeAttribute('rel');
+            ctaEl.setAttribute('aria-disabled', 'true');
+          }
+        } else {
+          ctaEl.textContent = '';
+          ctaEl.removeAttribute('href');
+          ctaEl.removeAttribute('aria-label');
+          ctaEl.removeAttribute('target');
+          ctaEl.removeAttribute('rel');
+          ctaEl.setAttribute('aria-disabled', 'true');
+          ctaEl.setAttribute('aria-hidden', 'true');
+          ctaEl.setAttribute('tabindex', '-1');
+        }
+      }
+
+      const termsWrap = frag.querySelector('.plan-card__terms');
+      const termsList = frag.querySelector('.plan-card__terms-list');
+      if (termsWrap && termsList) {
+        const terms = Array.isArray(p.terms) ? p.terms : [];
+        const displayTerms = terms.map(term => {
+          const label = term && typeof term.label === 'string' ? term.label.trim() : '';
+          return label || 'N/A';
+        });
+        if (displayTerms.length) {
+          termsList.innerHTML = displayTerms.map(term => `<li><span class="plan-term-label">${escapeHtml(term)}</span></li>`).join('');
+          termsWrap.hidden = false;
+        } else {
+          termsList.innerHTML = '';
+          termsWrap.hidden = true;
+        }
+      }
 
       container.appendChild(frag);
     });
@@ -538,10 +592,22 @@
     if (!filename) filename = buildPdfFilename();
 
     const printNode = makePrintNode(root);
+    const printWrapper = document.createElement('div');
+    printWrapper.style.position = 'fixed';
+    printWrapper.style.left = '-9999px';
+    printWrapper.style.top = '0';
+    const rootWidth = root.offsetWidth || 1;
+    const rootHeight = root.offsetHeight || 1;
+    printWrapper.style.width = `${rootWidth}px`;
+    printWrapper.style.height = `${rootHeight}px`;
+    printWrapper.style.overflow = 'hidden';
+    printWrapper.appendChild(printNode);
+    document.body.appendChild(printWrapper);
 
     const opt = {
       margin,
       filename,
+      enableLinks: true,
       image: { type: 'jpeg', quality: 0.95 },
       html2canvas: {
         scale,
@@ -580,6 +646,10 @@
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
+    } finally {
+      if (printWrapper.parentNode) {
+        printWrapper.parentNode.removeChild(printWrapper);
+      }
     }
   }
 

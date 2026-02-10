@@ -15,12 +15,12 @@
   --bg: linear-gradient(90deg,#191970,#4b0082);
   --surface: #0b1222;
   --card-bg: #ffffff;
-  --card-muted:#f7f8fb;
-  --input-bg:#ffffff;
+  --card-muted:#f3f5fb;
+  --input-bg:#f8fafc;
 
   --text:#0b0f19;
   --ink:#5b6470;
-  --border: rgba(15,23,42,.10);
+  --border: rgba(15,23,42,.12);
 
   --accent: linear-gradient(90deg,#191970,#4b0082);
   --accent-solid:#4b0082;
@@ -31,11 +31,11 @@
   --radius-md:14px;
   --radius-sm:12px;
 
-  --shadow-1: 0 10px 30px rgba(2,6,23,.10);
-  --shadow-2: 0 18px 50px rgba(2,6,23,.16);
-  --shadow-3: 0 26px 80px rgba(2,6,23,.22);
+  --shadow-1: 0 8px 24px rgba(2,6,23,.10);
+  --shadow-2: 0 16px 44px rgba(2,6,23,.16);
+  --shadow-3: 0 24px 70px rgba(2,6,23,.22);
 
-  --ring: 0 0 0 4px rgba(99,102,241,.25);
+  --ring: 0 0 0 4px rgba(79,70,229,.22);
 
   --maxw: 1280px;
   --pad: clamp(14px, 2.2vw, 24px);
@@ -192,6 +192,39 @@ h1,h2,h3{ margin:0; }
   letter-spacing:.01em;
   margin: 0 0 10px;
 }
+.terms-card h2{
+  margin-bottom: 4px;
+}
+.terms-card .terms-description{
+  margin: 0px 0 5px;
+  padding: 5px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(99,102,241,.18);
+  background: linear-gradient(135deg, rgba(99,102,241,.10), rgba(255,255,255,.92));
+  color: #475569;
+  line-height: 1.2;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.terms-card .terms-description__label{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  margin: 0 8px 4px 0;
+  border-radius: 999px;
+  background: rgba(99,102,241,.12);
+  color: #4f46e5;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.plan-label-desc{
+  margin:0;
+  color:#475569;
+  font-weight:200;
+  line-height:1.25;
+}
 .lede{
   margin:0 0 10px;
   color:#334155;
@@ -215,33 +248,15 @@ h1,h2,h3{ margin:0; }
   background: rgba(255,255,255,.92);
   padding: 10px;
   box-shadow: 0 14px 30px rgba(2,6,23,.06);
-  overflow:flex;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 .clearUploadedHeaderBtn{
-  background: var(--accent-solid);
-  color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin: 0;
 }
 .downloadProfileBtn{
-  background: var(--accent-solid);
-  color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  margin: 0;
 }
 
 .header-preview-meta{
@@ -275,8 +290,8 @@ h1,h2,h3{ margin:0; }
   gap:10px;
 
   /* spacing */
-  margin-top:14px;              /* ⬅ ensures padding from content above */
-  padding:14px 16px;
+  margin-top:0px;              /* ⬅ ensures padding from content above */
+  padding:12px 55px;
 
   /* visuals */
   background: linear-gradient(
@@ -317,7 +332,7 @@ h1,h2,h3{ margin:0; }
 /* Optional icon (future-safe) */
 .profile-upload span::before{
   content:"⬆";
-  font-size:.1.2rem;
+  font-size:1.2rem;
   opacity:.75;
 }
 
@@ -378,72 +393,144 @@ h1,h2,h3{ margin:0; }
   min-height: 130px;
 }
 
+.profile-card-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+
 /* Sidebar “control panel” feel */
 .builder-sidebar .card{ background: rgba(255,255,255,.92); }
 
-/* 7) Tabs */
-.tab-row{
+/* 7) Notebook tabs */
+.notebook-tabs{
   display:flex;
-  gap:8px;
+  gap:6px;
   margin-bottom:10px;
   flex-wrap:wrap;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(15,23,42,.06);
-  border: 1px solid rgba(15,23,42,.08);
+  padding: 6px;
+  border-radius: 18px 18px 14px 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(15,23,42,.04));
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
-.tab-btn{
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
+.notebook-tab{
+  padding: 9px 16px;
+  border-radius: 12px 12px 8px 8px;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  background: rgba(255,255,255,.9);
   font-size:.82rem;
   cursor:pointer;
-  font-weight: 750;
+  font-weight: 760;
   color:#0b0f19;
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease;
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(2,6,23,.08);
 }
-.tab-btn:hover{ transform: translateY(-1px); filter: brightness(1.02); }
-.tab-btn.active{
-  background: var(--accent);
-  color:#fff;
-  box-shadow: 0 14px 30px rgba(2,6,23,.18);
+.notebook-tab:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.notebook-tab.active,
+.notebook-tab.is-active{
+  background: #fff;
+  color:#0b0f19;
+  border-color: rgba(79,70,229,.35);
+  box-shadow: 0 14px 30px rgba(2,6,23,.12);
+}
+.tab-count{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  background:#dc2626;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 0 1px rgba(220,38,38,.3);
+  border:2px solid #fff;
+  opacity:0;
+  transform:scale(.8);
+  transition:opacity .12s ease, transform .12s ease;
+  pointer-events:none;
+}
+.notebook-tab.has-count .tab-count{
+  opacity:1;
+  transform:scale(1);
+}
+.terms-tiles-toprow .tab-count{
+  display:none;
+}
+.terms-tiles-toprow .tab-btn.active{
+  background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(224,231,255,.92));
+  border-color: rgba(139,92,246,.45);
+  color:#1f2937;
+}
+.tab-action-btn{
+  margin-left:auto;
+  padding: 9px 14px;
+  font-weight: 760;
+}
+.tab-action-btn.notebook-tab{
+  border-bottom: 0;
 }
 .panel{ display:none; }
 .panel.active{ display:block; }
 
+.panel,
+.panel.active{
+  width: 100%;
+}
+
+#retentionTerms,
+#newBizTerms,
+#datesTimesTerms,
+#pricingPromosTerms,
+#representativeTerms{
+  width: 100%;
+}
+
 /* 8) Grids */
-.top-grid{ display:grid; gap:12px; }
+.top-grid{
+  display:grid;
+  gap:12px;
+  min-width:0;
+}
 .top-simple{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 10px 12px;
+  min-width:0;
 }
+/* Top terms grid: slightly tighter + better responsive fit */
 .top-term-row{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 10px 12px;
+  gap: 8px 10px;
+  align-items: start;
 }
-.top-field{
-  display:grid;
-  gap:8px;
-  min-width: 180px;
-}
-.top-field label,
-.top-label{
-  font-size:.85rem;
-  font-weight: 650;
-  color:#0f172a;
-  letter-spacing:.02em;
-}
-.top-field.term-style{
-  grid-template-columns: 20px 1fr minmax(120px, 180px);
-  align-items:center;
-}
+
+/* Each term field becomes a small surface row */
+.top-field.term-style,
 .top-field.yoy-row{
-  grid-template-columns: 20px 1fr minmax(120px, 180px);
+  display:grid;
+  grid-template-columns: 18px 1fr minmax(140px, 200px);
   align-items:center;
-  padding: 4px 0;
+
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.82);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  gap: 10px;
+}
+
+/* Hover: subtle clarity */
+.top-field.term-style:hover,
+.top-field.yoy-row:hover{
+  border-color: rgba(99,102,241,.22);
+  background: rgba(255,255,255,.92);
 }
 
 /* 9) Inputs */
@@ -451,8 +538,8 @@ h1,h2,h3{ margin:0; }
 select, input[type="text"], input[type="number"], input[type="date"], textarea{
   appearance:none;
   width:100%;
-  background: rgba(255,255,255,.98);
-  border: 1px solid rgba(15,23,42,.12);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: .95rem;
@@ -465,7 +552,7 @@ select, input[type="text"], input[type="number"], input[type="date"], textarea{
 input::placeholder, textarea::placeholder{ color:#9aa4b2; }
 input:focus, select:focus, textarea:focus{
   outline:none;
-  border-color: rgba(99,102,241,.55);
+  border-color: rgba(79,70,229,.48);
   box-shadow: var(--ring), 0 18px 44px rgba(2,6,23,.12);
   transform: translateY(-1px);
   background:#fff;
@@ -503,14 +590,756 @@ input:focus, select:focus, textarea:focus{
   border-color: rgba(99,102,241,.20);
   background: rgba(248,250,252,.98);
 }
-.term-label{
-  font-size:.82rem;
-  font-weight: 650;
+.top-field label,
+.top-label{
+  font-size: .78rem;
+  font-weight: 800;
+  color: rgba(15,23,42,.78);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Top row: library left, toggles right */
+.terms-tiles-toprow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+}
+
+/* Library should live along the top (horizontal, scroll if needed) */
+.terms-tiles-librarywrap{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Right side controls (Retention + New Biz) */
+.terms-tiles-controls{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:flex-end;
   white-space:nowrap;
+}
+
+/* Make the tab + content stack and stretch full width */
+.terms-tiles-toprow{
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* This is NOT a right-side strip anymore — it's the main content region */
+.terms-tiles-controls{
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  display: block;          /* important: don't keep it as a horizontal flex strip */
+  white-space: normal;     /* undo nowrap */
+  justify-content: unset;  /* undo end alignment */
+}
+.terms-tiles-shared{
+  margin-top: 10px;
+}
+
+/* 11.b) Terms Tiles (Plan-aware, drag-to-activate) */
+.yoy-row{ display:none; } /* moved into Terms Tiles library */
+
+/* Classic top panel unchanged */
+.terms-classic-panel{
+  margin: 10px 0 0px 0;
+  padding: 10px 10px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(15,23,42,.03);
+  max-width: 100%;
+  overflow: hidden;
+}
+.terms-classic-panel__head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:0px;
+}
+.terms-classic-panel__head h3{
+  margin:0;
+  font-size:.88rem;
+  font-weight:750;
+}
+.terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
+.terms-classic-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 8px;
+  overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+  padding-bottom: 4px;
+}
+.terms-classic-row{
+  display:grid;
+  grid-template-columns: 14px minmax(84px, 1fr) minmax(124px, 1.45fr);
+  gap:8px;
+  align-items:center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.92);
+  flex: 1 1 calc(33.333% - 6px);
+  min-width: 0;
+}
+.terms-classic-row .term-label{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  font-size:.74rem;
+  text-align:center;
+  line-height:1.15;
+  word-break:break-word;
+}
+.terms-classic-row .term-input{ margin-top:0; min-width:0; }
+.terms-classic-row input,
+.terms-classic-row select{
+  width:100%;
+  height: 30px;
+  border-radius: 12px;
+  border:1px solid rgba(15,23,42,.12);
+  padding: 0 12px;
+  font-size: .82rem;
+  background: var(--input-bg);
+  outline:none;
+}
+.terms-classic-row input[type="date"]{
+  min-width: 132px;
+  position: relative;
+  padding-right: 38px;
+  padding-inline-end: 38px;
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  text-align: left;
+  box-sizing: border-box;
+}
+.terms-classic-row input[type="date"]::-webkit-calendar-picker-indicator{
+  cursor: pointer;
+  margin: 0;
+  position: absolute;
+  right: 10px;
+}
+.terms-classic-row input[type="date"]::-webkit-date-and-time-value{
+  text-align: left;
+}
+.terms-classic-row input[type="date"]::-ms-clear,
+.terms-classic-row input[type="date"]::-ms-expand{
+  display: none;
+}
+.terms-classic-row input:focus,
+.terms-classic-row select:focus{
+  box-shadow: var(--ring);
+  border-color: rgba(99,102,241,.55);
+}
+
+/* --- NEW layout: top bar (library + toggles) then full-width dropzone --- */
+.terms-tiles-split{
+  display:grid;
+  grid-template-columns: 1fr;   /* no left/right split anymore */
+  gap:12px;
+  align-items:start;
+}
+
+/* Blocks: slightly quieter, less padding */
+.terms-tiles-block{
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(15,23,42,.08);
+  background: rgba(15,23,42,.03);
+  padding: 9px 9px;
+}
+.terms-tiles-block__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom: 8px;
+}
+.terms-tiles-block__head h3{
+  margin:0;
+  font-size:.84rem;
+  font-weight:800;
+}
+.terms-expand-all-btn{
+  margin-left:auto;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(99,102,241,.35);
+  background: rgba(238,242,255,.95);
+  color:#3730a3;
+  font-size:.72rem;
+  font-weight:700;
+  cursor:pointer;
+  transition: filter .12s ease, transform .12s ease;
+}
+.terms-expand-all-btn:hover{
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+}
+.terms-expand-all-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* Library: horizontal strip across top */
+.terms-tile-library{
+  display:flex;
+  flex-wrap: wrap;
+  align-items:flex-start;
+  gap:.40rem;
+
+  max-height: none;
+  overflow: visible;
+
+  padding: 2px 2px 6px;
+}
+
+/* Tiles: compact, refined chips */
+.term-tile{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+
+  padding: .26rem .46rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  border:1px solid rgba(15,23,42,.10);
+
+  font-size:.72rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color:#0b0f19;
+
+  cursor:grab;
+  user-select:none;
+  white-space:nowrap;
+  box-shadow: none;
+  transition: transform .08s ease, background .10s ease, border-color .10s ease, opacity .10s ease;
+}
+.term-tile span:last-child{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+  display: block;
+}
+.term-tile:hover{
+  transform: translateY(-1px);
+  background: rgba(248,250,252,.98);
+  border-color: rgba(99,102,241,.28);
+}
+.term-tile:active{ cursor:grabbing; transform:none; }
+
+.term-tile.is-used{
+  opacity:.55;
+  cursor:pointer;
+  border-style:dashed;
+  background: rgba(15,23,42,.04);
+}
+
+/* Subtle dot only */
+.term-tile .dot{
+  width:6px; height:6px; border-radius:999px;
+  background: color-mix(in srgb, var(--accent-solid) 78%, white 0%);
+  box-shadow: none;
+  opacity:.75;
+}
+
+/* ===============================
+   TERMS: Compact input treatment (scoped)
+   - fixes “bulky” inputs inside the active Terms drop zone
+   =============================== */
+
+/* Remove the global "lift on focus" feel only inside term rows */
+.term-active-row input:focus,
+.term-active-row select:focus,
+.term-active-row textarea:focus{
+  transform: none !important;
+  box-shadow: var(--ring) !important;
+}
+
+/* Shared (Applies to All) input — compact */
+.term-active-row .term-shared-input input{
+  height: 32px;
+  padding: 0 10px;
+  font-size: .86rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  box-shadow: none;
+}
+.term-active-row .term-shared-input input[type="range"]{
+  height: 24px;
+  padding: 0;
+  accent-color: #000;
+}
+.term-active-row .term-shared-input .term-range-output{
+  margin-top: 6px;
+  font-size: .75rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+/* Per-plan inputs — compact + clean */
+.term-active-row .term-plan-input{
+  --plan-tint: rgba(148,163,184,.08);
+  --plan-tint-strong: rgba(148,163,184,.18);
+  padding: 8px 9px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--plan-tint-strong) 55%, rgba(15,23,42,.08));
+  background: color-mix(in srgb, var(--plan-tint) 62%, rgba(255,255,255,.98));
+}
+
+/* Plan chip: smaller and tighter */
+.term-active-row .term-plan-chip{
+  padding: .12rem .42rem;
+  font-size: .70rem;
+  font-weight: 750;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  background: color-mix(in srgb, var(--plan-tint-strong) 65%, rgba(255,255,255,.95));
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Compact field controls */
+.term-active-row .term-plan-input input,
+.term-active-row .term-plan-input select{
+  height: 34px;
+  padding: 0 10px;
+  font-size: .88rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  box-shadow: none;
+  min-width: 0;
+  flex: 1 1 160px;
+}
+.term-active-row .term-plan-input input[type="range"]{
+  height: 24px;
+  padding: 0;
+  accent-color: #000;
+}
+.term-active-row .term-plan-input .term-range-output{
+  margin-top: 6px;
+  font-size: .74rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+/* Stop oversized dropdown arrow spacing */
+.term-active-row .term-plan-input select{
+  padding-right: 28px;
+}
+
+/* Tighten grid spacing */
+.term-active-row .term-plan-grid{
+  gap: 9px;
+}
+
+/* Optional: make rows visually thinner overall */
+.term-active-row__body{
+  padding: 7px 9px 9px 9px;
+}
+.term-active-row__head{
+  padding: 7px 9px;
+}
+
+/* Optional: slightly reduce the active row card shadow */
+.term-active-row{
+  box-shadow: 0 8px 18px rgba(2,6,23,.06);
+}
+
+@media (min-width: 760px){
+  .term-active-row .term-plan-input{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 8px 9px;
+    flex-wrap: wrap;
+  }
+  .term-active-row .term-plan-chip{
+    margin:0;
+    flex: 0 0 auto;
+  }
+  .term-active-row .term-plan-input input,
+  .term-active-row .term-plan-input select{
+    flex: 1 1 auto;
+  }
+}
+
+.term-active-row .term-plan-input{
+  border-color: color-mix(in srgb, var(--plan-tint-strong) 42%, rgba(15,23,42,.08));
+  background: color-mix(in srgb, var(--plan-tint) 50%, rgba(255,255,255,.9));
+}
+.term-active-row .term-plan-input input,
+.term-active-row .term-plan-input select{
+  border-color: var(--border);
+}
+
+.terms-dropzone{
+  position: relative;
+  width: 100%;
+  min-height: 180px;
+  padding: 10px 10px;
+  outline:none;
+  border-radius: 18px;
+
+  background:
+    radial-gradient(800px 220px at 50% 0%, rgba(99,102,241,.16), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(15,23,42,.045) 0px,
+      rgba(15,23,42,.045) 10px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) 20px
+    ),
+    rgba(255,255,255,.92);
+  border: 2px solid rgba(30,41,59,.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px rgba(99,102,241,.12);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+
+/* Hover: subtle lift so it feels interactive */
+.terms-dropzone:hover{
+  border-color: rgba(30,41,59,.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px rgba(99,102,241,.22),
+    0 18px 44px rgba(2,6,23,.10);
+  transform: translateY(-1px);
+}
+
+/* Active drag-over: clear "accepting" state */
+.terms-dropzone.is-over{
+  border-color: rgba(99,102,241,.85);
+  background:
+    radial-gradient(900px 260px at 50% 0%, rgba(99,102,241,.26), transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(99,102,241,.12) 0px,
+      rgba(99,102,241,.12) 10px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) 20px
+    ),
+    rgba(224,231,255,.50);
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,.18),
+    0 22px 60px rgba(2,6,23,.14);
+  transform: translateY(-2px);
+}
+
+/* Drop indicator (centered, feels like a real target) */
+.drop-indicator{
+  position:absolute;
+  inset: 0;
+  display:grid;
+  place-items:center;
+  gap:6px;
+  text-align:center;
+  pointer-events:none;
+  padding: 16px;
+}
+
+/* Icon bubble */
+.drop-indicator__icon{
+  width:44px; height:44px;
+  display:grid; place-items:center;
+  border-radius: 999px;
+  background: rgba(99,102,241,.12);
+  border: 1px solid rgba(99,102,241,.22);
+  font-size: 1.25rem;
+  font-weight: 950;
+  color: rgba(15,23,42,.85);
+}
+
+/* Text */
+.drop-indicator__text{
+  font-weight: 950;
+  font-size: .95rem;
+  color: rgba(15,23,42,.78);
+}
+.drop-indicator__sub{
+  font-size: .82rem;
+  font-weight: 700;
+  color: rgba(91,100,112,.9);
+}
+
+/* Keep your existing hint visible but toned down */
+.terms-dropzone__hint{
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px 0;
+  font-size: .78rem;
+  color: var(--ink);
+  opacity: .92;
+}
+
+/* Ensure active list sits above the indicator */
+.terms-active-list{
+  position: relative;
+  z-index: 1;
+}
+
+/* Auto-hide the indicator once any active term row exists */
+.terms-active-list:not(:empty) ~ .drop-indicator,
+.terms-dropzone:has(.terms-active-list:not(:empty)) .drop-indicator{
+  display:none;
+}
+
+/* Stronger indicator when dragging over */
+.terms-dropzone.is-over .drop-indicator__icon{
+  background: rgba(99,102,241,.18);
+  border-color: rgba(99,102,241,.42);
+  transform: scale(1.00);
+}
+
+.terms-dropzone.has-terms .drop-indicator{
+  display:none;
+}
+
+/* If it has content, keep it calmer and stop the big empty overlay */
+.terms-dropzone:not(:empty){
+  min-height: 120px; /* can be smaller once used */
+  background: rgba(255,255,255,.92);
+  border-style: solid;
+}
+
+.terms-dropzone:focus{
+  box-shadow: var(--ring);
+  border-color: rgba(99,102,241,.65);
+}
+.terms-dropzone__hint{
+  font-size:.78rem;
+  color: var(--ink);
+}
+
+/* Active list: tighter vertical rhythm */
+.terms-active-list{
+  display:flex;
+  flex-direction:column;
+  gap:.55rem;
+}
+
+/* Active term row: smaller footprint */
+.term-active-row{
+  border-radius: 14px;
+  border:1px solid rgba(15,23,42,.10);
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 10px 24px rgba(2,6,23,.07);
+  overflow:hidden;
+}
+
+/* Header: slimmer */
+.term-active-row__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding: 8px 10px;
+  background: rgba(15,23,42,.03);
+}
+.term-active-row__title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight: 800;
+  font-size:.82rem;
+  min-width:0;
+}
+.term-active-row__title span{
+  flex: 1 1 auto;
+  min-width: 0;
+  display:block;
   overflow:hidden;
   text-overflow:ellipsis;
-  color:#0f172a;
+  white-space:nowrap;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 72%, transparent 100%);
 }
+
+/* Controls smaller */
+.term-drag-handle{
+  width: 20px; height: 20px;
+  border-radius: 8px;
+  border:1px solid rgba(15,23,42,.12);
+  display:inline-flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,.92);
+  cursor:grab;
+  user-select:none;
+}
+.term-drag-handle:active{ cursor:grabbing; }
+
+.term-expand-toggle{
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border:1px solid rgba(15,23,42,.12);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,.92);
+  cursor:pointer;
+  padding: 0;
+  color: rgba(15,23,42,.78);
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+}
+.term-expand-toggle__icon{
+  display:inline-block;
+  transform: rotate(-90deg);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.term-active-row.is-expanded .term-expand-toggle__icon{
+  transform: rotate(0deg);
+}
+.term-expand-toggle:hover{
+  background: rgba(99,102,241,.10);
+  color: rgba(15,23,42,.92);
+}
+
+.term-row-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.term-remove{
+  border:none;
+  background: transparent;
+  color: #b91c1c;
+  font-weight: 900;
+  cursor:pointer;
+  padding: 4px 6px;
+  border-radius: 10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 26px;
+}
+.term-remove:hover{ background: rgba(185,28,28,.10); }
+.term-remove svg{
+  width: 16px;
+  height: 16px;
+  display:block;
+}
+
+/* Applies toggle more compact */
+.applies-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:.80rem;
+  color: var(--ink);
+  user-select:none;
+  border:none;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 10px;
+  cursor:pointer;
+}
+.applies-toggle:hover{ background: rgba(15,23,42,.05); }
+
+.switch{
+  position:relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(15,23,42,.14);
+  border:1px solid rgba(15,23,42,.14);
+  transition: background .12s ease, border-color .12s ease;
+  flex: 0 0 auto;
+}
+.switch::after{
+  content:"";
+  position:absolute;
+  top: 50%;
+  left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  background:#fff;
+  box-shadow: 0 10px 20px rgba(2,6,23,.12);
+  transform: translateY(-50%);
+  transition: transform .12s ease;
+}
+.switch.is-on{
+  background: color-mix(in srgb, var(--accent-solid) 75%, white 0%);
+  border-color: rgba(99,102,241,.55);
+}
+.switch.is-on::after{ transform: translate(16px, -50%); }
+
+/* Body: tighter padding */
+.term-active-row__body{ padding: 8px 10px 10px 10px; }
+.term-active-row.is-collapsed .term-active-row__body{ display:none; }
+
+/* Shared input: shorter */
+.term-shared-input input{
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  border:1px solid rgba(15,23,42,.12);
+  padding: 0 10px;
+  font-size: .88rem;
+  background: var(--input-bg);
+  outline:none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.term-shared-input input:focus{ box-shadow: var(--ring); border-color: rgba(99,102,241,.55); }
+
+.term-plan-grid{
+  display:flex;
+  flex-wrap: nowrap;
+  gap:8px; /* slightly roomier */
+  overflow-x: hidden;
+  padding-bottom: 2px;
+}
+
+
+.term-plan-input{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 9px;
+  border-radius: 12px;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.term-plan-chip{
+  margin:0;
+  flex: 0 0 auto;
+  padding: .10rem .42rem;
+  font-size: .68rem;
+}
+
+.term-plan-input input,
+.term-plan-input select{
+  height: 34px;
+  border-radius: 10px;
+  font-size: .86rem;
+  padding: 0 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.term-row--dragging{ opacity:.55; }
 
 /* 12) Buttons */
 .btn-clear,
@@ -558,19 +1387,36 @@ input:focus, select:focus, textarea:focus{
 .btn-copy{  background:linear-gradient(135deg,#0f766e,#0e7490); color:#fff; border-color:rgba(255,255,255,.12); }
 .btn-open{  background:linear-gradient(135deg,#be123c,#9f1239); color:#fff; border-color:rgba(255,255,255,.12); padding:.72rem 1rem; }
 
-/* Add plan */
-.addPlanbtn{
+/* Unified pill buttons */
+.btn-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding: 8px 12px;
+  font-size:.80rem;
+  font-weight: 750;
+  letter-spacing:.01em;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  cursor:pointer;
+  line-height:1.1;
+  white-space:nowrap;
   background: var(--accent);
   color:#fff;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  margin: 0, 0, 0, .5rem;
-  padding: 6px 10px;
-  font-size: .74rem;
-  font-weight: 750;
-  cursor:pointer;
-  box-shadow: 0 22px 60px rgba(2,6,23,.18);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  box-shadow: 0 18px 44px rgba(2,6,23,.18);
+  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+.btn-pill:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 26px 70px rgba(2,6,23,.22);
+}
+.btn-pill:active{ transform: translateY(0); }
+
+/* Add plan */
+.addPlanbtn{
+  margin: 0;
 }
 
 .addPlanbtn:hover{ transform: translateY(-1px); filter: brightness(1.03); box-shadow: 0 30px 80px rgba(2,6,23,.22); }
@@ -666,128 +1512,191 @@ input:focus, select:focus, textarea:focus{
   outline-offset: 4px;
   border-radius: 14px;
 }
-/* ===============================
-   Presets Sidecar (appears on scroll)
-   =============================== */
-
-.presets-sidecar{
-  position: fixed;
-  right: 16px;
-  bottom: 75px; /* <-- extend toward the bottom */
-  width: min(200px, calc(100vw - 32px));
-
-  /* viewport-fit height (no fixed 600px cap) */
-  height: auto;
-  max-height: calc(100vh - 400px); /* 300 top + 16 bottom */
-
-  z-index: 9999;
-
-  /* Hidden by default */
-  opacity: 0;
-  transform: translateX(12px);
-  pointer-events: none;
-
-  transition: opacity .18s ease, transform .18s ease;
-
-  /* Match your panel styling */
-  padding: 12px 12px;
-  background: rgba(105,53,202,1);
-  border: 1px solid rgba(15,23,42,.08);
-  border-radius: var(--radius-md);
-
-  box-shadow: 0 18px 50px rgba(2,6,23,.18);
-  backdrop-filter: blur(8px);
-
-  /* header + body */
-  display: flex;
-  flex-direction: column;
-
-  /* never collapse too small */
-  min-height: 400px;
-}
-
-.presets-sidecar.is-open{
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-.presets-sidecar__header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom: 10px;
-  flex: 0 0 auto;
-  color: var(--card-muted);
-}
-
-.presets-sidecar__header h3{
-  margin:0;
-  font-size:.82rem;
-  font-weight:850;
-}
-
-.presets-sidecar__header p{
-  margin:.15rem 0 0;
-  font-size:.82rem;
-  color: var(--card-muted);
-  line-height:1.35;
-}
-
-.presets-sidecar__close{
-  border: 1px solid rgba(15,23,42,.10);
-  background: rgba(255,255,255,.85);
-  border-radius: 10px;
-  padding: 6px 8px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #0b0f19;
-  line-height: 1;
-}
-
-/* The body should fill the rest of the sidecar */
-.presets-sidecar__body{
-  flex: 1 1 auto;
-  min-height: 0;          /* critical in flex layouts */
-  overflow: auto;         /* body scrolls ONLY if truly needed */
-  overflow-x: hidden;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* IMPORTANT: neutralize any old list constraints coming from the main panel */
-.presets-sidecar__body #presetList,
-.presets-sidecar__body .presets-list{
-  flex: 0 0 auto;         /* let it be natural height */
-  height: auto !important;
-  max-height: none !important;   /* <-- this is usually the culprit */
-  overflow: visible !important;  /* <-- remove inner scrolling */
-}
-
-/* If your list wrapper is flex/grid, keep it packed to the top */
-.presets-sidecar__body #presetList,
-.presets-sidecar__body .presets-list{
-  align-content: flex-start;
-}
-
 /* 14) Plans grid */
 #plansContainer{
-  display:grid;
-  gap:14px;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  align-items:start;
+  display:block;
 }
-@media (max-width:820px){
-  #plansContainer{ grid-template-columns: 1fr; }
+
+.plan-tabs{
+  margin-bottom: 12px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.plan-tab{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  flex: 0 0 150px;
+  max-width: 150px;
+  cursor: pointer;
+}
+.plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
+.plan-tab[data-plan-id].is-dragging{ cursor: grabbing; opacity: .75; }
+.plan-tab.is-active{
+  background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(224,231,255,.92));
+  border-color: rgba(139,92,246,.45);
+  color:#1f2937;
+}
+.plan-tab__name{
+  font-size:.84rem;
+  font-weight: 800;
+  color: var(--text);
+  display:block;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 72%, transparent 100%);
+}
+.plan-tab--add{
+  background: linear-gradient(135deg,#5b21b6,#4f46e5);
+  color:#fff;
+  border-color: rgba(255,255,255,.25);
+  padding: 7px 12px;
+  font-size: 1rem;
+  line-height: 1;
+  flex: 0 0 auto;
+  max-width: none;
+}
+.plan-tab--add:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
+
+.plan-sheet{
+  display:grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap:16px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.92));
+  box-shadow: var(--shadow-1);
+}
+@media (max-width:900px){
+  .plan-sheet{ grid-template-columns: 1fr; }
+}
+
+.plan-sheet__header{
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  align-items:center;
+  gap:16px;
+}
+@media (max-width:900px){
+  .plan-sheet__header{ grid-template-columns: 1fr; }
+}
+
+.plan-sheet__contents-title{
+  margin:0;
+  font-weight: 700;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(15,23,42,.66);
+}
+
+.plan-sheet__left{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.plan-sheet__left-panel{
+  border:1px solid rgba(148,163,184,.3);
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.92));
+  border-radius: 14px;
+  padding: 12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
+}
+.plan-sheet__left .field{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.plan-sheet__left .field > label{
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color: rgba(51,65,85,.92);
+}
+.plan-sheet__left .field input{
+  margin-top: 0;
+}
+.plan-sheet__left .plan-cta-btn{
+  width:100%;
+  justify-content:center;
+}
+.plan-sheet__left [data-plan-cta-summary]{
+  display:block;
+  margin-top:2px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  border:1px dashed rgba(148,163,184,.55);
+  background: rgba(248,250,252,.95);
+  line-height:1.35;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-sheet__right{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.plan-sheet__right .plan-contents{
+  min-height: 220px;
+}
+.plan-sheet__meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.plan-remove{
+  border-radius: 999px;
+  border: 1px solid rgba(185,28,28,.24);
+  background: rgba(254,242,242,.85);
+  color:#b91c1c;
+  padding: 6px 12px;
+  font-size: .78rem;
+  font-weight: 800;
+  cursor:pointer;
+}
+.plan-remove:hover{ filter: brightness(1.02); box-shadow: 0 10px 24px rgba(185,28,28,.16); }
+
+.term-plan-input.is-empty{
+  opacity:.4;
+  filter: grayscale(.2);
+}
+.term-plan-input.is-empty .term-plan-chip{
+  opacity:.7;
+}
+.term-plan-input.is-empty input,
+.term-plan-input.is-empty select{
+  pointer-events:none;
 }
 
 /* 15) Plan cards */
 .plan-card{
-  background: rgba(255,255,255,.96);
-  border: 1px solid rgba(15,23,42,.10);
+  --plan-tint: rgba(59,130,246,.06);
+  --plan-tint-strong: rgba(59,130,246,.14);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.94)),
+    var(--plan-tint);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 12px 12px;
   display:flex;
@@ -795,13 +1704,13 @@ input:focus, select:focus, textarea:focus{
   gap:10px;
   min-height: 200px;
   min-width:0;
-  box-shadow: var(--shadow-2);
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  box-shadow: var(--shadow-1);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
 }
 .plan-card:hover{
   transform: translateY(-1px);
-  border-color: rgba(99,102,241,.20);
-  box-shadow: 0 28px 80px rgba(2,6,23,.18);
+  border-color: rgba(79,70,229,.20);
+  box-shadow: var(--shadow-2);
 }
 .plan-card-header{
   display:flex;
@@ -809,7 +1718,7 @@ input:focus, select:focus, textarea:focus{
   align-items:center;
   gap:10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(15,23,42,.06);
+  border-bottom: 1px solid rgba(15,23,42,.08);
 }
 .plan-card-title{
   font-weight: 800;
@@ -818,8 +1727,8 @@ input:focus, select:focus, textarea:focus{
 }
 .plan-card button.secondary{
   border-radius: 999px;
-  border: 1px solid rgba(15,23,42,.12);
-  background: rgba(248,250,252,.95);
+  border: 1px solid var(--border);
+  background: rgba(248,250,252,.98);
   padding: 6px 10px;
   font-size: .78rem;
   font-weight: 800;
@@ -845,8 +1754,8 @@ input:focus, select:focus, textarea:focus{
 
 .plan-drag-handle{
   border-radius: 999px;
-  border: 1px solid rgba(15,23,42,.12);
-  background: rgba(248,250,252,.95);
+  border: 1px solid var(--border);
+  background: rgba(248,250,252,.98);
   padding: 6px 10px;
   font-size: .78rem;
   font-weight: 950;
@@ -862,8 +1771,34 @@ input:focus, select:focus, textarea:focus{
 }
 
 .plan-card.drop-target{
-  outline: 2px dashed rgba(99,102,241,.85);
+  outline: 2px dashed rgba(79,70,229,.7);
   outline-offset: 4px;
+}
+
+/* Plan tint mapping (by plan index) */
+.plan-card[data-plan-idx="0"],
+.term-plan-input[data-plan-idx="0"],
+.term-plan-chip[data-plan-idx="0"]{
+  --plan-tint: rgba(59,130,246,.08);
+  --plan-tint-strong: rgba(59,130,246,.18);
+}
+.plan-card[data-plan-idx="1"],
+.term-plan-input[data-plan-idx="1"],
+.term-plan-chip[data-plan-idx="1"]{
+  --plan-tint: rgba(16,185,129,.08);
+  --plan-tint-strong: rgba(16,185,129,.18);
+}
+.plan-card[data-plan-idx="2"],
+.term-plan-input[data-plan-idx="2"],
+.term-plan-chip[data-plan-idx="2"]{
+  --plan-tint: rgba(139,92,246,.08);
+  --plan-tint-strong: rgba(139,92,246,.18);
+}
+.plan-card[data-plan-idx="3"],
+.term-plan-input[data-plan-idx="3"],
+.term-plan-chip[data-plan-idx="3"]{
+  --plan-tint: rgba(245,158,11,.10);
+  --plan-tint-strong: rgba(245,158,11,.20);
 }
 
 /* 16) Toolbar */
@@ -875,13 +1810,14 @@ input:focus, select:focus, textarea:focus{
   margin: 6px 0 8px;
   padding: 6px;
   border-radius: 16px;
-  background: rgba(15,23,42,.04);
-  border: 1px solid rgba(15,23,42,.06);
+  background: rgba(248,250,252,.9);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
 .plan-toolbar button,
 .plan-toolbar select,
 .plan-toolbar input[type="color"]{
-  border:1px solid rgba(15,23,42,.12);
+  border:1px solid var(--border);
   background: rgba(255,255,255,.98);
   border-radius: 12px;
   padding: 7px 9px;
@@ -1048,6 +1984,82 @@ input:focus, select:focus, textarea:focus{
   body.sidebar-open .sidebar-overlay{
     opacity: 1;
     pointer-events: auto;
+  }
+}
+
+@media (max-width: 720px){
+  .page-header{
+    margin: 18px auto 10px;
+    align-items:flex-start;
+  }
+  .page-header-left{ flex: 1 1 auto; }
+  .form-top-actions{
+    justify-content:flex-start;
+  }
+  .builder-layout{
+    padding: 10px;
+  }
+  .card{
+    padding: 12px;
+  }
+  .terms-tiles-block{
+    padding: 8px;
+  }
+  .plan-toolbar{
+    gap:8px;
+  }
+}
+
+@media (max-width: 520px){
+  :root{
+    --pad: 12px;
+  }
+  .form-top-actions{
+    gap:8px;
+  }
+  .form-top-actions > button{
+    flex: 1 1 100%;
+    justify-content:center;
+  }
+  .top-simple{
+    grid-template-columns: 1fr;
+  }
+  .terms-classic-row{
+    flex: 1 1 100%;
+  }
+  .term-row{
+    grid-template-columns: 1fr;
+    gap:8px;
+  }
+  .term-row .term-check{
+    justify-content:flex-start;
+  }
+  .term-active-row__head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .term-row-actions{
+    width:100%;
+    justify-content:flex-end;
+  }
+  .term-plan-grid{
+    flex-wrap:wrap;
+  }
+  .term-plan-input{
+    flex: 1 1 100%;
+  }
+  .plan-toolbar button,
+  .plan-toolbar select,
+  .plan-toolbar input[type="color"]{
+    flex: 1 1 100%;
+  }
+  .plan-card-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .sidebar-toggle{
+    width: 100%;
+    justify-content:center;
   }
 }
 
@@ -1271,8 +2283,8 @@ input:focus, select:focus, textarea:focus{
     </label>
   </div>
 </div>
-
 <script>
+
 (function(){
   // CHANGE THIS:
   const PASSCODE = "937";
@@ -1324,9 +2336,9 @@ input:focus, select:focus, textarea:focus{
     <div class="page-header-left">
       <h1>LNPresents - Builder</h1>
       <p>
-        Welcome to the LexisNexis Proposal Builder for LNPresents.
-        Fill out this form and show up to four plans with up to six term details selected to present on LNPresents.
-        The plan contents support basic text formatting (bold, italic, underline, bulletpoint, and color).
+        Welcome to LNPresents — the LexisNexis Proposal Builder.
+Use this tool to quickly build and present up to four tailored plans with your selected terms in a clear, client-ready format.
+Plan content supports rich text formatting, including bold, italic, underline, bullet points, and color for clarity and emphasis.
       </p>
     </div>
   </header>
@@ -1406,13 +2418,21 @@ input:focus, select:focus, textarea:focus{
       </div>
       <img id="headerPreviewImg" alt="Header preview" />
     </div>
-        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn" style="padding:.55rem .85rem; font-size:.78rem;">
+        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn btn-pill" style="padding:.55rem .85rem; font-size:.78rem;">
       Clear uploaded header
     </button>
 
-    <small class="muted-text">
-      This saves the image to <b>this device/browser</b> so the Presenter can use it.
-    </small>
+   <small class="muted-text">
+  Don’t have a header image yet?
+  <a
+    href="https://lexisnexislngglobal.seismic.com/Link/Content/DC2DVH3GCVQmpGQF6XfHq3VFHW8d"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="font-weight:900;"
+  >
+    CLICK HERE
+  </a>.
+</small>
   </div>
 </div>
           </div>
@@ -1423,7 +2443,7 @@ input:focus, select:focus, textarea:focus{
           <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
           <div class="card-info">
             <div class="profile-card-controls">
-              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn">
+              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn btn-pill">
                 Download Profile
               </button>
 
@@ -1442,7 +2462,7 @@ input:focus, select:focus, textarea:focus{
         <div class="card">
           <p class="lede">Quick tips for using LNPresents:</p>
           <ul class="bullet-list">
-            <li>You may choose up to <strong>six</strong> terms to show above your plans.</li>
+            <li>Activate terms from the <strong>Term Library</strong> and add plan specific and general proposal terms</li>
             <li>You may show up to <strong>four</strong> plans at once.</li>
             <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
             <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
@@ -1477,49 +2497,11 @@ input:focus, select:focus, textarea:focus{
                 </div>
               </div>
 
-              <div class="top-term-row">
-                <div class="top-field term-style">
-                  <div class="term-check">
-                    <input type="checkbox" data-term-option="numAttorneys">
-                    <span class="box"></span>
-                  </div>
-                  <div class="top-label">Attorney Count</div>
-                  <div>
-                    <select data-key="clgNumAttorneys">
-                      <option value="">Select…</option>
-                      <option>1</option><option>2</option><option>3</option><option>4</option>
-                      <option>5</option><option>6</option><option>7</option><option>8</option>
-                      <option>9</option><option>10</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="top-field yoy-row">
-                  <div class="term-check">
-                    <input type="checkbox" data-term-option="yoyIncrease">
-                    <span class="box"></span>
-                  </div>
-                  <div class="top-label">Year over Year increase</div>
-                  <div><input type="text" data-key="clgYoyIncrease" placeholder="3%" class="input-style"></div>
+                <div id="classicTopTerms" class="terms-classic-panel"></div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- 2) Side-by-side panels -->
-          <div class="form-panel-row">
-            <div class="card">
-              <h2>Terms</h2>
-              <div class="tab-row">
-                <button type="button" class="tab-btn active" data-panel="retentionPanel">Retention</button>
-                <button type="button" class="tab-btn" data-panel="newBizPanel">New Business</button>
-              </div>
-              <div id="retentionPanel" class="panel active"><div id="retentionTerms"></div></div>
-              <div id="newBizPanel" class="panel"><div id="newBizTerms"></div></div>
-            </div>
-          </div>
-
-          <!-- 3) Plans -->
+          <!-- 2) Plans -->
           <div class="card" id="plansSection">
             <h2>Plans</h2>
 
@@ -1537,9 +2519,45 @@ input:focus, select:focus, textarea:focus{
               </div>
             </div>
 
-            <button type="button" id="addPlanBtn" class="addPlanbtn" style="addPlanbtn">+ Add Plan</button>
+            <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
+              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
+              <button type="button" id="clearPlansBtn" class="notebook-tab tab-action-btn" aria-label="Clear plans">Clear Plans</button>
+            </div>
             <div id="plansContainer"></div>
           </div>
+
+          <!-- 3) Terms -->
+          <div class="form-panel-row">
+          <div class="card terms-card">
+            <h2>Terms</h2>
+            <p class="muted-text terms-description">
+              Choose from the available terms and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
+            </p>
+          <div class="terms-tiles-toprow">
+                <div class="terms-tiles-controls">
+                  <div id="allTermsPanel" class="panel active"><div id="allTermsLibrary"></div></div>
+                </div>
+
+                <div class="terms-tiles-shared">
+                  <div class="terms-tiles-block">
+                    <div class="terms-tiles-block__head">
+                      <h3>Active Terms — All Categories</h3>
+                      <button type="button" id="termsExpandToggleBtn" class="terms-expand-all-btn" aria-label="Expand all active terms" hidden>Expand All</button>
+                    </div>
+                    <div class="terms-dropzone" id="termsDropzone" tabindex="0" aria-label="Active terms drop zone">
+                      <div class="drop-indicator" aria-hidden="true">
+                        <span class="drop-indicator__icon">＋</span>
+                        <span class="drop-indicator__text">Drop terms here</span>
+                        <span class="drop-indicator__sub">Drag from the library above</span>
+                      </div>
+                      <div class="terms-active-list" id="termsActiveList"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              </div>
+            </div>
         </form>
       </main>
 
@@ -1589,8 +2607,8 @@ input:focus, select:focus, textarea:focus{
             <div>
               <h2>Welcome to LNPresents Builder</h2>
               <p>
-                This Builder creates the proposal content that your Presenter displays. Fill in firm details, select up to 6 terms, build up to 4 plans,
-                then click <b>Open Presenter</b> to view the live output.
+                This Builder creates the proposal content that your Presenter displays. Fill in firm details, choose your classic/top terms, activate plan terms,
+                build up to 4 plans, then click <b>Open Presenter</b> to view the live output.
               </p>
             </div>
             <button type="button" class="demo-close" aria-label="Close demo">✕</button>
@@ -1602,9 +2620,9 @@ input:focus, select:focus, textarea:focus{
                 <h3>Builder Breakdown</h3>
                 <ol class="demo-steps">
                   <li><b>Firm Details</b>: Enter the Firm Name + Incentive (Personalized Proposal Message).</li>
-                  <li><b>Terms</b>: Choose up to <b>6</b> checkboxes across Retention/New Business options to be displayed with your plans.</li>
                   <li><b>Plans</b>: Add up to <b>4</b> plans with Platform, Price, and Contents displayed in a clean and direct format.</li>
                   <li><b>Presets</b>: Drag a preset into a plan’s Contents area to start from a personalized template.</li>
+                  <li><b>Terms</b>: Click or Drag tiles from the Term Library into Active. Expand each active term to enter values and choose <b>Applies to All</b> or per-plan values.</li>
                   <li><b>Save Details</b>: Save details in an easy and secure way by exporting your Plan Profile found in the side menu.</li>
                   <li><b>Open Presenter</b>: Once you've saved your details, Open the Presenter. You will be taken to another page with your presentation and the PDF export.</li>
                 </ol>
@@ -1715,14 +2733,13 @@ input:focus, select:focus, textarea:focus{
      * A) DOM REFERENCES
      * ========================= */
     const form = document.getElementById("clgForm");
-    const retentionHost = document.getElementById("retentionTerms");
-    const newBizHost = document.getElementById("newBizTerms");
+    const allTermsLibraryHost = document.getElementById("allTermsLibrary");
     const plansContainer = document.getElementById("plansContainer");
+    const planTabs = document.getElementById("planTabs");
     const addPlanBtn = document.getElementById("addPlanBtn");
+    const clearPlansBtn = document.getElementById("clearPlansBtn");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
-    const tabs = document.querySelectorAll(".tab-btn");
-    const panels = document.querySelectorAll(".panel");
     const exportBtn = document.getElementById('exportEmailBtn');
     const emailProposalBtn = document.getElementById("emailProposalBtn");
     const copyProposalBtn = document.getElementById("copyProposalBtn");
@@ -1750,6 +2767,8 @@ const clearUploadedHeaderBtn  = document.getElementById("clearUploadedHeaderBtn"
     const MAX_PLANS = 4;
     const MAX_TERM_SELECTIONS = 6;
     const currencyFmt = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+    let activePlanId = null;
+    const SHARED_TERMS_GROUP = "all";
 
     /* =========================
      * B.1) LN REP (HEADER) STATE
@@ -2198,11 +3217,188 @@ LNPresents Support`;
       { key: "termEndDate",    label: "Term End Date",   input: { type: "date", dataKey: "clgTermEndDate" }, defaultSelected: false },
       { key: "nbExtensionTerm",label: "Term Length",     input: { type: "select", dataKey: "clgnbExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] }, defaultSelected: false }
     ];
+    /* =========================
+     * C.1) TERMS V4 (Tiles + per-term Applies-to-All)
+     * - Classic terms: checkbox + single global value
+     * - Tile terms: drag to activate, per-plan by default, optional Applies-to-All
+     * ========================= */
+    const TERMS_TILES_STORAGE_KEY = "LNP_STATE_V4_TERMS_TILES";
+    const TERMS_TILES_SCHEMA = 4;
+    const TERMS_TILE_GROUPS = [
+      { id: "retention", label: "Retention" },
+      { id: "newbiz", label: "New Business" },
+      { id: "datesTimes", label: "Dates/Times" },
+      { id: "pricingPromos", label: "Pricing/Promos" }
+    ];
+
+    const classicTermsDefs = [
+      { id: "attorneyCount", label: "Attorney Count", type: "select", dataKey: "clgNumAttorneys", options: Array.from({ length: 10 }, (_, idx) => String(idx + 1)) },
+      { id: "currentSpend",  label: "Current Spend",  type: "text", dataKey: "clgCurrentSpend", placeholder: "$0.00" },
+      { id: "currentTermEnd",label: "Current Term End",type: "date", dataKey: "clgCurrentTermEnd" }
+    ];
+
+    const tileTermDefinitions = {
+      effectiveDate:     { id: "effectiveDate", label: "Effective Date", input: { type: "date", dataKey: "clgEffectiveDate" } },
+      extensionTermEnd:  { id: "extensionTermEnd", label: "Extension Term End", input: { type: "date", dataKey: "clgExtensionTermEnd" } },
+      extensionTerm:     { id: "extensionTerm", label: "Term Extension", input: { type: "select", dataKey: "clgExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] } },
+      yoyIncrease:       { id: "yoyIncrease", label: "Year over Year Increase", input: { type: "text", dataKey: "clgYoyIncrease", placeholder: "3%" } },
+      activationDate:    { id: "activationDate", label: "Activation Date", input: { type: "date", dataKey: "clgActivationDate" } },
+      introPrice:        { id: "introPrice", label: "Promotion Price", input: { type: "text", dataKey: "clgIntroPrice", placeholder: "$0.00" } },
+      termStartDate:     { id: "termStartDate", label: "Promotion End Date", input: { type: "date", dataKey: "clgTermStartDate" } },
+      termEndDate:       { id: "termEndDate", label: "Term End Date", input: { type: "date", dataKey: "clgTermEndDate" } },
+      nbExtensionTerm:   { id: "nbExtensionTerm", label: "Term Length", input: { type: "select", dataKey: "clgnbExtensionTerm", options: ["", "1 year", "2 years", "3 years", "4 years", "5 years"] } },
+      promotion:         { id: "promotion", label: "Promotion", input: { type: "text", dataKey: "clgPromotion", placeholder: "Describe the promotion" } },
+      freeTimeAvailable: { id: "freeTimeAvailable", label: "Free Time Available", input: { type: "range", dataKey: "clgFreeTimeAvailable", min: 1, max: 59, step: 1, suffix: "days" } },
+      costPerAttorney:   { id: "costPerAttorney", label: "Cost Per Attorney", input: { type: "text", dataKey: "clgCostPerAttorney", placeholder: "$0.00" } }
+    };
+
+    const tileTermsCatalog = {
+      retention: [
+        tileTermDefinitions.effectiveDate,
+        tileTermDefinitions.extensionTerm,
+        tileTermDefinitions.extensionTermEnd,
+        tileTermDefinitions.yoyIncrease
+      ],
+      newbiz: [
+        tileTermDefinitions.activationDate,
+        tileTermDefinitions.introPrice,
+        tileTermDefinitions.termStartDate,
+        tileTermDefinitions.termEndDate,
+        tileTermDefinitions.nbExtensionTerm
+      ],
+      datesTimes: [
+        tileTermDefinitions.activationDate,
+        tileTermDefinitions.effectiveDate,
+        tileTermDefinitions.extensionTermEnd,
+        tileTermDefinitions.termStartDate,
+        tileTermDefinitions.termEndDate
+      ],
+      pricingPromos: [
+        tileTermDefinitions.introPrice,
+        tileTermDefinitions.promotion,
+        tileTermDefinitions.freeTimeAvailable,
+        tileTermDefinitions.costPerAttorney
+      ]
+    };
+
+    const tileTermById = (() => {
+      const map = {};
+      Object.keys(tileTermsCatalog).forEach(g => {
+        tileTermsCatalog[g].forEach(t => { map[t.id] = { ...t, group: g }; });
+      });
+      return map;
+    })();
+
+    const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
+
+    function defaultTermsTilesState() {
+      const classicSel = {};
+      const classicVals = {};
+      classicTermsDefs.forEach(d => { classicSel[d.id] = false; classicVals[d.id] = ""; });
+      const emptyOrders = TERMS_TILE_GROUPS.reduce((acc, group) => {
+        acc[group.id] = [];
+        return acc;
+      }, {});
+      emptyOrders[SHARED_TERMS_GROUP] = [];
+      return {
+        __schema: TERMS_TILES_SCHEMA,
+        classicTermsSelected: classicSel,
+        classicTermsValues: classicVals,
+        activeTileTermsOrder: emptyOrders,
+        tileTermsState: {}
+      };
+    }
+
+    function loadTermsTilesState() {
+      let raw = null;
+      try { raw = JSON.parse(localStorage.getItem(TERMS_TILES_STORAGE_KEY) || "null"); } catch (e) { raw = null; }
+      if (raw && raw.__schema === TERMS_TILES_SCHEMA) return raw;
+
+      // Best-effort migration from legacy selection model (clgSelectedTerms + single values)
+      const migrated = defaultTermsTilesState();
+
+      const legacySelected = Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [];
+      // Classic terms
+      migrated.classicTermsSelected.attorneyCount = legacySelected.includes("numAttorneys");
+      migrated.classicTermsSelected.currentSpend  = legacySelected.includes("currentSpend");
+      migrated.classicTermsSelected.currentTermEnd= legacySelected.includes("currentTermEnd");
+
+      migrated.classicTermsValues.attorneyCount = saved.clgNumAttorneys || "";
+      migrated.classicTermsValues.currentSpend  = saved.clgCurrentSpend || "";
+      migrated.classicTermsValues.currentTermEnd= saved.clgCurrentTermEnd || "";
+
+      // Tile terms (previously global-only -> migrate as Applies-to-All ON)
+      function migrateTile(termId, dataKey, group) {
+        const isSel = legacySelected.includes(termId);
+        const hasVal = !!(saved[dataKey] != null && String(saved[dataKey]).trim() !== "");
+        if (!isSel && !hasVal) return;
+        if (!migrated.tileTermsState[termId]) {
+          migrated.tileTermsState[termId] = { active: false, appliesToAll: true, globalValue: "", perPlanValues: {} };
+        }
+        migrated.tileTermsState[termId].active = true;
+        migrated.tileTermsState[termId].appliesToAll = true;
+        migrated.tileTermsState[termId].globalValue = saved[dataKey] || "";
+        if (!migrated.activeTileTermsOrder[group].includes(termId)) migrated.activeTileTermsOrder[group].push(termId);
+      }
+
+      migrateTile("effectiveDate", "clgEffectiveDate", "retention");
+      migrateTile("extensionTermEnd", "clgExtensionTermEnd", "retention");
+      migrateTile("extensionTerm", "clgExtensionTerm", "retention");
+      migrateTile("yoyIncrease", "clgYoyIncrease", "retention");
+
+      migrateTile("activationDate", "clgActivationDate", "newbiz");
+      migrateTile("introPrice", "clgIntroPrice", "newbiz");
+      migrateTile("termStartDate", "clgTermStartDate", "newbiz");
+      migrateTile("termEndDate", "clgTermEndDate", "newbiz");
+      migrateTile("nbExtensionTerm", "clgnbExtensionTerm", "newbiz");
+
+      // Persist migrated state (do NOT delete legacy storage)
+      try { localStorage.setItem(TERMS_TILES_STORAGE_KEY, JSON.stringify(migrated)); } catch (e) {}
+      return migrated;
+    }
+
+    let termsTilesState = loadTermsTilesState();
+    let termsTilesExpandedByGroup = TERMS_TILE_GROUPS.reduce((acc, group) => {
+      acc[group.id] = new Set();
+      return acc;
+    }, {});
+    termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
+
+    function persistTermsTiles() {
+      try {
+        termsTilesState.__schema = TERMS_TILES_SCHEMA;
+        localStorage.setItem(TERMS_TILES_STORAGE_KEY, JSON.stringify(termsTilesState));
+      } catch (e) {}
+    }
+
+    function ensureTileTerm(termId) {
+      if (!termsTilesState.tileTermsState[termId]) {
+        termsTilesState.tileTermsState[termId] = { active: false, appliesToAll: false, globalValue: "", perPlanValues: {} };
+      }
+      return termsTilesState.tileTermsState[termId];
+    }
+
+    function currentPlanIds() {
+      return (state.clgPlans || []).map(p => p.__id).filter(Boolean);
+    }
+
+    function syncTileTermPlanSlots() {
+      const ids = new Set(currentPlanIds());
+      Object.keys(termsTilesState.tileTermsState || {}).forEach(termId => {
+        const st = ensureTileTerm(termId);
+        if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+        // Remove deleted plans
+        Object.keys(st.perPlanValues).forEach(pid => { if (!ids.has(pid)) delete st.perPlanValues[pid]; });
+        // Add new plans
+        ids.forEach(pid => { if (!(pid in st.perPlanValues)) st.perPlanValues[pid] = ""; });
+      });
+      persistTermsTiles();
+    }
+
 
     /* =========================
      * D) PERSISTED & STATE
      * ========================= */
-    const saved = JSON.parse(localStorage.getItem("clgFormVars") || "{}");
 
     function makeEmptyPlan() {
       return {
@@ -2210,7 +3406,9 @@ LNPresents Support`;
         clgPlatform: "",
         clgPriceCents: null,
         clgPrice: "",
-        clgContents: ""
+        clgContents: "",
+        clgCtaLabel: "",
+        clgCtaUrl: ""
       };
     }
 
@@ -2229,6 +3427,9 @@ LNPresents Support`;
       clgnbExtensionTerm: saved.clgnbExtensionTerm || "",
       clgIntroPrice: saved.clgIntroPrice || "",
       clgTermStartDate: saved.clgTermStartDate || "",
+      clgPromotion: saved.clgPromotion || "",
+      clgFreeTimeAvailable: saved.clgFreeTimeAvailable || "",
+      clgCostPerAttorney: saved.clgCostPerAttorney || "",
       clgSelectedTerms: Array.isArray(saved.clgSelectedTerms) ? saved.clgSelectedTerms : [],
       clgPlans: Array.isArray(saved.clgPlans) && saved.clgPlans.length ? saved.clgPlans : [makeEmptyPlan()]
     };
@@ -2238,6 +3439,8 @@ LNPresents Support`;
       state.clgPlans = state.clgPlans.map(p => {
         if (!p || typeof p !== "object") p = {};
         if (!p.__id) p.__id = "plan_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+        if (p.clgCtaLabel == null) p.clgCtaLabel = "";
+        if (p.clgCtaUrl == null) p.clgCtaUrl = "";
         return p;
       });
     }
@@ -2261,7 +3464,8 @@ LNPresents Support`;
         clgnbExtensionTerm: state.clgnbExtensionTerm,
         clgIntroPrice: state.clgIntroPrice,
         clgTermStartDate: state.clgTermStartDate,
-        clgPlans: state.clgPlans
+        clgPlans: state.clgPlans,
+        lnpTermsTiles: termsTilesState
       };
     }
 
@@ -2309,7 +3513,30 @@ LNPresents Support`;
       state.clgPlans = Array.isArray(data.clgPlans) && data.clgPlans.length ? data.clgPlans : [makeEmptyPlan()];
 
       ensurePlanIds();
+      if (data.lnpTermsTiles && typeof data.lnpTermsTiles === "object") {
+        termsTilesState = data.lnpTermsTiles;
+        // normalize / defaults
+        if (!termsTilesState || typeof termsTilesState !== "object") termsTilesState = defaultTermsTilesState();
+      if (!termsTilesState.activeTileTermsOrder) termsTilesState.activeTileTermsOrder = {};
+      TERMS_TILE_GROUPS.forEach(group => {
+        if (!Array.isArray(termsTilesState.activeTileTermsOrder[group.id])) {
+          termsTilesState.activeTileTermsOrder[group.id] = [];
+        }
+      });
+      if (!Array.isArray(termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP])) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = [];
+      }
+      if (!termsTilesState.tileTermsState) termsTilesState.tileTermsState = {};
+      if (!termsTilesState.classicTermsSelected) termsTilesState.classicTermsSelected = defaultTermsTilesState().classicTermsSelected;
+      if (!termsTilesState.classicTermsValues) termsTilesState.classicTermsValues = defaultTermsTilesState().classicTermsValues;
+        persistTermsTiles();
+      }
+
       hydrateFormFromState();
+
+      renderClassicTopTerms();
+      renderAllTermsTiles();
+      syncTileTermPlanSlots();
       renderPlans();
       persistNow();
 
@@ -2551,6 +3778,42 @@ LNPresents Support`;
       return Math.round(pct * 100);
     }
 
+    const INPUT_FORMAT_PATTERNS = {
+      currency: /(spend|price|cost|amount|fee|charge)/i,
+      percent: /(percent|percentage|increase|growth|yoy)/i,
+      number: /(count|number|qty|quantity|attorney)/i
+    };
+
+    function inferInputFormat({ label, dataKey, type }) {
+      if (type === "date" || type === "select") return null;
+      const haystack = `${label || ""} ${dataKey || ""}`.trim();
+      if (!haystack) return null;
+      if (INPUT_FORMAT_PATTERNS.currency.test(haystack)) return "currency";
+      if (INPUT_FORMAT_PATTERNS.percent.test(haystack)) return "percent";
+      if (INPUT_FORMAT_PATTERNS.number.test(haystack)) return "number";
+      return null;
+    }
+
+    function formatValueForInput(rawValue, format) {
+      const raw = String(rawValue ?? "");
+      if (!raw.trim()) return "";
+      if (format === "currency") {
+        const cents = parseCurrencyToCents(raw);
+        return cents == null ? raw : currencyFmt.format(cents / 100);
+      }
+      if (format === "percent") {
+        const bps = parsePercentToBps(raw);
+        return bps == null ? raw : (bps / 100).toFixed(2).replace(/\.00$/, "") + "%";
+      }
+      if (format === "number") {
+        const normalized = raw.replace(/[^0-9\-]/g, "");
+        if (!normalized) return "";
+        const num = Number(normalized);
+        return Number.isNaN(num) ? raw : String(Math.trunc(num));
+      }
+      return raw;
+    }
+
     function normalizePlan(raw) {
       if (!raw) return {};
       return {
@@ -2602,8 +3865,8 @@ LNPresents Support`;
       add("extensionTerm","Term Extension",data.clgExtensionTerm);
 
       add("ActivationDate","Activation Date",data.clgActivationDate,"date");
-      add("introPrice","Promo Price",data.clgIntroPrice);
-      add("termStartDate","Promo End Date",data.clgTermStartDate,"date");
+      add("introPrice","Promotion Price",data.clgIntroPrice);
+      add("termStartDate","Promotion End Date",data.clgTermStartDate,"date");
       add("termEndDate","Term End Date",data.clgTermEndDate,"date");
       add("nbExtensionTerm","Term Length",data.clgnbExtensionTerm);
 
@@ -2747,156 +4010,908 @@ LNPresents Support`;
     /* =========================
      * F) RENDERERS
      * ========================= */
-    function renderTermPanel(host, termList) {
-      host.innerHTML = "";
-      termList.forEach(term => {
-        const row = document.createElement("div");
-        row.className = "term-row";
+    function renderClassicTopTerms() {
+      const host = document.getElementById("classicTopTerms");
+      if (!host) return;
 
-        const checkWrap = document.createElement("div");
-        checkWrap.className = "term-check";
+      host.innerHTML = `
+        <div class="terms-classic-panel__head">
+        <div class="terms-classic-grid" id="classicTermsGrid"></div>
+      `;
+
+      const grid = host.querySelector("#classicTermsGrid");
+      classicTermsDefs.forEach(def => {
+        const selected = !!termsTilesState.classicTermsSelected?.[def.id];
+        const value = termsTilesState.classicTermsValues?.[def.id] ?? "";
+
+        const row = document.createElement("div");
+        row.className = "terms-classic-row";
+
+        const check = document.createElement("div");
+        check.className = "term-check";
         const cb = document.createElement("input");
         cb.type = "checkbox";
-        cb.setAttribute("data-term-option", term.key);
+        cb.checked = selected;
+        cb.setAttribute("aria-label", "Select " + def.label);
         const box = document.createElement("span");
         box.className = "box";
-        cb.checked = Array.isArray(state.clgSelectedTerms) && state.clgSelectedTerms.includes(term.key);
-        checkWrap.appendChild(cb);
-        checkWrap.appendChild(box);
+        check.appendChild(cb);
+        check.appendChild(box);
 
         const label = document.createElement("div");
         label.className = "term-label";
-        label.textContent = term.label;
+        label.textContent = def.label;
 
-        let inputEl;
-        if (term.input.type === "select") {
-          inputEl = document.createElement("select");
-          inputEl.setAttribute("data-key", term.input.dataKey);
-          term.input.options.forEach(opt => {
-            const o = document.createElement("option");
-            o.value = opt; o.textContent = opt === "" ? "-- choose --" : opt;
-            inputEl.appendChild(o);
+        const inputWrap = document.createElement("div");
+        inputWrap.className = "term-input";
+        let input;
+        if (def.type === "select") {
+          input = document.createElement("select");
+          const blank = document.createElement("option");
+          blank.value = "";
+          blank.textContent = "Select";
+          input.appendChild(blank);
+          (def.options || []).forEach(optVal => {
+            const opt = document.createElement("option");
+            opt.value = String(optVal);
+            opt.textContent = String(optVal);
+            input.appendChild(opt);
           });
+          input.value = value || "";
         } else {
-          inputEl = document.createElement("input");
-          inputEl.type = term.input.type;
-          inputEl.setAttribute("data-key", term.input.dataKey);
-          if (term.input.placeholder) inputEl.placeholder = term.input.placeholder;
+          input = document.createElement("input");
+          input.type = def.type;
+          if (def.placeholder) input.placeholder = def.placeholder;
+          input.value = value || "";
+        }
+        inputWrap.appendChild(input);
+
+        row.appendChild(check);
+        row.appendChild(label);
+        row.appendChild(inputWrap);
+        grid.appendChild(row);
+
+        cb.addEventListener("change", () => {
+          termsTilesState.classicTermsSelected[def.id] = !!cb.checked;
+          // Keep legacy state mirrors (compat only)
+          if (def.dataKey) {
+            if (!state.clgSelectedTerms) state.clgSelectedTerms = [];
+            const legacyKey = def.id === "attorneyCount" ? "numAttorneys" : def.id;
+            const idx = state.clgSelectedTerms.indexOf(legacyKey);
+            if (cb.checked && idx === -1) state.clgSelectedTerms.push(legacyKey);
+            if (!cb.checked && idx !== -1) state.clgSelectedTerms.splice(idx, 1);
+          }
+          persistTermsTiles();
+          persistNow();
+        });
+
+        input.addEventListener("input", () => {
+          termsTilesState.classicTermsValues[def.id] = input.value;
+          if (def.dataKey) state[def.dataKey] = input.value; // mirror for exports/compat
+          persistTermsTiles();
+          persistNow();
+        });
+
+        input.addEventListener("blur", () => {
+          const format = inferInputFormat({ label: def.label, dataKey: def.dataKey, type: def.type });
+          if (!format) return;
+          const formatted = formatValueForInput(input.value, format);
+          if (formatted !== input.value) input.value = formatted;
+          termsTilesState.classicTermsValues[def.id] = formatted;
+          if (def.dataKey) state[def.dataKey] = formatted;
+          persistTermsTiles();
+          persistNow();
+        });
+      });
+    }
+
+    function buildInputElForTile(termDef) {
+      let inputEl;
+      const t = termDef.input.type;
+      if (t === "select") {
+        inputEl = document.createElement("select");
+        (termDef.input.options || []).forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt === "" ? "-- choose --" : opt;
+          inputEl.appendChild(o);
+        });
+      } else if (t === "range") {
+        inputEl = document.createElement("input");
+        inputEl.type = "range";
+        if (termDef.input.min != null) inputEl.min = termDef.input.min;
+        if (termDef.input.max != null) inputEl.max = termDef.input.max;
+        if (termDef.input.step != null) inputEl.step = termDef.input.step;
+      } else {
+        inputEl = document.createElement("input");
+        inputEl.type = t;
+        if (termDef.input.placeholder) inputEl.placeholder = termDef.input.placeholder;
+      }
+      return inputEl;
+    }
+
+    function addRangeOutputIfNeeded(parent, inputEl, termDef) {
+      if (termDef.input?.type !== "range") return null;
+      const output = document.createElement("div");
+      output.className = "term-range-output";
+      const suffix = termDef.input?.suffix ? ` ${termDef.input.suffix}` : "";
+      const update = () => {
+        output.textContent = `${inputEl.value || ""}${suffix}`.trim();
+      };
+      inputEl.addEventListener("input", update);
+      update();
+      parent.appendChild(output);
+      return output;
+    }
+
+    function getTermGroupLabel(groupId) {
+      return TERMS_TILE_GROUPS.find(group => group.id === groupId)?.label || groupId;
+    }
+
+    function updateTermCategoryBadges() {
+      TERMS_TILE_GROUPS.forEach(group => {
+        const badge = document.querySelector(`.tab-count[data-group="${group.id}"]`);
+        const btn = document.querySelector(`.tab-btn[data-group="${group.id}"]`);
+        if (!badge || !btn) return;
+        const activeOrder = (termsTilesState.activeTileTermsOrder[group.id] || []).filter(id => ensureTileTerm(id).active);
+        const hasActiveTerms = activeOrder.length > 0;
+        badge.textContent = "";
+        btn.classList.toggle("has-count", hasActiveTerms);
+        btn.setAttribute("aria-label", hasActiveTerms ? `${group.label} (terms active)` : group.label);
+      });
+    }
+
+    function buildSharedActiveOrder() {
+      const order = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => ensureTileTerm(id).active);
+      let didUpdate = false;
+      TERMS_TILE_GROUPS.forEach(group => {
+        (termsTilesState.activeTileTermsOrder[group.id] || []).forEach(id => {
+          if (ensureTileTerm(id).active && !order.includes(id)) {
+            order.push(id);
+            didUpdate = true;
+          }
+        });
+      });
+      Object.keys(termsTilesState.tileTermsState || {}).forEach(id => {
+        if (ensureTileTerm(id).active && !order.includes(id)) {
+          order.push(id);
+          didUpdate = true;
+        }
+      });
+      if (didUpdate) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = order.slice();
+        persistTermsTiles();
+      }
+      return order;
+    }
+
+    function addTermToOrders(termId, group) {
+      if (!termsTilesState.activeTileTermsOrder[group]) termsTilesState.activeTileTermsOrder[group] = [];
+      if (!termsTilesState.activeTileTermsOrder[group].includes(termId)) {
+        termsTilesState.activeTileTermsOrder[group].push(termId);
+      }
+      if (!termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP].includes(termId)) {
+        termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP].push(termId);
+      }
+    }
+
+    function removeTermFromOrders(termId) {
+      TERMS_TILE_GROUPS.forEach(group => {
+        termsTilesState.activeTileTermsOrder[group] = (termsTilesState.activeTileTermsOrder[group] || []).filter(id => id !== termId);
+      });
+      termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] =
+        (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => id !== termId);
+    }
+
+    const MAX_ACTIVE_TILE_TERMS = 5;
+
+    function getActiveTileTermCount() {
+      return Object.entries(termsTilesState.tileTerms || {}).reduce((total, [id, termState]) => {
+        if (!termState?.active) return total;
+        if (!tileTermById[id]) return total;
+        return total + 1;
+      }, 0);
+    }
+
+    function canActivateAnotherTileTerm() {
+      return getActiveTileTermCount() < MAX_ACTIVE_TILE_TERMS;
+    }
+
+    function updateTermsExpandToggle(order = buildSharedActiveOrder(), expandedSet = termsTilesExpandedByGroup[SHARED_TERMS_GROUP] || new Set()) {
+      const btn = document.getElementById("termsExpandToggleBtn");
+      if (!btn) return;
+      const hasTerms = order.length > 0;
+      btn.hidden = !hasTerms;
+      btn.disabled = !hasTerms;
+      if (!hasTerms) return;
+      const allExpanded = order.every(termId => expandedSet.has(termId));
+      const allCollapsed = order.every(termId => !expandedSet.has(termId));
+      const shouldShowCollapse = allExpanded && !allCollapsed;
+      const nextLabel = shouldShowCollapse ? "Collapse All" : "Expand All";
+      btn.textContent = nextLabel;
+      btn.setAttribute("aria-label", `${nextLabel} active terms`);
+    }
+
+    let draggingSharedTermId = null;
+
+    function renderSharedActiveTerms() {
+      const dropzone = document.getElementById("termsDropzone");
+      const activeList = document.getElementById("termsActiveList");
+      if (!dropzone || !activeList) return;
+      activeList.innerHTML = "";
+
+      const order = buildSharedActiveOrder();
+      dropzone.classList.toggle("has-terms", order.length > 0);
+      const expandedSet = termsTilesExpandedByGroup[SHARED_TERMS_GROUP] || new Set();
+      updateTermsExpandToggle(order, expandedSet);
+
+      order.forEach(termId => {
+        const termDef = tileTermById[termId];
+        if (!termDef) return;
+        const st = ensureTileTerm(termId);
+        const isExpanded = expandedSet.has(termId);
+
+        const row = document.createElement("div");
+        row.className = `term-active-row ${isExpanded ? "is-expanded" : "is-collapsed"}`;
+        row.dataset.termId = termId;
+
+        const head = document.createElement("div");
+        head.className = "term-active-row__head";
+
+        const title = document.createElement("div");
+        title.className = "term-active-row__title";
+
+        const handle = document.createElement("div");
+        handle.className = "term-drag-handle";
+        handle.textContent = "⋮⋮";
+        handle.setAttribute("title", "Drag to reorder");
+        handle.setAttribute("draggable", "true");
+
+        const expandBtn = document.createElement("button");
+        expandBtn.type = "button";
+        expandBtn.className = "term-expand-toggle";
+        expandBtn.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+        expandBtn.setAttribute("aria-label", isExpanded ? "Collapse term values" : "Expand term values");
+        expandBtn.innerHTML = `<span class="term-expand-toggle__icon">▾</span>`;
+
+        const toggleExpanded = () => {
+          if (expandedSet.has(termId)) {
+            expandedSet.delete(termId);
+          } else {
+            expandedSet.add(termId);
+          }
+          termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = expandedSet;
+          renderSharedActiveTerms();
+        };
+
+        expandBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          toggleExpanded();
+        });
+
+        const name = document.createElement("div");
+        name.textContent = termDef.label;
+
+        title.appendChild(handle);
+        title.appendChild(expandBtn);
+        title.appendChild(name);
+
+        const actions = document.createElement("div");
+        actions.className = "term-row-actions";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "applies-toggle";
+        toggleBtn.innerHTML = `<span class="switch ${st.appliesToAll ? "is-on" : ""}"></span><span>One Value for All Plans</span>`;
+
+        toggleBtn.addEventListener("click", () => {
+          st.appliesToAll = !st.appliesToAll;
+          if (st.appliesToAll && (!st.globalValue || String(st.globalValue).trim() === "")) {
+            const ids = currentPlanIds();
+            for (const pid of ids) {
+              const v = st.perPlanValues?.[pid];
+              if (v && String(v).trim() !== "") { st.globalValue = v; break; }
+            }
+          }
+          persistTermsTiles();
+          persistNow();
+          renderSharedActiveTerms();
+        });
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "term-remove";
+        removeBtn.setAttribute("aria-label", "Remove term");
+        removeBtn.title = "Remove term";
+        removeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M9 3h6l1 2h4a1 1 0 1 1 0 2h-1l-1.1 12.4A3 3 0 0 1 14.9 22h-5.8a3 3 0 0 1-2.99-2.6L5 7H4a1 1 0 1 1 0-2h4l1-2zm2 0-.5 1h3L13 3h-2zM7 7l1.05 12.1a1 1 0 0 0 .99.9h5.8a1 1 0 0 0 .99-.9L17 7H7zM10 10a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7zm4 0a1 1 0 0 1 2 0v7a1 1 0 1 1-2 0v-7z"/>
+          </svg>
+        `;
+        removeBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          st.active = false;
+          removeTermFromOrders(termId);
+          expandedSet.delete(termId);
+          termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = expandedSet;
+          persistTermsTiles();
+          persistNow();
+          renderAllTermsTiles();
+        });
+
+        actions.appendChild(toggleBtn);
+        actions.appendChild(removeBtn);
+
+        head.appendChild(title);
+        head.appendChild(actions);
+
+        head.addEventListener("click", (event) => {
+          if (event.target.closest("button, input, select, textarea, .term-drag-handle")) return;
+          toggleExpanded();
+        });
+
+        const body = document.createElement("div");
+        body.className = "term-active-row__body";
+
+        if (st.appliesToAll) {
+          const wrap = document.createElement("div");
+          wrap.className = "term-shared-input";
+          const inputEl = buildInputElForTile(termDef);
+          const hasGlobal = st.globalValue != null && String(st.globalValue).trim() !== "";
+          if (termDef.input?.type === "range") {
+            const minVal = termDef.input?.min ?? 1;
+            inputEl.value = hasGlobal ? st.globalValue : minVal;
+          } else {
+            inputEl.value = st.globalValue || "";
+          }
+          wrap.appendChild(inputEl);
+          addRangeOutputIfNeeded(wrap, inputEl, termDef);
+          body.appendChild(wrap);
+
+          inputEl.addEventListener("input", () => {
+            st.globalValue = inputEl.value;
+            const dk = termDef.input?.dataKey;
+            if (dk) state[dk] = inputEl.value;
+            persistTermsTiles();
+            persistNow();
+          });
+
+          if (termDef.input?.type === "select") {
+            inputEl.addEventListener("change", () => {
+              st.globalValue = inputEl.value;
+              const dk = termDef.input?.dataKey;
+              if (dk) state[dk] = inputEl.value;
+              persistTermsTiles();
+              persistNow();
+            });
+          } else {
+            inputEl.addEventListener("blur", () => {
+              const format = inferInputFormat({
+                label: termDef.label,
+                dataKey: termDef.input?.dataKey,
+                type: termDef.input?.type
+              });
+              if (!format) return;
+              const formatted = formatValueForInput(inputEl.value, format);
+              if (formatted !== inputEl.value) inputEl.value = formatted;
+              st.globalValue = formatted;
+              const dk = termDef.input?.dataKey;
+              if (dk) state[dk] = formatted;
+              persistTermsTiles();
+              persistNow();
+            });
+          }
+        } else {
+          syncTileTermPlanSlots();
+          const grid = document.createElement("div");
+          grid.className = "term-plan-grid";
+
+          const planCount = state.clgPlans.length;
+          for (let idx = 0; idx < planCount; idx += 1) {
+            const plan = state.clgPlans[idx];
+            const pid = plan?.__id || null;
+            const planName = plan ? getPlanDisplayName(plan, idx) : `Plan ${idx + 1}`;
+
+            const card = document.createElement("div");
+            card.className = "term-plan-input";
+            card.dataset.planIdx = idx;
+
+            const chip = document.createElement("div");
+            chip.className = "term-plan-chip";
+            chip.dataset.planIdx = idx;
+            chip.textContent = planName;
+
+            const inputEl = buildInputElForTile(termDef);
+
+            const perPlanValue = (st.perPlanValues && pid in st.perPlanValues) ? (st.perPlanValues[pid] || "") : "";
+            if (termDef.input?.type === "range") {
+              const minVal = termDef.input?.min ?? 1;
+              inputEl.value = perPlanValue || minVal;
+            } else {
+              inputEl.value = perPlanValue;
+            }
+
+            card.appendChild(chip);
+            card.appendChild(inputEl);
+            addRangeOutputIfNeeded(card, inputEl, termDef);
+            grid.appendChild(card);
+
+            const onUpdate = () => {
+              if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+              st.perPlanValues[pid] = inputEl.value;
+              persistTermsTiles();
+              persistNow();
+            };
+            inputEl.addEventListener("input", onUpdate);
+            if (termDef.input?.type === "select") {
+              inputEl.addEventListener("change", onUpdate);
+            } else {
+              inputEl.addEventListener("blur", () => {
+                const format = inferInputFormat({
+                  label: termDef.label,
+                  dataKey: termDef.input?.dataKey,
+                  type: termDef.input?.type
+                });
+                if (!format) return;
+                const formatted = formatValueForInput(inputEl.value, format);
+                if (formatted !== inputEl.value) inputEl.value = formatted;
+                if (!st.perPlanValues || typeof st.perPlanValues !== "object") st.perPlanValues = {};
+                st.perPlanValues[pid] = formatted;
+                persistTermsTiles();
+                persistNow();
+              });
+            }
+          }
+
+          body.appendChild(grid);
         }
 
-        if (saved[term.input.dataKey]) inputEl.value = saved[term.input.dataKey];
+        row.appendChild(head);
+        row.appendChild(body);
+        activeList.appendChild(row);
 
-        row.appendChild(checkWrap);
-        row.appendChild(label);
-        row.appendChild(inputEl);
-        host.appendChild(row);
+        handle.addEventListener("dragstart", (e) => {
+          row.classList.add("term-row--dragging");
+          draggingSharedTermId = termId;
+          e.dataTransfer.setData("application/x-lnp-term", termId);
+          e.dataTransfer.setData("text/plain", termId);
+          e.dataTransfer.effectAllowed = "move";
+        });
+        handle.addEventListener("dragend", () => {
+          row.classList.remove("term-row--dragging");
+          draggingSharedTermId = null;
+        });
+        row.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.dataTransfer.dropEffect = "move";
+        });
+        row.addEventListener("drop", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const movingId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
+          if (!movingId || movingId === termId) return;
+          const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).slice();
+          const from = arr.indexOf(movingId);
+          const to = arr.indexOf(termId);
+          if (from === -1 || to === -1) return;
+
+          const rect = row.getBoundingClientRect();
+          const before = (e.clientY - rect.top) < rect.height / 2;
+
+          arr.splice(from, 1);
+          const insertAt = before ? (to > from ? to - 1 : to) : (to > from ? to : to + 1);
+          arr.splice(insertAt, 0, movingId);
+          termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = arr;
+
+          persistTermsTiles();
+          persistNow();
+          renderSharedActiveTerms();
+        });
       });
+    }
+
+    function buildAllTermsCatalog() {
+      const seen = new Set();
+      const allTerms = [];
+      TERMS_TILE_GROUPS.forEach(group => {
+        (tileTermsCatalog[group.id] || []).forEach(term => {
+          if (seen.has(term.id)) return;
+          seen.add(term.id);
+          allTerms.push({ ...term, group: group.id });
+        });
+      });
+      return allTerms;
+    }
+
+    function renderAllTermsTiles() {
+      renderTermsTilesPanel(buildAllTermsCatalog(), allTermsLibraryHost);
+      renderSharedActiveTerms();
+      updateTermCategoryBadges();
+    }
+
+    const sharedDropzone = document.getElementById("termsDropzone");
+    const termsExpandToggleBtn = document.getElementById("termsExpandToggleBtn");
+    if (termsExpandToggleBtn) {
+      termsExpandToggleBtn.addEventListener("click", () => {
+        const order = buildSharedActiveOrder();
+        const expandedSet = termsTilesExpandedByGroup[SHARED_TERMS_GROUP] || new Set();
+        const allExpanded = order.length > 0 && order.every(termId => expandedSet.has(termId));
+        if (allExpanded) {
+          expandedSet.clear();
+        } else {
+          order.forEach(termId => expandedSet.add(termId));
+        }
+        termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = expandedSet;
+        renderSharedActiveTerms();
+      });
+    }
+    if (sharedDropzone) {
+      sharedDropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        sharedDropzone.classList.add("is-over");
+        e.dataTransfer.dropEffect = draggingSharedTermId ? "move" : "copy";
+      });
+      sharedDropzone.addEventListener("dragleave", () => sharedDropzone.classList.remove("is-over"));
+      sharedDropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        sharedDropzone.classList.remove("is-over");
+        if (e.target.closest(".term-active-row")) return;
+        const termId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
+        if (!termId || !tileTermById[termId]) return;
+        const termDef = tileTermById[termId];
+        const s = ensureTileTerm(termId);
+        if (s.active) {
+          const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => id !== termId);
+          arr.push(termId);
+          termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = arr;
+          persistTermsTiles();
+          persistNow();
+          renderAllTermsTiles();
+          return;
+        }
+        if (!canActivateAnotherTileTerm()) {
+          alert(`You can select up to ${MAX_ACTIVE_TILE_TERMS} active terms from the dropzone.`);
+          return;
+        }
+        s.active = true;
+        if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+        if (!s.globalValue) {
+          const dk = termDef.input?.dataKey;
+          if (dk && state[dk]) s.globalValue = state[dk];
+        }
+        syncTileTermPlanSlots();
+        const group = termDef.group || TERMS_TILE_GROUPS[0]?.id || "";
+        addTermToOrders(termId, group);
+        persistTermsTiles();
+        persistNow();
+        renderAllTermsTiles();
+      });
+    }
+
+    function renderTermsTilesPanel(catalog, host) {
+      if (!host) return;
+
+      host.innerHTML = `
+        <div class="terms-tiles-block">
+          <div class="terms-tiles-block__head">
+            <h3>Terms Library — All Available Terms</h3>
+            <button type="button" id="clearTermsBtn" class="notebook-tab tab-action-btn" aria-label="Clear terms">Clear Terms</button>
+          </div>
+          <div class="terms-tile-library" id="allTermsTileLibrary" aria-label="All available terms"></div>
+        </div>
+      `;
+
+      const lib = host.querySelector("#allTermsTileLibrary");
+      const clearTermsBtn = host.querySelector("#clearTermsBtn");
+      if (clearTermsBtn) {
+        clearTermsBtn.onclick = clearTermsOnly;
+      }
+
+      // Library tiles
+      catalog.forEach(term => {
+        const st = ensureTileTerm(term.id);
+        const tile = document.createElement("div");
+        tile.className = "term-tile" + (st.active ? " is-used" : "");
+        tile.setAttribute("role", "button");
+        tile.setAttribute("tabindex", "0");
+        tile.setAttribute("draggable", st.active ? "false" : "true");
+        tile.dataset.termId = term.id;
+        tile.innerHTML = `<span class="dot"></span><span>${term.label}</span>`;
+
+        function activateFromUI() {
+          const s = ensureTileTerm(term.id);
+          if (s.active) return;
+          if (!canActivateAnotherTileTerm()) {
+            alert(`You can select up to ${MAX_ACTIVE_TILE_TERMS} active terms from the dropzone.`);
+            return;
+          }
+          if (!s.active) s.active = true;
+          // default OFF (per-plan)
+          if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
+          // inherit from any legacy global value if present
+          if (!s.globalValue) {
+            const dk = term.input?.dataKey;
+            if (dk && state[dk]) s.globalValue = state[dk];
+          }
+          // seed per-plan keys
+          syncTileTermPlanSlots();
+          addTermToOrders(term.id, term.group || TERMS_TILE_GROUPS[0]?.id || "");
+          persistTermsTiles();
+          persistNow();
+          renderAllTermsTiles();
+        }
+
+        tile.addEventListener("click", activateFromUI);
+        tile.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateFromUI(); }
+        });
+
+        tile.addEventListener("dragstart", (e) => {
+          if (ensureTileTerm(term.id).active) { e.preventDefault(); return; }
+          e.dataTransfer.setData("text/plain", term.id);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+
+        lib.appendChild(tile);
+      });
+    }
+
+
+    function getPlanDisplayName(plan, idx) {
+      const name = (plan?.clgPlatform || "").trim();
+      return name || `Plan ${idx + 1}`;
+    }
+
+    function getActivePlanIndex() {
+      if (!state.clgPlans.length) return -1;
+      const idx = state.clgPlans.findIndex(p => p.__id === activePlanId);
+      if (idx !== -1) return idx;
+      activePlanId = state.clgPlans[0]?.__id || null;
+      return 0;
+    }
+
+    function updatePlanTabLabel(idx) {
+      if (!planTabs || !state.clgPlans[idx]) return;
+      const plan = state.clgPlans[idx];
+      const label = planTabs.querySelector(`.plan-tab[data-plan-id="${plan.__id}"] .plan-tab__name`);
+      if (label) label.textContent = getPlanDisplayName(plan, idx);
     }
 
     function renderPlans() {
       plansContainer.innerHTML = "";
-      state.clgPlans.forEach((plan, idx) => {
-        const card = document.createElement("div");
-        card.className = "plan-card";
-        card.setAttribute("draggable", "true");       /* enable drag on card */
-        card.dataset.planId = plan.__id;
-
-        card.innerHTML = `
-          <div class="plan-card-header">
-            <div class="plan-card-title">Plan ${idx + 1}</div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <!-- FIXED: handle is real + visible -->
-              <button type="button" class="secondary" data-remove="${idx}">Remove</button>
-            </div>
-          </div>
-
-          <div class="plan-card-topfields">
-            <div class="field">
-              <label>Platform</label>
-              <input type="text" data-plan-idx="${idx}" data-plan-field="clgPlatform" value="${plan.clgPlatform || ""}">
-            </div>
-            <div class="field">
-              <label>Plan Price</label>
-              <input type="text" data-plan-idx="${idx}" data-plan-field="clgPrice" value="${plan.clgPrice || ""}" placeholder="$0.00">
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Plan Contents</label>
-
-            <div class="plan-toolbar" data-plan-idx="${idx}" role="toolbar" aria-label="Formatting">
-              <button type="button" data-cmd="bold" title="Bold (⌘/Ctrl+B)"><b>B</b></button>
-              <button type="button" data-cmd="italic" title="Italic (⌘/Ctrl+I)"><i>I</i></button>
-              <button type="button" data-cmd="underline" title="Underline (⌘/Ctrl+U)"><u>U</u></button>
-              <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">• • •</button>
-              <button type="button" data-cmd="insertOrderedList" title="Numbered list">1.</button>
-              <button type="button" data-cmd="createLink" title="Add link (⌘/Ctrl+K)">Link</button>
-              <button type="button" class="rte-color-btn"></button>
-              <input type="color" class="rte-color" aria-label="Text color">
-              <select data-size-select class="rte-size-select" aria-label="Text size">
-                <option value="body">Body</option>
-                <option value="subhead">Subhead</option>
-                <option value="head">Head</option>
-              </select>
-              <button type="button" data-cmd="removeFormat" title="Clear formatting">Clear</button>
-            </div>
-
-            <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
-              data-plan-idx="${idx}" data-plan-field="clgContents"
-              placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets and links supported.">
-              ${(plan.clgContents || '').trim() || '<p><br></p>'}
-            </div>
-
-            <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K for links.</small>
-          </div>
-        `;
-        plansContainer.appendChild(card);
-      });
+      if (planTabs) planTabs.innerHTML = "";
 
       // keep ids stable
       ensurePlanIds();
 
-      if (state.clgPlans.length >= MAX_PLANS) {
-        addPlanBtn.disabled = true; addPlanBtn.textContent = "Max plans reached";
-      } else {
-        addPlanBtn.disabled = false; addPlanBtn.textContent = "+ Add Plan";
+      const activeIdx = getActivePlanIndex();
+      const activePlan = state.clgPlans[activeIdx] || null;
+
+      if (planTabs) {
+        state.clgPlans.forEach((plan, idx) => {
+          const tab = document.createElement("button");
+          tab.type = "button";
+          tab.className = "plan-tab notebook-tab" + (idx === activeIdx ? " is-active" : "");
+          tab.dataset.planId = plan.__id;
+          tab.setAttribute("draggable", "true");
+          tab.setAttribute("role", "tab");
+          tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
+          tab.innerHTML = `
+            <span class="plan-tab__name">${escapeHtml(getPlanDisplayName(plan, idx))}</span>
+          `;
+          planTabs.appendChild(tab);
+        });
+
+        if (addPlanBtn) {
+          planTabs.appendChild(addPlanBtn);
+        }
+        if (clearPlansBtn) {
+          planTabs.appendChild(clearPlansBtn);
+        }
+      }
+
+      if (activePlan) {
+        const sheet = document.createElement("div");
+        sheet.className = "plan-sheet";
+        sheet.dataset.planId = activePlan.__id;
+        sheet.dataset.planIdx = activeIdx;
+
+        sheet.innerHTML = `
+          <div class="plan-sheet__header">
+            <div class="plan-sheet__meta">
+              <div class="plan-card-title">Plan ${activeIdx + 1}</div>
+              <button type="button" class="plan-remove" data-remove="${activeIdx}">Remove</button>
+            </div>
+            <label class="plan-sheet__contents-title">Plan Contents</label>
+          </div>
+          <div class="plan-sheet__left">
+            <div class="plan-sheet__left-panel">
+            <div class="field">
+              <label>Plan Title</label>
+              <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPlatform" value="${escapeHtml(activePlan.clgPlatform || "")}">
+            </div>
+            <div class="field">
+              <label>Plan Price</label>
+              <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
+            </div>
+            <div class="field plan-label-desc">
+              <label>Click the button below to create a <b>Plan Label</b> where you can attach a link or a recommendation.</label>
+            </div>
+            <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
+
+            <small class="muted-text" data-plan-cta-summary>
+              ${formatPlanCtaSummary(activePlan)}
+            </small>
+            </div>
+          </div>
+
+          <div class="plan-sheet__right">
+            <div class="field plan-sheet__contents">
+              <div class="plan-toolbar" data-plan-idx="${activeIdx}" role="toolbar" aria-label="Formatting">
+                <button type="button" data-cmd="bold" title="Bold (⌘/Ctrl+B)"><b>B</b></button>
+                <button type="button" data-cmd="italic" title="Italic (⌘/Ctrl+I)"><i>I</i></button>
+                <button type="button" data-cmd="underline" title="Underline (⌘/Ctrl+U)"><u>U</u></button>
+                <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">• • •</button>
+                <button type="button" data-cmd="insertOrderedList" title="Numbered list">1.</button>
+                <input type="color" class="rte-color" aria-label="Text color">
+                <select data-size-select class="rte-size-select" aria-label="Text size">
+                  <option value="body">Body</option>
+                  <option value="subhead">Subhead</option>
+                  <option value="head">Head</option>
+                </select>
+                <button type="button" data-cmd="removeFormat" title="Clear formatting">Clear</button>
+              </div>
+              <div class="plan-contents rte" contenteditable="true" data-plan-content="true"
+                data-plan-idx="${activeIdx}" data-plan-field="clgContents"
+                placeholder="Type or paste content. Use ⌘/Ctrl+B, I, U. Bullets supported.">
+                ${(activePlan.clgContents || '').trim() || '<p><br></p>'}
+              </div>
+              <small class="muted-text">Tip: Use ⌘/Ctrl+B, I, U. Click list buttons for bullets. ⌘/Ctrl+K sets the plan CTA.</small>
+            </div>
+          </div>
+        `;
+        plansContainer.appendChild(sheet);
+      }
+
+      if (addPlanBtn) {
+        const isMax = state.clgPlans.length >= MAX_PLANS;
+        addPlanBtn.disabled = isMax;
+        addPlanBtn.setAttribute("title", isMax ? "Max plans reached" : "Add plan");
+        addPlanBtn.setAttribute("aria-label", isMax ? "Max plans reached" : "Add plan");
       }
     }
 
+    function formatPlanCtaSummary(plan) {
+      const defaultLabel = "None";
+      const label = (plan?.clgCtaLabel || "").trim();
+      const url = (plan?.clgCtaUrl || "").trim();
+      const displayLabel = label || defaultLabel;
+      if (!url) return `Current Label: ${displayLabel} (no link)`;
+      return `CTA button: ${displayLabel} — ${url}`;
+    }
+
+    function updatePlanCtaSummary(card, plan) {
+      const summaryEl = card?.querySelector('[data-plan-cta-summary]');
+      if (!summaryEl) return;
+      summaryEl.textContent = formatPlanCtaSummary(plan);
+    }
+
+    function setPlanCtaFromPrompt(idx, card) {
+      const plan = state.clgPlans[idx];
+      if (!plan) return;
+      const currentUrl = plan.clgCtaUrl || "";
+      const currentLabel = plan.clgCtaLabel || "";
+      const urlInput = prompt("(Optional Link) - You may put a link to be embedded in the Plan Label:", currentUrl);
+      if (urlInput === null) return;
+      const labelInput = prompt("Plan Label Message:", currentLabel);
+      if (labelInput === null) return;
+      plan.clgCtaUrl = String(urlInput || "").trim();
+      plan.clgCtaLabel = String(labelInput || "").trim();
+      updatePlanCtaSummary(card, plan);
+      persistNow();
+    }
+
     function buildAppConfigFromState(s) {
-      const termMap = {};
-      termMap.numAttorneys = { key: "numAttorneys", label: s.clgNumAttorneys ? "Number of Attorneys: " + s.clgNumAttorneys : "Number of Attorneys" };
-      termMap.yoyIncrease =  { key: "yoyIncrease",  label: s.clgYoyIncrease  ? "Year over Year increase: " + s.clgYoyIncrease : "Year over Year increase" };
+      // TERM DELIVERY RULES (V4):
+      // - Classic terms: show in regular terms area if selected
+      // - Tile terms: only show if active; if appliesToAll => regular terms area, else => per-plan terms
 
-      function makeLabelFromTermDef(termDef) {
-        const dataKey = termDef.input?.dataKey;
-        const baseLabel = termDef.label;
-        const rawVal = dataKey ? s[dataKey] : "";
-        if (termDef.input?.type === "date") {
-          return { key: termDef.key, label: rawVal ? baseLabel + ": " + fmtDate(rawVal) : baseLabel };
+      const deliveredRegular = [];
+
+      // Classic terms
+      const ctSel = termsTilesState.classicTermsSelected || {};
+      const ctVal = termsTilesState.classicTermsValues || {};
+
+      function formatTermValue(def, rawVal) {
+        if (rawVal == null || String(rawVal).trim() === "") return "";
+        if (def?.input?.type === "date") return fmtDate(rawVal);
+        if (def?.input?.suffix) {
+          const suffix = def.input.suffix;
+          return String(rawVal).includes(suffix) ? rawVal : `${rawVal} ${suffix}`;
         }
-        if (rawVal && rawVal !== "") {
-          const needsColon = !baseLabel.endsWith(":");
-          return { key: termDef.key, label: baseLabel + (needsColon ? ": " : " ") + rawVal };
-        }
-        return { key: termDef.key, label: baseLabel };
+        return rawVal;
       }
 
-      retentionTerms.forEach(termDef => { termMap[termDef.key] = makeLabelFromTermDef(termDef); });
-      newBizTerms.forEach(termDef => { termMap[termDef.key] = makeLabelFromTermDef(termDef); });
-
-      const delivered = [];
-      for (const key of s.clgSelectedTerms || []) {
-        if (termMap[key]) delivered.push(termMap[key]);
-        if (delivered.length >= 6) break;
+      function pushRegular(key, label, rawVal, type, def) {
+        if (!label) return;
+        let finalLabel = label;
+        if (rawVal && String(rawVal).trim() !== "") {
+          if (def) {
+            finalLabel = `${label}: ${formatTermValue(def, rawVal)}`;
+          } else {
+            finalLabel = type === "date" ? `${label}: ${fmtDate(rawVal)}` : `${label}: ${rawVal}`;
+          }
+        }
+        deliveredRegular.push({ key, label: finalLabel });
       }
 
-      const plans = (s.clgPlans || []).map((plan, idx) => ({
-        id: idx + 1,
-        title: plan.clgPlatform || `Plan ${idx + 1}`,
-        price: plan.clgPrice || "",
-        contentsHtml: plan.clgContents || ""
-      }));
+      if (ctSel.attorneyCount) pushRegular("attorneyCount", "Attorney Count", ctVal.attorneyCount, "text");
+      if (ctSel.currentSpend)  pushRegular("currentSpend",  "Current Spend",  ctVal.currentSpend,  "text");
+      if (ctSel.currentTermEnd)pushRegular("currentTermEnd","Current Term End",ctVal.currentTermEnd,"date");
+
+      // Tile terms that are active + appliesToAll
+      const ttState = termsTilesState.tileTermsState || {};
+      const activeOrders = termsTilesState.activeTileTermsOrder || {};
+      const seenTileRegular = new Set();
+
+      function maybePushTileRegular(termId) {
+        if (seenTileRegular.has(termId)) return;
+        const def = tileTermById[termId];
+        if (!def) return;
+        const st = ttState[termId];
+        if (!st || !st.active || !st.appliesToAll) return;
+        const val = st.globalValue || (def.input?.dataKey ? (s[def.input.dataKey] || "") : "");
+        pushRegular(termId, def.label, val, def.input?.type === "date" ? "date" : "text", def);
+        seenTileRegular.add(termId);
+      }
+
+      Object.keys(activeOrders).forEach(group => {
+        (activeOrders[group] || []).forEach(maybePushTileRegular);
+      });
+
+      // Cap for regular area (legacy behavior)
+      const delivered = deliveredRegular.slice(0, MAX_TERM_SELECTIONS);
+
+      // Plans + plan terms
+      const plans = (s.clgPlans || []).map((plan, idx) => {
+        const planId = plan.__id;
+        const planTerms = [];
+        const seenPlanTerms = new Set();
+
+        function maybePushPlanTerm(termId) {
+          if (seenPlanTerms.has(termId)) return;
+          const def = tileTermById[termId];
+          if (!def) return;
+          const st = ttState[termId];
+          if (!st || !st.active || st.appliesToAll) return;
+
+          let rawVal = "";
+          if (st.perPlanValues && planId && planId in st.perPlanValues) rawVal = st.perPlanValues[planId] || "";
+          if (!rawVal) rawVal = st.globalValue || ""; // fallback
+
+          let label = def.label;
+          if (rawVal && String(rawVal).trim() !== "") {
+            label = `${def.label}: ${formatTermValue(def, rawVal)}`;
+          }
+          planTerms.push({ key: termId, label });
+          seenPlanTerms.add(termId);
+        }
+        Object.keys(activeOrders).forEach(group => {
+          (activeOrders[group] || []).forEach(maybePushPlanTerm);
+        });
+
+        return {
+          id: idx + 1,
+          title: plan.clgPlatform || `Plan ${idx + 1}`,
+          price: plan.clgPrice || "",
+          contentsHtml: plan.clgContents || "",
+          terms: planTerms,
+          cta: plan.clgCtaLabel || "",
+          ctaLabel: plan.clgCtaLabel || "",
+          ctaUrl: plan.clgCtaUrl || ""
+        };
+      });
 
       // Keep Rep header selection available to the Presenter (raw + label)
       let repFile = "";
@@ -3013,7 +5028,7 @@ try{
         const colorInput = e.target.closest('.plan-toolbar input[type="color"].rte-color');
         if (!colorInput) return;
 
-        const card = colorInput.closest('.plan-card');
+        const card = colorInput.closest('.plan-sheet');
         const editor = card?.querySelector('.plan-contents.rte');
         if (!editor) return;
 
@@ -3095,30 +5110,6 @@ try{
     }
 
 
-    function insertLinkWithLabel(editor){
-      const url = prompt('Link URL:');
-      if (!url) return;
-      const label = prompt('Link label (text to show):');
-      if (!label) return;
-
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
-      let range = sel.getRangeAt(0);
-      if (!editor.contains(range.commonAncestorContainer)) return;
-
-      range.deleteContents();
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = label;
-      range.insertNode(a);
-
-      range = document.createRange();
-      range.setStartAfter(a); range.collapse(true);
-      sel.removeAllRanges(); sel.addRange(range);
-    }
-
     /* =========================
      * H) EVENT WIRING
      * ========================= */
@@ -3130,9 +5121,10 @@ try{
     });
 
     // Render term panels
-    renderTermPanel(retentionHost, retentionTerms);
-    renderTermPanel(newBizHost, newBizTerms);
+    renderClassicTopTerms();
+    renderAllTermsTiles();
     hydrateFormFromState();
+    syncTileTermPlanSlots();
 
     const STORAGE_KEY = "clgFormVars";
 const STORAGE_SCHEMA = 1;
@@ -3144,17 +5136,6 @@ function persistNow(){
   };
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e){}
 }
-
-    // Tabs
-    tabs.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const target = btn.getAttribute("data-panel");
-        tabs.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        panels.forEach(p => p.classList.remove("active"));
-        document.getElementById(target).classList.add("active");
-      });
-    });
 
     // Clear (NOTE: does NOT clear LN_Rep)
     function clearForm() {
@@ -3176,113 +5157,186 @@ function persistNow(){
       state.clgnbExtensionTerm = "";
       state.clgIntroPrice = "";
       state.clgTermStartDate = "";
+      state.clgPromotion = "";
+      state.clgFreeTimeAvailable = "";
+      state.clgCostPerAttorney = "";
       state.clgPlans = [makeEmptyPlan()];
+      activePlanId = null;
       renderPlans();
+      termsTilesState = defaultTermsTilesState();
+      termsTilesExpandedByGroup = TERMS_TILE_GROUPS.reduce((acc, group) => {
+        acc[group.id] = new Set();
+        return acc;
+      }, {});
+      termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
+      try { localStorage.removeItem(TERMS_TILES_STORAGE_KEY); } catch (e) {}
+      renderClassicTopTerms();
+      renderAllTermsTiles();
+      syncTileTermPlanSlots();
       localStorage.removeItem("clgFormVars");
       buildAppConfigFromState(state);
     }
     clearBtn.addEventListener("click", clearForm);
 
+    function clearPlansOnly() {
+      state.clgPlans = [makeEmptyPlan()];
+      activePlanId = null;
+      renderPlans();
+      syncTileTermPlanSlots();
+      persistNow();
+    }
+    if (clearPlansBtn) {
+      clearPlansBtn.addEventListener("click", clearPlansOnly);
+    }
+
+    function clearTermsOnly() {
+      termsTilesState = defaultTermsTilesState();
+      termsTilesExpandedByGroup = TERMS_TILE_GROUPS.reduce((acc, group) => {
+        acc[group.id] = new Set();
+        return acc;
+      }, {});
+      termsTilesExpandedByGroup[SHARED_TERMS_GROUP] = new Set();
+      state.clgSelectedTerms = [];
+      classicTermsDefs.forEach(def => {
+        if (def.dataKey) state[def.dataKey] = "";
+      });
+      Object.values(tileTermDefinitions).forEach(def => {
+        if (def.input?.dataKey) state[def.input.dataKey] = "";
+      });
+      try { localStorage.removeItem(TERMS_TILES_STORAGE_KEY); } catch (e) {}
+      renderClassicTopTerms();
+      renderAllTermsTiles();
+      syncTileTermPlanSlots();
+      persistNow();
+    }
+    if (planTabs) {
+      planTabs.addEventListener("click", (e) => {
+        const tab = e.target.closest(".plan-tab[data-plan-id]");
+        if (!tab) return;
+        if (suppressPlanTabClick) {
+          e.preventDefault();
+          return;
+        }
+        activePlanId = tab.dataset.planId;
+        renderPlans();
+      });
+    }
+
     // Plans initial render
     renderPlans();
 
     /* =========================
-     * Plans: drag to reorder (handle-only, grid-safe)
+     * Plans: tab long-press drag to reorder
      * ========================= */
-    let dragEl = null;
+    let dragTabEl = null;
+    let planTabHoldTimer = null;
+    let armedPlanTabId = null;
+    let suppressPlanTabClick = false;
 
-    function reorderStateFromDom() {
-      const cards = [...plansContainer.querySelectorAll(".plan-card[data-plan-id]")];
-      const ids = cards.map(c => c.dataset.planId);
+    function clearPlanTabHoldState() {
+      if (planTabHoldTimer) {
+        clearTimeout(planTabHoldTimer);
+        planTabHoldTimer = null;
+      }
+      if (!planTabs) return;
+      planTabs.querySelectorAll('.plan-tab.is-reorder-armed').forEach(tab => tab.classList.remove('is-reorder-armed'));
+      armedPlanTabId = null;
+    }
+
+    function reorderPlansByTabDom() {
+      if (!planTabs) return;
+      const tabs = [...planTabs.querySelectorAll('.plan-tab[data-plan-id]')];
+      const ids = tabs.map(tab => tab.dataset.planId).filter(Boolean);
+      if (!ids.length) return;
       const byId = new Map((state.clgPlans || []).map(p => [p.__id, p]));
       const next = ids.map(id => byId.get(id)).filter(Boolean);
       if (!next.length) return;
-
       state.clgPlans = next;
+      activePlanId = dragTabEl?.dataset.planId || activePlanId;
+      persistNow();
       renderPlans();
       buildAppConfigFromState(state);
     }
 
-    function getClosestCard(container, x, y) {
-      const cards = [...container.querySelectorAll(".plan-card:not(.is-dragging)")];
+    function getClosestPlanTab(container, x) {
+      const tabs = [...container.querySelectorAll('.plan-tab[data-plan-id]:not(.is-dragging)')];
       let best = null;
       let bestDist = Infinity;
-
-      for (const el of cards) {
-        const r = el.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const dist = (dx * dx) + (dy * dy);
+      tabs.forEach(tab => {
+        const rect = tab.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const dist = Math.abs(x - cx);
         if (dist < bestDist) {
           bestDist = dist;
-          best = { el, rect: r, cx, cy };
+          best = { el: tab, cx };
         }
-      }
+      });
       return best;
     }
 
-    plansContainer.addEventListener("dragstart", (e) => {
-      const handle = e.target.closest('[data-drag-handle="1"]');
-      if (!handle) { e.preventDefault(); return; }
+    if (planTabs) {
+      const beginHold = (targetTab) => {
+        clearPlanTabHoldState();
+        if (!targetTab?.dataset?.planId) return;
+        planTabHoldTimer = setTimeout(() => {
+          armedPlanTabId = targetTab.dataset.planId;
+          targetTab.classList.add('is-reorder-armed');
+        }, 1000);
+      };
 
-      const card = handle.closest(".plan-card");
-      if (!card) return;
+      planTabs.addEventListener('mousedown', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab) return;
+        beginHold(tab);
+      });
+      planTabs.addEventListener('touchstart', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab) return;
+        beginHold(tab);
+      }, { passive: true });
 
-      dragEl = card;
-      card.classList.add("is-dragging");
+      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt => {
+        planTabs.addEventListener(evt, () => {
+          if (!dragTabEl) clearPlanTabHoldState();
+        });
+      });
 
-      try { e.dataTransfer.setData("text/plain", card.dataset.planId || "plan"); } catch {}
-      e.dataTransfer.effectAllowed = "move";
+      planTabs.addEventListener('dragstart', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab || tab.dataset.planId !== armedPlanTabId) { e.preventDefault(); return; }
+        dragTabEl = tab;
+        tab.classList.add('is-dragging');
+        suppressPlanTabClick = true;
+        try { e.dataTransfer.setData('text/plain', tab.dataset.planId || 'plan'); } catch {}
+        e.dataTransfer.effectAllowed = 'move';
+      });
 
-      try {
-        const ghost = card.cloneNode(true);
-        ghost.style.position = "fixed";
-        ghost.style.top = "-9999px";
-        ghost.style.left = "-9999px";
-        ghost.style.width = card.getBoundingClientRect().width + "px";
-        document.body.appendChild(ghost);
-        e.dataTransfer.setDragImage(ghost, 20, 20);
-        setTimeout(() => ghost.remove(), 0);
-      } catch {}
-    });
+      planTabs.addEventListener('dragover', (e) => {
+        if (!dragTabEl) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const hit = getClosestPlanTab(planTabs, e.clientX);
+        if (!hit || !hit.el || hit.el === dragTabEl) return;
+        if (e.clientX > hit.cx) {
+          planTabs.insertBefore(dragTabEl, hit.el.nextElementSibling);
+        } else {
+          planTabs.insertBefore(dragTabEl, hit.el);
+        }
+      });
 
-    plansContainer.addEventListener("dragover", (e) => {
-      if (!dragEl) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
+      planTabs.addEventListener('drop', (e) => {
+        if (!dragTabEl) return;
+        e.preventDefault();
+      });
 
-      const hit = getClosestCard(plansContainer, e.clientX, e.clientY);
-      if (!hit || !hit.el || hit.el === dragEl) return;
-
-      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-      hit.el.classList.add("drop-target");
-
-      const after =
-        (e.clientY > hit.cy) ||
-        (Math.abs(e.clientY - hit.cy) < 6 && e.clientX > hit.cx);
-
-      if (after) {
-        const next = hit.el.nextElementSibling;
-        if (next !== dragEl) plansContainer.insertBefore(dragEl, next);
-      } else {
-        if (hit.el !== dragEl) plansContainer.insertBefore(dragEl, hit.el);
-      }
-    });
-
-    plansContainer.addEventListener("drop", (e) => {
-      if (!dragEl) return;
-      e.preventDefault();
-    });
-
-    plansContainer.addEventListener("dragend", () => {
-      if (dragEl) dragEl.classList.remove("is-dragging");
-      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-      dragEl = null;
-      reorderStateFromDom();
-    });
-
+      planTabs.addEventListener('dragend', () => {
+        if (dragTabEl) dragTabEl.classList.remove('is-dragging');
+        clearPlanTabHoldState();
+        reorderPlansByTabDom();
+        dragTabEl = null;
+        setTimeout(() => { suppressPlanTabClick = false; }, 0);
+      });
+    }
     // Plan inputs
     plansContainer.addEventListener("input", function (e) {
       const field = e.target.getAttribute("data-plan-field");
@@ -3303,6 +5357,8 @@ function persistNow(){
 
       if (field === "clgPlatform") {
         state.clgPlans[idx].clgPlatform = val;
+        updatePlanTabLabel(idx);
+        renderAllTermsTiles();
         return;
       }
 
@@ -3330,9 +5386,17 @@ function persistNow(){
     plansContainer.addEventListener("click", function (e) {
       const rem = e.target.getAttribute("data-remove");
       if (rem != null) {
-        state.clgPlans.splice(Number(rem), 1);
+        const removeIdx = Number(rem);
+        const removedId = state.clgPlans[removeIdx]?.__id;
+        state.clgPlans.splice(removeIdx, 1);
         if (state.clgPlans.length === 0) state.clgPlans.push(makeEmptyPlan());
+        if (removedId && removedId === activePlanId) {
+          const nextIdx = Math.min(removeIdx, state.clgPlans.length - 1);
+          activePlanId = state.clgPlans[nextIdx]?.__id || null;
+        }
         renderPlans();
+        syncTileTermPlanSlots();
+        renderAllTermsTiles();
       }
     });
 
@@ -3340,7 +5404,11 @@ function persistNow(){
     addPlanBtn.addEventListener("click", function () {
       if (state.clgPlans.length >= MAX_PLANS) return;
       state.clgPlans.push(makeEmptyPlan());
+      ensurePlanIds();
+      activePlanId = state.clgPlans[state.clgPlans.length - 1]?.__id || null;
       renderPlans();
+      syncTileTermPlanSlots();
+      renderAllTermsTiles();
     });
 
     // Form input (top-level)
@@ -3363,6 +5431,26 @@ function persistNow(){
       state[key] = e.target.value;
       persistNow();
     });
+
+    form.addEventListener("blur", function (e) {
+      const key = e.target.getAttribute("data-key");
+      if (!key) return;
+      const labelText = e.target.closest(".field")?.querySelector("label")?.textContent || "";
+      const format = inferInputFormat({ label: labelText, dataKey: key, type: e.target.type });
+      if (!format) return;
+      const formatted = formatValueForInput(e.target.value, format);
+      if (formatted !== e.target.value) e.target.value = formatted;
+      if (key === "clgCurrentSpend" || key === "clgIntroPrice") {
+        const cents = parseCurrencyToCents(formatted);
+        state[key] = cents == null ? formatted : currencyFmt.format(cents / 100);
+      } else if (key === "clgYoyIncrease") {
+        const bps = parsePercentToBps(formatted);
+        state.clgYoyIncrease = bps == null ? formatted : (bps / 100).toFixed(2).replace(/\.00$/, "") + "%";
+      } else {
+        state[key] = formatted;
+      }
+      persistNow();
+    }, true);
 
     // Term checkbox selection
     form.addEventListener("change", function (e) {
@@ -3504,6 +5592,7 @@ function persistNow(){
     plansContainer.addEventListener('keydown', (e)=>{
       const editor = e.target.closest('.plan-contents[contenteditable]');
       if (!editor) return;
+      const planIdx = Number(editor.getAttribute('data-plan-idx'));
       const mod = e.ctrlKey || e.metaKey;
       if (!mod) return;
       const k = e.key.toLowerCase();
@@ -3513,29 +5602,28 @@ function persistNow(){
       if (k === 'i') document.execCommand('italic');
       if (k === 'u') document.execCommand('underline');
       if (k === 'k') {
-        const url = prompt('URL to link:');
-        if (url) {
-          document.execCommand('createLink', false, url);
-          editor.querySelectorAll('a').forEach(a=>{ a.target='_blank'; a.rel='noopener noreferrer'; });
-        }
+        const card = editor.closest('.plan-sheet');
+        setPlanCtaFromPrompt(planIdx, card);
       }
       convertFontTagsToSpan(editor);
-      const idx = Number(editor.getAttribute('data-plan-idx'));
-      if (state.clgPlans[idx]) state.clgPlans[idx].clgContents = editor.innerHTML;
+      if (state.clgPlans[planIdx]) state.clgPlans[planIdx].clgContents = editor.innerHTML;
     });
 
     plansContainer.addEventListener('click', (e)=>{
       const btn = e.target.closest('[data-cmd]');
       if (!btn) return;
       const toolbar = btn.closest('.plan-toolbar');
-      const idx = toolbar?.getAttribute('data-plan-idx');
+      const idx = btn.getAttribute('data-plan-idx')
+        || toolbar?.getAttribute('data-plan-idx')
+        || btn.closest('.plan-sheet')?.getAttribute('data-plan-idx');
       if (idx == null) return;
       const editor = plansContainer.querySelector('.plan-contents[data-plan-idx="'+idx+'"]');
       if (!editor) return;
       restoreSelectionFor(idx, editor);
       const cmd = btn.getAttribute('data-cmd');
       if (cmd === 'createLink') {
-        insertLinkWithLabel(editor);
+        const card = editor.closest('.plan-sheet');
+        setPlanCtaFromPrompt(Number(idx), card);
       } else if (cmd === 'removeFormat') {
         document.execCommand('removeFormat', false, null);
         editor.querySelectorAll('a').forEach(a=>{ a.replaceWith(document.createTextNode(a.textContent)); });
@@ -3737,109 +5825,5 @@ function persistNow(){
 })();
 </script>
 
-<script>
-(function () {
-  function ready(fn){ if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
-
-  ready(function () {
-    const presetsPanel = document.querySelector(".presets-panel");
-    const presetList = document.getElementById("presetList");
-    if (!presetsPanel || !presetList) return;
-
-    // Create a placeholder so the original panel doesn't "collapse" when we move #presetList
-    const placeholder = document.createElement("div");
-    placeholder.className = "presets-list-placeholder";
-    placeholder.hidden = true;
-
-    // Insert placeholder right after the header (before the list)
-    const header = presetsPanel.querySelector(".presets-header");
-    if (header && header.nextSibling) {
-      presetsPanel.insertBefore(placeholder, header.nextSibling);
-    } else {
-      presetsPanel.appendChild(placeholder);
-    }
-
-    // Build the sidecar
-    const sidecar = document.createElement("aside");
-    sidecar.className = "presets-sidecar";
-    sidecar.setAttribute("aria-hidden", "true");
-
-    sidecar.innerHTML = `
-      <div class="presets-sidecar__header">
-        <div>
-          <h3>Plan Content Presets</h3>
-          <p>Drag a preset into a plan's Contents area to start from a template.</p>
-        </div>
-        <button type="button" class="presets-sidecar__close" aria-label="Close presets">✕</button>
-      </div>
-      <div class="presets-sidecar__body"></div>
-    `;
-
-    document.body.appendChild(sidecar);
-
-    const sidecarBody = sidecar.querySelector(".presets-sidecar__body");
-    const closeBtn = sidecar.querySelector(".presets-sidecar__close");
-
-    let userClosed = false;
-
-    closeBtn.addEventListener("click", function () {
-      userClosed = true;
-      hideSidecar();
-      // Move list back to original when user closes
-      moveListToOriginal();
-    });
-
-    function showSidecar() {
-      if (userClosed) return;
-      sidecar.classList.add("is-open");
-      sidecar.setAttribute("aria-hidden", "false");
-    }
-
-    function hideSidecar() {
-      sidecar.classList.remove("is-open");
-      sidecar.setAttribute("aria-hidden", "true");
-    }
-
-    function moveListToSidecar() {
-      if (!sidecarBody.contains(presetList)) {
-        placeholder.hidden = false;
-        sidecarBody.appendChild(presetList);
-      }
-    }
-
-    function moveListToOriginal() {
-      if (!presetsPanel.contains(presetList)) {
-        placeholder.hidden = true;
-        // Put it back where it originally lived: after the header, before placeholder (or at end)
-        if (header && placeholder.parentNode === presetsPanel) {
-          presetsPanel.insertBefore(presetList, placeholder);
-        } else {
-          presetsPanel.appendChild(presetList);
-        }
-      }
-    }
-
-    // Detect when user scrolls past the presets panel
-    function onScroll() {
-      const rect = presetsPanel.getBoundingClientRect();
-      const passed = rect.bottom <= 8; // threshold: once the panel is fully above the viewport
-
-      if (passed) {
-        showSidecar();
-        moveListToSidecar();
-      } else {
-        hideSidecar();
-        moveListToOriginal();
-        userClosed = false; // re-enable if they scroll back above then down again
-      }
-    }
-
-    // Use passive scroll + also run once initially
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    onScroll();
-  });
-})();
-</script>
 </body>
 </html>
