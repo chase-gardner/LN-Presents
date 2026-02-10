@@ -715,17 +715,27 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row input[type="date"]{
   min-width: 132px;
-  padding-right: 34px;
+  position: relative;
+  padding-right: 38px;
+  padding-inline-end: 38px;
   appearance: auto;
   -webkit-appearance: auto;
+  -moz-appearance: auto;
   text-align: left;
+  box-sizing: border-box;
 }
 .terms-classic-row input[type="date"]::-webkit-calendar-picker-indicator{
   cursor: pointer;
-  margin-left: 6px;
+  margin: 0;
+  position: absolute;
+  right: 10px;
 }
 .terms-classic-row input[type="date"]::-webkit-date-and-time-value{
   text-align: left;
+}
+.terms-classic-row input[type="date"]::-ms-clear,
+.terms-classic-row input[type="date"]::-ms-expand{
+  display: none;
 }
 .terms-classic-row input:focus,
 .terms-classic-row select:focus{
@@ -1635,6 +1645,11 @@ input:focus, select:focus, textarea:focus{
   border:1px dashed rgba(148,163,184,.55);
   background: rgba(248,250,252,.95);
   line-height:1.35;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .plan-sheet__right{
   display:flex;
