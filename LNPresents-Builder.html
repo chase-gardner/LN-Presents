@@ -715,7 +715,14 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row input[type="date"]{
   min-width: 132px;
-  padding-right: 52px;
+  padding-right: 34px;
+  appearance: auto;
+  -webkit-appearance: auto;
+  text-align: left;
+}
+.terms-classic-row input[type="date"]::-webkit-calendar-picker-indicator{
+  cursor: pointer;
+  margin-left: 6px;
 }
 .terms-classic-row input[type="date"]::-webkit-date-and-time-value{
   text-align: left;
