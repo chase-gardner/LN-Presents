@@ -1303,10 +1303,9 @@ input:focus, select:focus, textarea:focus{
 .term-shared-input input:focus{ box-shadow: var(--ring); border-color: rgba(99,102,241,.55); }
 
 .term-plan-grid{
-  display:flex;
-  flex-wrap: nowrap;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap:8px; /* slightly roomier */
-  overflow-x: hidden;
   padding-bottom: 2px;
 }
 
@@ -1317,8 +1316,6 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   padding: 8px 9px;
   border-radius: 12px;
-  flex: 1 1 0;
-  flex-wrap: nowrap;
   min-width: 0;
 }
 
