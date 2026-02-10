@@ -1502,113 +1502,6 @@ input:focus, select:focus, textarea:focus{
   outline-offset: 4px;
   border-radius: 14px;
 }
-/* ===============================
-   Presets Sidecar (appears on scroll)
-   =============================== */
-
-.presets-sidecar{
-  position: fixed;
-  right: 16px;
-  bottom: 75px; /* <-- extend toward the bottom */
-  width: min(200px, calc(100vw - 32px));
-
-  /* viewport-fit height (no fixed 600px cap) */
-  height: auto;
-  max-height: calc(100vh - 400px); /* 300 top + 16 bottom */
-
-  z-index: 9999;
-
-  /* Hidden by default */
-  opacity: 0;
-  transform: translateX(12px);
-  pointer-events: none;
-
-  transition: opacity .18s ease, transform .18s ease;
-
-  /* Match your panel styling */
-  padding: 12px 12px;
-  background: rgba(105,53,202,1);
-  border: 1px solid rgba(15,23,42,.08);
-  border-radius: var(--radius-md);
-
-  box-shadow: 0 18px 50px rgba(2,6,23,.18);
-  backdrop-filter: blur(8px);
-
-  /* header + body */
-  display: flex;
-  flex-direction: column;
-
-  /* never collapse too small */
-  min-height: 400px;
-}
-
-.presets-sidecar.is-open{
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-.presets-sidecar__header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom: 10px;
-  flex: 0 0 auto;
-  color: var(--card-muted);
-}
-
-.presets-sidecar__header h3{
-  margin:0;
-  font-size:.82rem;
-  font-weight:850;
-}
-
-.presets-sidecar__header p{
-  margin:.15rem 0 0;
-  font-size:.82rem;
-  color: var(--card-muted);
-  line-height:1.35;
-}
-
-.presets-sidecar__close{
-  border: 1px solid rgba(15,23,42,.10);
-  background: rgba(255,255,255,.85);
-  border-radius: 10px;
-  padding: 6px 8px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #0b0f19;
-  line-height: 1;
-}
-
-/* The body should fill the rest of the sidecar */
-.presets-sidecar__body{
-  flex: 1 1 auto;
-  min-height: 0;          /* critical in flex layouts */
-  overflow: auto;         /* body scrolls ONLY if truly needed */
-  overflow-x: hidden;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* IMPORTANT: neutralize any old list constraints coming from the main panel */
-.presets-sidecar__body #presetList,
-.presets-sidecar__body .presets-list{
-  flex: 0 0 auto;         /* let it be natural height */
-  height: auto !important;
-  max-height: none !important;   /* <-- this is usually the culprit */
-  overflow: visible !important;  /* <-- remove inner scrolling */
-}
-
-/* If your list wrapper is flex/grid, keep it packed to the top */
-.presets-sidecar__body #presetList,
-.presets-sidecar__body .presets-list{
-  align-content: flex-start;
-}
-
 /* 14) Plans grid */
 #plansContainer{
   display:block;
@@ -4324,6 +4217,8 @@ LNPresents Support`;
       btn.setAttribute("aria-label", `${nextLabel} active terms`);
     }
 
+    let draggingSharedTermId = null;
+
     function renderSharedActiveTerms() {
       const dropzone = document.getElementById("termsDropzone");
       const activeList = document.getElementById("termsActiveList");
@@ -4562,17 +4457,22 @@ LNPresents Support`;
 
         handle.addEventListener("dragstart", (e) => {
           row.classList.add("term-row--dragging");
+          draggingSharedTermId = termId;
+          e.dataTransfer.setData("application/x-lnp-term", termId);
           e.dataTransfer.setData("text/plain", termId);
           e.dataTransfer.effectAllowed = "move";
         });
-        handle.addEventListener("dragend", () => row.classList.remove("term-row--dragging"));
+        handle.addEventListener("dragend", () => {
+          row.classList.remove("term-row--dragging");
+          draggingSharedTermId = null;
+        });
         row.addEventListener("dragover", (e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = "move";
         });
         row.addEventListener("drop", (e) => {
           e.preventDefault();
-          const movingId = e.dataTransfer.getData("text/plain");
+          const movingId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
           if (!movingId || movingId === termId) return;
           const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).slice();
           const from = arr.indexOf(movingId);
@@ -4633,17 +4533,25 @@ LNPresents Support`;
       sharedDropzone.addEventListener("dragover", (e) => {
         e.preventDefault();
         sharedDropzone.classList.add("is-over");
-        e.dataTransfer.dropEffect = "copy";
+        e.dataTransfer.dropEffect = draggingSharedTermId ? "move" : "copy";
       });
       sharedDropzone.addEventListener("dragleave", () => sharedDropzone.classList.remove("is-over"));
       sharedDropzone.addEventListener("drop", (e) => {
         e.preventDefault();
         sharedDropzone.classList.remove("is-over");
-        const termId = e.dataTransfer.getData("text/plain");
+        const termId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
         if (!termId || !tileTermById[termId]) return;
         const termDef = tileTermById[termId];
         const s = ensureTileTerm(termId);
-        if (s.active) return;
+        if (s.active) {
+          const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => id !== termId);
+          arr.push(termId);
+          termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] = arr;
+          persistTermsTiles();
+          persistNow();
+          renderAllTermsTiles();
+          return;
+        }
         if (!canActivateAnotherTileTerm()) {
           alert(`You can select up to ${MAX_ACTIVE_TILE_TERMS} active terms from the dropzone.`);
           return;
@@ -5899,109 +5807,5 @@ function persistNow(){
 })();
 </script>
 
-<script>
-(function () {
-  function ready(fn){ if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
-
-  ready(function () {
-    const presetsPanel = document.querySelector(".presets-panel");
-    const presetList = document.getElementById("presetList");
-    if (!presetsPanel || !presetList) return;
-
-    // Create a placeholder so the original panel doesn't "collapse" when we move #presetList
-    const placeholder = document.createElement("div");
-    placeholder.className = "presets-list-placeholder";
-    placeholder.hidden = true;
-
-    // Insert placeholder right after the header (before the list)
-    const header = presetsPanel.querySelector(".presets-header");
-    if (header && header.nextSibling) {
-      presetsPanel.insertBefore(placeholder, header.nextSibling);
-    } else {
-      presetsPanel.appendChild(placeholder);
-    }
-
-    // Build the sidecar
-    const sidecar = document.createElement("aside");
-    sidecar.className = "presets-sidecar";
-    sidecar.setAttribute("aria-hidden", "true");
-
-    sidecar.innerHTML = `
-      <div class="presets-sidecar__header">
-        <div>
-          <h3>Plan Content Presets</h3>
-          <p>Drag a preset into a plan's Contents area to start from a template.</p>
-        </div>
-        <button type="button" class="presets-sidecar__close" aria-label="Close presets">✕</button>
-      </div>
-      <div class="presets-sidecar__body"></div>
-    `;
-
-    document.body.appendChild(sidecar);
-
-    const sidecarBody = sidecar.querySelector(".presets-sidecar__body");
-    const closeBtn = sidecar.querySelector(".presets-sidecar__close");
-
-    let userClosed = false;
-
-    closeBtn.addEventListener("click", function () {
-      userClosed = true;
-      hideSidecar();
-      // Move list back to original when user closes
-      moveListToOriginal();
-    });
-
-    function showSidecar() {
-      if (userClosed) return;
-      sidecar.classList.add("is-open");
-      sidecar.setAttribute("aria-hidden", "false");
-    }
-
-    function hideSidecar() {
-      sidecar.classList.remove("is-open");
-      sidecar.setAttribute("aria-hidden", "true");
-    }
-
-    function moveListToSidecar() {
-      if (!sidecarBody.contains(presetList)) {
-        placeholder.hidden = false;
-        sidecarBody.appendChild(presetList);
-      }
-    }
-
-    function moveListToOriginal() {
-      if (!presetsPanel.contains(presetList)) {
-        placeholder.hidden = true;
-        // Put it back where it originally lived: after the header, before placeholder (or at end)
-        if (header && placeholder.parentNode === presetsPanel) {
-          presetsPanel.insertBefore(presetList, placeholder);
-        } else {
-          presetsPanel.appendChild(presetList);
-        }
-      }
-    }
-
-    // Detect when user scrolls past the presets panel
-    function onScroll() {
-      const rect = presetsPanel.getBoundingClientRect();
-      const passed = rect.bottom <= 8; // threshold: once the panel is fully above the viewport
-
-      if (passed) {
-        showSidecar();
-        moveListToSidecar();
-      } else {
-        hideSidecar();
-        moveListToOriginal();
-        userClosed = false; // re-enable if they scroll back above then down again
-      }
-    }
-
-    // Use passive scroll + also run once initially
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    onScroll();
-  });
-})();
-</script>
 </body>
 </html>
