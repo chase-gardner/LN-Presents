@@ -219,6 +219,12 @@ h1,h2,h3{ margin:0; }
   letter-spacing: .12em;
   text-transform: uppercase;
 }
+.plan-label-desc{
+  margin:5 0 25 15px;
+  color:#334155;
+  font-weight:400;
+  line-height:0.95;
+}
 .lede{
   margin:0 0 10px;
   color:#334155;
@@ -2353,9 +2359,9 @@ input:focus, select:focus, textarea:focus{
     <div class="page-header-left">
       <h1>LNPresents - Builder</h1>
       <p>
-        Welcome to the LexisNexis Proposal Builder for LNPresents.
-        Fill out this form and show up to four plans with up to six term details selected to present on LNPresents.
-        The plan contents support basic text formatting (bold, italic, underline, bulletpoint, and color).
+        Welcome to LNPresents — the LexisNexis Proposal Builder.
+Use this tool to quickly build and present up to four tailored plans with your selected terms in a clear, client-ready format.
+Plan content supports rich text formatting, including bold, italic, underline, bullet points, and color for clarity and emphasis.
       </p>
     </div>
   </header>
@@ -4701,8 +4707,8 @@ LNPresents Support`;
               <label>Plan Price</label>
               <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
             </div>
-            <div class="field">
-              <label>Click the button below to create a <b>Plan Label</b> where you can put a link or attach a label.</label>
+            <div class="field plan-label-desc">
+              <label>Click the button below to create a <b>Plan Label</b> where you can attach a link or a recommendation.</label>
             </div>
             <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
 
