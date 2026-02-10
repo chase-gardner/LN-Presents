@@ -676,7 +676,7 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 14px minmax(70px, 1fr) minmax(90px, 1.2fr);
+  grid-template-columns: 14px minmax(84px, 1fr) minmax(124px, 1.45fr);
   gap:8px;
   align-items:center;
   padding: 8px 10px;
@@ -706,6 +706,10 @@ input:focus, select:focus, textarea:focus{
   font-size: .82rem;
   background: var(--input-bg);
   outline:none;
+}
+.terms-classic-row input[type="date"]{
+  min-width: 132px;
+  padding-right: 34px;
 }
 .terms-classic-row input:focus,
 .terms-classic-row select:focus{
@@ -832,6 +836,7 @@ input:focus, select:focus, textarea:focus{
 .term-active-row .term-shared-input input[type="range"]{
   height: 24px;
   padding: 0;
+  accent-color: #000;
 }
 .term-active-row .term-shared-input .term-range-output{
   margin-top: 6px;
@@ -881,6 +886,7 @@ input:focus, select:focus, textarea:focus{
 .term-active-row .term-plan-input input[type="range"]{
   height: 24px;
   padding: 0;
+  accent-color: #000;
 }
 .term-active-row .term-plan-input .term-range-output{
   margin-top: 6px;
@@ -1583,7 +1589,10 @@ input:focus, select:focus, textarea:focus{
   gap:8px;
   flex: 0 0 150px;
   max-width: 150px;
+  cursor: pointer;
 }
+.plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
+.plan-tab[data-plan-id].is-dragging{ cursor: grabbing; opacity: .75; }
 .plan-tab.is-active{
   background: linear-gradient(135deg, rgba(167,139,250,.35), rgba(224,231,255,.92));
   border-color: rgba(139,92,246,.45);
@@ -3239,7 +3248,7 @@ LNPresents Support`;
     ];
 
     const classicTermsDefs = [
-      { id: "attorneyCount", label: "Attorney Count", type: "text", dataKey: "clgNumAttorneys", placeholder: "0" },
+      { id: "attorneyCount", label: "Attorney Count", type: "select", dataKey: "clgNumAttorneys", options: Array.from({ length: 10 }, (_, idx) => String(idx + 1)) },
       { id: "currentSpend",  label: "Current Spend",  type: "text", dataKey: "clgCurrentSpend", placeholder: "$0.00" },
       { id: "currentTermEnd",label: "Current Term End",type: "date", dataKey: "clgCurrentTermEnd" }
     ];
@@ -4051,10 +4060,26 @@ LNPresents Support`;
 
         const inputWrap = document.createElement("div");
         inputWrap.className = "term-input";
-        const input = document.createElement("input");
-        input.type = def.type;
-        if (def.placeholder) input.placeholder = def.placeholder;
-        input.value = value || "";
+        let input;
+        if (def.type === "select") {
+          input = document.createElement("select");
+          const blank = document.createElement("option");
+          blank.value = "";
+          blank.textContent = "Select";
+          input.appendChild(blank);
+          (def.options || []).forEach(optVal => {
+            const opt = document.createElement("option");
+            opt.value = String(optVal);
+            opt.textContent = String(optVal);
+            input.appendChild(opt);
+          });
+          input.value = value || "";
+        } else {
+          input = document.createElement("input");
+          input.type = def.type;
+          if (def.placeholder) input.placeholder = def.placeholder;
+          input.value = value || "";
+        }
         inputWrap.appendChild(input);
 
         row.appendChild(check);
@@ -4192,6 +4217,20 @@ LNPresents Support`;
       });
       termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] =
         (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).filter(id => id !== termId);
+    }
+
+    const MAX_ACTIVE_TILE_TERMS = 5;
+
+    function getActiveTileTermCount() {
+      return Object.entries(termsTilesState.tileTerms || {}).reduce((total, [id, termState]) => {
+        if (!termState?.active) return total;
+        if (!tileTermById[id]) return total;
+        return total + 1;
+      }, 0);
+    }
+
+    function canActivateAnotherTileTerm() {
+      return getActiveTileTermCount() < MAX_ACTIVE_TILE_TERMS;
     }
 
     function renderSharedActiveTerms() {
@@ -4498,6 +4537,10 @@ LNPresents Support`;
         const termDef = tileTermById[termId];
         const s = ensureTileTerm(termId);
         if (s.active) return;
+        if (!canActivateAnotherTileTerm()) {
+          alert(`You can select up to ${MAX_ACTIVE_TILE_TERMS} active terms from the dropzone.`);
+          return;
+        }
         s.active = true;
         if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
         if (!s.globalValue) {
@@ -4546,6 +4589,10 @@ LNPresents Support`;
         function activateFromUI() {
           const s = ensureTileTerm(term.id);
           if (s.active) return;
+          if (!canActivateAnotherTileTerm()) {
+            alert(`You can select up to ${MAX_ACTIVE_TILE_TERMS} active terms from the dropzone.`);
+            return;
+          }
           if (!s.active) s.active = true;
           // default OFF (per-plan)
           if (typeof s.appliesToAll !== "boolean") s.appliesToAll = false;
@@ -4614,6 +4661,7 @@ LNPresents Support`;
           tab.type = "button";
           tab.className = "plan-tab notebook-tab" + (idx === activeIdx ? " is-active" : "");
           tab.dataset.planId = plan.__id;
+          tab.setAttribute("draggable", "true");
           tab.setAttribute("role", "tab");
           tab.setAttribute("aria-selected", idx === activeIdx ? "true" : "false");
           tab.innerHTML = `
@@ -5130,6 +5178,10 @@ function persistNow(){
       planTabs.addEventListener("click", (e) => {
         const tab = e.target.closest(".plan-tab[data-plan-id]");
         if (!tab) return;
+        if (suppressPlanTabClick) {
+          e.preventDefault();
+          return;
+        }
         activePlanId = tab.dataset.planId;
         renderPlans();
       });
@@ -5139,102 +5191,117 @@ function persistNow(){
     renderPlans();
 
     /* =========================
-     * Plans: drag to reorder (handle-only, grid-safe)
+     * Plans: tab long-press drag to reorder
      * ========================= */
-    let dragEl = null;
+    let dragTabEl = null;
+    let planTabHoldTimer = null;
+    let armedPlanTabId = null;
+    let suppressPlanTabClick = false;
 
-    function reorderStateFromDom() {
-      const cards = [...plansContainer.querySelectorAll(".plan-card[data-plan-id]")];
-      const ids = cards.map(c => c.dataset.planId);
+    function clearPlanTabHoldState() {
+      if (planTabHoldTimer) {
+        clearTimeout(planTabHoldTimer);
+        planTabHoldTimer = null;
+      }
+      if (!planTabs) return;
+      planTabs.querySelectorAll('.plan-tab.is-reorder-armed').forEach(tab => tab.classList.remove('is-reorder-armed'));
+      armedPlanTabId = null;
+    }
+
+    function reorderPlansByTabDom() {
+      if (!planTabs) return;
+      const tabs = [...planTabs.querySelectorAll('.plan-tab[data-plan-id]')];
+      const ids = tabs.map(tab => tab.dataset.planId).filter(Boolean);
+      if (!ids.length) return;
       const byId = new Map((state.clgPlans || []).map(p => [p.__id, p]));
       const next = ids.map(id => byId.get(id)).filter(Boolean);
       if (!next.length) return;
-
       state.clgPlans = next;
+      activePlanId = dragTabEl?.dataset.planId || activePlanId;
+      persistNow();
       renderPlans();
       buildAppConfigFromState(state);
     }
 
-    function getClosestCard(container, x, y) {
-      const cards = [...container.querySelectorAll(".plan-card:not(.is-dragging)")];
+    function getClosestPlanTab(container, x) {
+      const tabs = [...container.querySelectorAll('.plan-tab[data-plan-id]:not(.is-dragging)')];
       let best = null;
       let bestDist = Infinity;
-
-      for (const el of cards) {
-        const r = el.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const dist = (dx * dx) + (dy * dy);
+      tabs.forEach(tab => {
+        const rect = tab.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const dist = Math.abs(x - cx);
         if (dist < bestDist) {
           bestDist = dist;
-          best = { el, rect: r, cx, cy };
+          best = { el: tab, cx };
         }
-      }
+      });
       return best;
     }
 
-    plansContainer.addEventListener("dragstart", (e) => {
-      const handle = e.target.closest('[data-drag-handle="1"]');
-      if (!handle) { e.preventDefault(); return; }
+    if (planTabs) {
+      const beginHold = (targetTab) => {
+        clearPlanTabHoldState();
+        if (!targetTab?.dataset?.planId) return;
+        planTabHoldTimer = setTimeout(() => {
+          armedPlanTabId = targetTab.dataset.planId;
+          targetTab.classList.add('is-reorder-armed');
+        }, 1000);
+      };
 
-      const card = handle.closest(".plan-card");
-      if (!card) return;
+      planTabs.addEventListener('mousedown', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab) return;
+        beginHold(tab);
+      });
+      planTabs.addEventListener('touchstart', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab) return;
+        beginHold(tab);
+      }, { passive: true });
 
-      dragEl = card;
-      card.classList.add("is-dragging");
+      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt => {
+        planTabs.addEventListener(evt, () => {
+          if (!dragTabEl) clearPlanTabHoldState();
+        });
+      });
 
-      try { e.dataTransfer.setData("text/plain", card.dataset.planId || "plan"); } catch {}
-      e.dataTransfer.effectAllowed = "move";
+      planTabs.addEventListener('dragstart', (e) => {
+        const tab = e.target.closest('.plan-tab[data-plan-id]');
+        if (!tab || tab.dataset.planId !== armedPlanTabId) { e.preventDefault(); return; }
+        dragTabEl = tab;
+        tab.classList.add('is-dragging');
+        suppressPlanTabClick = true;
+        try { e.dataTransfer.setData('text/plain', tab.dataset.planId || 'plan'); } catch {}
+        e.dataTransfer.effectAllowed = 'move';
+      });
 
-      try {
-        const ghost = card.cloneNode(true);
-        ghost.style.position = "fixed";
-        ghost.style.top = "-9999px";
-        ghost.style.left = "-9999px";
-        ghost.style.width = card.getBoundingClientRect().width + "px";
-        document.body.appendChild(ghost);
-        e.dataTransfer.setDragImage(ghost, 20, 20);
-        setTimeout(() => ghost.remove(), 0);
-      } catch {}
-    });
+      planTabs.addEventListener('dragover', (e) => {
+        if (!dragTabEl) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const hit = getClosestPlanTab(planTabs, e.clientX);
+        if (!hit || !hit.el || hit.el === dragTabEl) return;
+        if (e.clientX > hit.cx) {
+          planTabs.insertBefore(dragTabEl, hit.el.nextElementSibling);
+        } else {
+          planTabs.insertBefore(dragTabEl, hit.el);
+        }
+      });
 
-    plansContainer.addEventListener("dragover", (e) => {
-      if (!dragEl) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
+      planTabs.addEventListener('drop', (e) => {
+        if (!dragTabEl) return;
+        e.preventDefault();
+      });
 
-      const hit = getClosestCard(plansContainer, e.clientX, e.clientY);
-      if (!hit || !hit.el || hit.el === dragEl) return;
-
-      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-      hit.el.classList.add("drop-target");
-
-      const after =
-        (e.clientY > hit.cy) ||
-        (Math.abs(e.clientY - hit.cy) < 6 && e.clientX > hit.cx);
-
-      if (after) {
-        const next = hit.el.nextElementSibling;
-        if (next !== dragEl) plansContainer.insertBefore(dragEl, next);
-      } else {
-        if (hit.el !== dragEl) plansContainer.insertBefore(dragEl, hit.el);
-      }
-    });
-
-    plansContainer.addEventListener("drop", (e) => {
-      if (!dragEl) return;
-      e.preventDefault();
-    });
-
-    plansContainer.addEventListener("dragend", () => {
-      if (dragEl) dragEl.classList.remove("is-dragging");
-      plansContainer.querySelectorAll(".plan-card.drop-target").forEach(el => el.classList.remove("drop-target"));
-      dragEl = null;
-      reorderStateFromDom();
-    });
-
+      planTabs.addEventListener('dragend', () => {
+        if (dragTabEl) dragTabEl.classList.remove('is-dragging');
+        clearPlanTabHoldState();
+        reorderPlansByTabDom();
+        dragTabEl = null;
+        setTimeout(() => { suppressPlanTabClick = false; }, 0);
+      });
+    }
     // Plan inputs
     plansContainer.addEventListener("input", function (e) {
       const field = e.target.getAttribute("data-plan-field");
