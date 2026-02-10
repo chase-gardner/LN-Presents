@@ -715,7 +715,10 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row input[type="date"]{
   min-width: 132px;
-  padding-right: 34px;
+  padding-right: 52px;
+}
+.terms-classic-row input[type="date"]::-webkit-date-and-time-value{
+  text-align: left;
 }
 .terms-classic-row input:focus,
 .terms-classic-row select:focus{
@@ -2524,7 +2527,32 @@ Plan content supports rich text formatting, including bold, italic, underline, b
                 </div>
               </div>
 
-          <!-- 2) Side-by-side panels -->
+          <!-- 2) Plans -->
+          <div class="card" id="plansSection">
+            <h2>Plans</h2>
+
+            <!-- Plan content presets panel (JSON + drag & drop, compact, drag-only) -->
+            <div class="presets-panel">
+              <div class="presets-header">
+                <div>
+                  <h3>Plan Content Presets</h3>
+                  <p>Drag a preset into a plan's Contents area to start from a template.</p>
+                </div>
+                <span id="reloadPresetsBtn"  hidden aria-hidden="true"></span>
+              </div>
+              <div id="presetList" class="preset-list">
+                <p class="presets-empty">Loading presets…</p>
+              </div>
+            </div>
+
+            <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
+              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
+              <button type="button" id="clearPlansBtn" class="notebook-tab tab-action-btn" aria-label="Clear plans">Clear Plans</button>
+            </div>
+            <div id="plansContainer"></div>
+          </div>
+
+          <!-- 3) Terms -->
           <div class="form-panel-row">
           <div class="card terms-card">
             <h2>Terms</h2>
@@ -2555,31 +2583,6 @@ Plan content supports rich text formatting, including bold, italic, underline, b
 
               </div>
             </div>
-
-          <!-- 3) Plans -->
-          <div class="card" id="plansSection">
-            <h2>Plans</h2>
-
-            <!-- Plan content presets panel (JSON + drag & drop, compact, drag-only) -->
-            <div class="presets-panel">
-              <div class="presets-header">
-                <div>
-                  <h3>Plan Content Presets</h3>
-                  <p>Drag a preset into a plan's Contents area to start from a template.</p>
-                </div>
-                <span id="reloadPresetsBtn"  hidden aria-hidden="true"></span>
-              </div>
-              <div id="presetList" class="preset-list">
-                <p class="presets-empty">Loading presets…</p>
-              </div>
-            </div>
-
-            <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
-              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
-              <button type="button" id="clearPlansBtn" class="notebook-tab tab-action-btn" aria-label="Clear plans">Clear Plans</button>
-            </div>
-            <div id="plansContainer"></div>
-          </div>
         </form>
       </main>
 
