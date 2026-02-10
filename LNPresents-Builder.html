@@ -4483,10 +4483,12 @@ LNPresents Support`;
         });
         row.addEventListener("dragover", (e) => {
           e.preventDefault();
+          e.stopPropagation();
           e.dataTransfer.dropEffect = "move";
         });
         row.addEventListener("drop", (e) => {
           e.preventDefault();
+          e.stopPropagation();
           const movingId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
           if (!movingId || movingId === termId) return;
           const arr = (termsTilesState.activeTileTermsOrder[SHARED_TERMS_GROUP] || []).slice();
@@ -4554,6 +4556,7 @@ LNPresents Support`;
       sharedDropzone.addEventListener("drop", (e) => {
         e.preventDefault();
         sharedDropzone.classList.remove("is-over");
+        if (e.target.closest(".term-active-row")) return;
         const termId = e.dataTransfer.getData("application/x-lnp-term") || e.dataTransfer.getData("text/plain") || draggingSharedTermId;
         if (!termId || !tileTermById[termId]) return;
         const termDef = tileTermById[termId];
