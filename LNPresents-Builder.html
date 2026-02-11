@@ -203,6 +203,7 @@ h1,h2,h3{ margin:0; }
   background: linear-gradient(135deg, rgba(99,102,241,.10), rgba(255,255,255,.92));
   color: #475569;
   line-height: 1.2;
+  font-size: 0.92rem;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
 }
 .terms-card .terms-description__label{
@@ -220,10 +221,11 @@ h1,h2,h3{ margin:0; }
   text-transform: uppercase;
 }
 .plan-label-desc{
-  margin:0;
+  padding: 3px 10px 5px;
   color:#475569;
-  font-weight:200;
-  line-height:1.25;
+  font-weight:470;
+  line-height:1.05;
+  font-size: 0.85rem;
 }
 .lede{
   margin:0 0 10px;
@@ -2247,6 +2249,16 @@ input:focus, select:focus, textarea:focus{
   .demo-overlay{ display:none !important; }
 }
 </style>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N7EP6C4NDE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-N7EP6C4NDE');
+</script>
 </head>
 
 <!-- PASSCODE GATE (front-end only) -->
@@ -4735,7 +4747,7 @@ LNPresents Support`;
               <label>Plan Price</label>
               <input type="text" data-plan-idx="${activeIdx}" data-plan-field="clgPrice" value="${escapeHtml(activePlan.clgPrice || "")}" placeholder="$0.00">
             </div>
-            <div class="field plan-label-desc">
+            <div class="plan-label-desc">
               <label>Click the button below to create a <b>Plan Label</b> where you can attach a link or a recommendation.</label>
             </div>
             <button type="button" class="ln-btn ln-btn--sm plan-cta-btn" data-plan-idx="${activeIdx}" data-cmd="createLink">Plan Label</button>
