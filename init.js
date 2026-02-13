@@ -589,22 +589,33 @@
 
     const preset = presets[formatRaw] || presets.a3;
     const portrait = preset[0] <= preset[1] ? preset : [preset[1], preset[0]];
-    if (orientation === 'landscape') return [portrait[1], portrait[0]];
-    return portrait;
+    return orientation === 'landscape' ? [portrait[1], portrait[0]] : portrait;
   }
 
-  function buildDynamicPageFormatMm(printNode, margin, page) {
-    const [baseWidthMm] = getBasePageSizeMm(page);
-    const [top = 0, left = 0, bottom = 0, right = 0] = Array.isArray(margin) ? margin : [margin, margin, margin, margin];
+  function buildAdaptivePdfFormat(printNode, margin, page) {
+    const [baseWidthMm, baseHeightMm] = getBasePageSizeMm(page);
+    const [top = 0, left = 0, bottom = 0, right = 0] = Array.isArray(margin)
+      ? margin
+      : [margin, margin, margin, margin];
 
     const nodeWidthPx = Math.max(printNode.scrollWidth, 1);
     const nodeHeightPx = Math.max(printNode.scrollHeight, 1);
 
     const usableWidthMm = Math.max(baseWidthMm - left - right, 50);
     const contentHeightMm = usableWidthMm * (nodeHeightPx / nodeWidthPx);
-    const pageHeightMm = Math.max(contentHeightMm + top + bottom, 80);
 
-    return [baseWidthMm, pageHeightMm];
+    const minPageHeightMm = Math.max(baseHeightMm, 120);
+    const maxPageHeightMm = 700;
+    const targetPageHeightMm = contentHeightMm + top + bottom;
+
+    const isAdaptiveSafe = targetPageHeightMm <= maxPageHeightMm;
+
+    return {
+      format: isAdaptiveSafe
+        ? [baseWidthMm, Math.max(Math.min(targetPageHeightMm, maxPageHeightMm), minPageHeightMm)]
+        : page.format,
+      pagebreakMode: isAdaptiveSafe ? ['avoid-all'] : ['css', 'legacy']
+    };
   }
 
   async function exportPresenter({
@@ -634,7 +645,7 @@
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
-    const dynamicPageFormat = buildDynamicPageFormatMm(printNode, margin, page);
+    const adaptivePdf = buildAdaptivePdfFormat(printNode, margin, page);
 
     const opt = {
       margin,
@@ -642,9 +653,11 @@
       enableLinks: true,
       image: { type: 'jpeg', quality: 0.95 },
       html2canvas: {
-        scale,
-        useCORS: false,
+        // Keep canvas size conservative for lower-memory machines.
+        scale: Math.min(Math.max(Number(scale) || 1, 1), 1.5),
+        useCORS: true,
         allowTaint: false,
+        backgroundColor: '#ffffff',
         logging: false,
         onclone: (clonedDoc) => {
   // Add export class so CSS overrides apply in the capture clone
@@ -666,22 +679,15 @@
       },
       jsPDF: {
         unit: 'mm',
-        format: dynamicPageFormat,
+        format: adaptivePdf.format,
         orientation: page.orientation,
         compress: true
       },
-      pagebreak: { mode: ['avoid-all'] }
+      pagebreak: { mode: adaptivePdf.pagebreakMode }
     };
 
     try {
-      const worker = html2pdf().set(opt).from(printNode).toPdf();
-      await worker.get('pdf').then((pdf) => {
-        const pageCount = pdf.internal.getNumberOfPages();
-        for (let i = pageCount; i > 1; i--) {
-          pdf.deletePage(i);
-        }
-      });
-      await worker.save();
+      await html2pdf().set(opt).from(printNode).save();
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
