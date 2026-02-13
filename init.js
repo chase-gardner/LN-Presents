@@ -604,6 +604,8 @@
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
+    scalePlanCardsForPdfPage(printNode, rootHeight);
+
     const opt = {
       margin,
       filename,
@@ -651,6 +653,39 @@
         printWrapper.parentNode.removeChild(printWrapper);
       }
     }
+  }
+
+  function scalePlanCardsForPdfPage(printNode, maxHeightPx) {
+    const cards = Array.from(printNode.querySelectorAll('.plan-card'));
+    if (!cards.length || !maxHeightPx) return;
+
+    const applyScale = (scale) => {
+      cards.forEach(card => {
+        card.style.zoom = String(scale);
+        card.style.transformOrigin = 'top center';
+      });
+    };
+
+    applyScale(1);
+    if (printNode.scrollHeight <= maxHeightPx) return;
+
+    const minScale = 0.6;
+    let low = minScale;
+    let high = 1;
+    let best = minScale;
+
+    for (let i = 0; i < 8; i++) {
+      const mid = (low + high) / 2;
+      applyScale(mid);
+      if (printNode.scrollHeight <= maxHeightPx) {
+        best = mid;
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+
+    applyScale(best);
   }
 
   function setupExportButton() {
