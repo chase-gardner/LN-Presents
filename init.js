@@ -429,6 +429,68 @@
       cta.style.lineHeight = '1.2';
     });
 
+    // --- 6) If content overflows one page, scale only plan cards down for PDF ---
+    try {
+      const cloneRoot = wrapper.firstElementChild;
+      const plansGrid = wrapper.querySelector('.plans-grid');
+      const cards = plansGrid ? Array.from(plansGrid.querySelectorAll('.plan-card')) : [];
+
+      if (cloneRoot && plansGrid && cards.length) {
+        const sourceHeight = Math.ceil(node.getBoundingClientRect().height);
+        let cloneHeight = Math.ceil(cloneRoot.scrollHeight);
+
+        if (cloneHeight > sourceHeight) {
+          const overflowRatio = sourceHeight / cloneHeight;
+          const cardScale = Math.max(0.76, Math.min(1, overflowRatio));
+
+          cards.forEach(card => {
+            card.style.minHeight = `${Math.max(190, Math.round(280 * cardScale))}px`;
+            card.style.fontSize = `${Math.round(cardScale * 100)}%`;
+          });
+
+          wrapper.querySelectorAll('.plan-card__header').forEach(el => {
+            const py = Math.max(8, Math.round(16 * cardScale));
+            const px = Math.max(10, Math.round(16 * cardScale));
+            el.style.padding = `${py}px ${px}px ${Math.max(8, py - 2)}px`;
+          });
+
+          wrapper.querySelectorAll('.plan-card__features').forEach(el => {
+            const topBottom = Math.max(8, Math.round(12 * cardScale));
+            const lr = Math.max(10, Math.round(16 * cardScale));
+            el.style.margin = `${topBottom}px ${lr}px`;
+            el.style.paddingLeft = `${Math.max(10, Math.round(17 * cardScale))}px`;
+          });
+
+          wrapper.querySelectorAll('.plan-card__footer').forEach(el => {
+            const py = Math.max(8, Math.round(14 * cardScale));
+            const px = Math.max(10, Math.round(16 * cardScale));
+            el.style.padding = `${py}px ${px}px`;
+            el.style.gap = `${Math.max(6, Math.round(12 * cardScale))}px`;
+          });
+
+          wrapper.querySelectorAll('.plan-card__cta').forEach(el => {
+            const py = Math.max(7, Math.round(10 * cardScale));
+            const px = Math.max(10, Math.round(14 * cardScale));
+            el.style.padding = `${py}px ${px}px`;
+          });
+
+          cloneHeight = Math.ceil(cloneRoot.scrollHeight);
+
+          // If still overflowing, apply one extra pass with a floor.
+          if (cloneHeight > sourceHeight) {
+            const secondPassScale = Math.max(0.72, cardScale * (sourceHeight / cloneHeight));
+
+            cards.forEach(card => {
+              card.style.minHeight = `${Math.max(170, Math.round(280 * secondPassScale))}px`;
+              card.style.fontSize = `${Math.round(secondPassScale * 100)}%`;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('PDF plan card scaling skipped:', e);
+    }
+
     // Detach from DOM and return clean clone
     document.body.removeChild(wrapper);
     return clone;
