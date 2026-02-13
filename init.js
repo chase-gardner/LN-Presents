@@ -576,6 +576,37 @@
     return clone;
   }
 
+  function getBasePageSizeMm(page = {}) {
+    const formatRaw = String(page.format || 'a3').toLowerCase();
+    const orientation = String(page.orientation || 'landscape').toLowerCase();
+
+    const presets = {
+      a3: [297, 420],
+      a4: [210, 297],
+      letter: [216, 279],
+      legal: [216, 356]
+    };
+
+    const preset = presets[formatRaw] || presets.a3;
+    const portrait = preset[0] <= preset[1] ? preset : [preset[1], preset[0]];
+    if (orientation === 'landscape') return [portrait[1], portrait[0]];
+    return portrait;
+  }
+
+  function buildDynamicPageFormatMm(printNode, margin, page) {
+    const [baseWidthMm] = getBasePageSizeMm(page);
+    const [top = 0, left = 0, bottom = 0, right = 0] = Array.isArray(margin) ? margin : [margin, margin, margin, margin];
+
+    const nodeWidthPx = Math.max(printNode.scrollWidth, 1);
+    const nodeHeightPx = Math.max(printNode.scrollHeight, 1);
+
+    const usableWidthMm = Math.max(baseWidthMm - left - right, 50);
+    const contentHeightMm = usableWidthMm * (nodeHeightPx / nodeWidthPx);
+    const pageHeightMm = Math.max(contentHeightMm + top + bottom, 80);
+
+    return [baseWidthMm, pageHeightMm];
+  }
+
   async function exportPresenter({
     selector = '#presenter',
     filename,
@@ -597,14 +628,13 @@
     printWrapper.style.left = '-9999px';
     printWrapper.style.top = '0';
     const rootWidth = root.offsetWidth || 1;
-    const rootHeight = root.offsetHeight || 1;
     printWrapper.style.width = `${rootWidth}px`;
-    printWrapper.style.height = `${rootHeight}px`;
-    printWrapper.style.overflow = 'hidden';
+    printWrapper.style.height = 'auto';
+    printWrapper.style.overflow = 'visible';
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
-    scalePlanCardsForPdfPage(printNode, rootHeight);
+    const dynamicPageFormat = buildDynamicPageFormatMm(printNode, margin, page);
 
     const opt = {
       margin,
@@ -636,15 +666,22 @@
       },
       jsPDF: {
         unit: 'mm',
-        format: page.format,
+        format: dynamicPageFormat,
         orientation: page.orientation,
         compress: true
       },
-      pagebreak: { mode: ['css', 'legacy'] }
+      pagebreak: { mode: ['avoid-all'] }
     };
 
     try {
-      await html2pdf().set(opt).from(printNode).save();
+      const worker = html2pdf().set(opt).from(printNode).toPdf();
+      await worker.get('pdf').then((pdf) => {
+        const pageCount = pdf.internal.getNumberOfPages();
+        for (let i = pageCount; i > 1; i--) {
+          pdf.deletePage(i);
+        }
+      });
+      await worker.save();
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
