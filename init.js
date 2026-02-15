@@ -615,74 +615,46 @@
     const pixelBudget = 14_000_000;
     const area = exportWidth * exportHeight;
     const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
-    const dprCap = Math.max(0.1, window.devicePixelRatio || 1);
-    const safeScale = Math.min(dprCap, Math.max(0.65, dynamicScale));
-    const jpegQuality = safeScale < 1 ? 0.9 : 0.95;
-
-    const knownPageSizesMm = {
-      a0: [841, 1189],
-      a1: [594, 841],
-      a2: [420, 594],
-      a3: [297, 420],
-      a4: [210, 297],
-      letter: [215.9, 279.4],
-      legal: [215.9, 355.6],
-      tabloid: [279.4, 431.8]
-    };
-
-    function getBasePageSizeMm(format, orientation) {
-      let size = null;
-
-      if (Array.isArray(format) && format.length === 2) {
-        const w = Number(format[0]);
-        const h = Number(format[1]);
-        if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) {
-          size = [w, h];
-        }
-      } else if (typeof format === 'string') {
-        const named = knownPageSizesMm[format.toLowerCase()];
-        if (named) size = [...named];
-      }
-
-      if (!size) size = [...knownPageSizesMm.a3];
-
-      const o = (orientation || '').toLowerCase();
-      const isLandscape = o === 'landscape';
-      const isPortrait = o === 'portrait';
-
-      if (isLandscape && size[0] < size[1]) size.reverse();
-      if (isPortrait && size[0] > size[1]) size.reverse();
-
-      return { widthMm: size[0], heightMm: size[1] };
-    }
-
-    const margins = {
-      top: Number(margin[0]) || 0,
-      left: Number(margin[1]) || 0,
-      bottom: Number(margin[2]) || 0,
-      right: Number(margin[3]) || 0
-    };
-
-    const basePage = getBasePageSizeMm(page.format, page.orientation);
-    const contentWidthMm = Math.max(20, basePage.widthMm - margins.left - margins.right);
-    const contentHeightMm = contentWidthMm * (exportHeight / exportWidth);
+    const baseSafeScale = Math.max(0.75, dynamicScale);
+    const cssDpi = 96;
     const maxPdfPageDimMm = 3000;
 
-    const pageWidthMm = Math.min(maxPdfPageDimMm, contentWidthMm + margins.left + margins.right);
-    const pageHeightMm = Math.min(maxPdfPageDimMm, contentHeightMm + margins.top + margins.bottom);
-    const pdfOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
+    function measurePdfGeometry(scaleValue) {
+      const renderWidthPx = exportWidth * scaleValue;
+      const renderHeightPx = exportHeight * scaleValue;
+      const pageWidthMm = (renderWidthPx * 25.4) / cssDpi;
+      const pageHeightMm = (renderHeightPx * 25.4) / cssDpi;
+      const orientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
+      return {
+        scaleValue,
+        pageWidthMm,
+        pageHeightMm,
+        orientation,
+        exceedsMax: pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm
+      };
+    }
 
-    const opt = {
-      margin,
-      filename,
-      enableLinks: true,
-      image: { type: 'jpeg', quality: jpegQuality },
-      html2canvas: {
-        scale: safeScale,
-        useCORS: false,
-        allowTaint: false,
-        logging: false,
-        onclone: (clonedDoc) => {
+    let geometry = measurePdfGeometry(baseSafeScale);
+    if (geometry.exceedsMax) {
+      const largestDimMm = Math.max(geometry.pageWidthMm, geometry.pageHeightMm);
+      const capRatio = maxPdfPageDimMm / largestDimMm;
+      const reducedScale = Math.max(0.3, geometry.scaleValue * capRatio);
+      geometry = measurePdfGeometry(reducedScale);
+    }
+
+    function buildExportOptions(captureScale) {
+      const jpegQuality = captureScale < 1 ? 0.9 : 0.95;
+      return {
+        margin,
+        filename,
+        enableLinks: true,
+        image: { type: 'jpeg', quality: jpegQuality },
+        html2canvas: {
+          scale: captureScale,
+          useCORS: false,
+          allowTaint: false,
+          logging: false,
+          onclone: (clonedDoc) => {
   // Add export class so CSS overrides apply in the capture clone
   const capRoot = clonedDoc.querySelector('#presenter');
   if (capRoot) {
@@ -704,18 +676,41 @@
 
   // ...keep the rest of your onclone logic (strip imgs, remove url() bgs, etc.)
 }
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: [pageWidthMm, pageHeightMm],
-        orientation: pdfOrientation,
-        compress: true
-      },
-      pagebreak: { mode: ['avoid-all'] }
-    };
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: [geometry.pageWidthMm, geometry.pageHeightMm],
+          orientation: geometry.orientation,
+          compress: true
+        },
+        pagebreak: { mode: ['avoid-all'] }
+      };
+    }
 
+    const minRetryScale = 0.35;
+    const exportScaleCandidates = [
+      geometry.scaleValue,
+      Math.max(minRetryScale, geometry.scaleValue * 0.75),
+      Math.max(minRetryScale, geometry.scaleValue * 0.5)
+    ].filter((value, index, arr) => arr.indexOf(value) === index);
+
+    let exportError = null;
     try {
-      await html2pdf().set(opt).from(printNode).save();
+      for (const captureScale of exportScaleCandidates) {
+        try {
+          const opt = buildExportOptions(captureScale);
+          await html2pdf().set(opt).from(printNode).save();
+          exportError = null;
+          break;
+        } catch (err) {
+          exportError = err;
+          console.warn(`PDF export attempt failed at scale ${captureScale}:`, err);
+        }
+      }
+
+      if (exportError) {
+        throw exportError;
+      }
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
