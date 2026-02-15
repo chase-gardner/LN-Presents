@@ -604,13 +604,22 @@
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
+    const exportWidth = Math.max(1, printNode.scrollWidth || printNode.offsetWidth || rootWidth);
+    const exportHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || rootHeight);
+    const pixelBudget = 14_000_000;
+    const area = exportWidth * exportHeight;
+    const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
+    const dprCap = Math.max(0.1, window.devicePixelRatio || 1);
+    const safeScale = Math.min(dprCap, Math.max(0.75, dynamicScale));
+    const jpegQuality = safeScale < 1 ? 0.9 : 0.95;
+
     const opt = {
       margin,
       filename,
       enableLinks: true,
-      image: { type: 'jpeg', quality: 0.95 },
+      image: { type: 'jpeg', quality: jpegQuality },
       html2canvas: {
-        scale,
+        scale: safeScale,
         useCORS: false,
         allowTaint: false,
         logging: false,
