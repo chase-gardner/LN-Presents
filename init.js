@@ -472,39 +472,52 @@
     return (px * 25.4) / 96;
   }
 
+  function getNodeHeightPx(node) {
+    return Math.max(1, Math.ceil(node.scrollHeight || node.offsetHeight || node.clientHeight || 1));
+  }
+
   function applyPlanCardScale(printNode, scale) {
     const cards = printNode.querySelectorAll('.plan-card');
-    cards.forEach(card => {
+    cards.forEach((card) => {
       card.style.zoom = String(scale);
+      card.style.transform = 'none';
       card.style.transformOrigin = 'top center';
-      card.style.transform = 'scale(1)';
     });
   }
 
-  function fitPlanCardsToHeight(printNode, targetHeightPx) {
+  function fitPlanCardsToSinglePage(printNode, targetPrintableHeightPx, {
+    minScale = 0.55,
+    maxScale = 1,
+    iterations = 14
+  } = {}) {
     const cards = Array.from(printNode.querySelectorAll('.plan-card'));
     if (!cards.length) {
-      return { scale: 1, heightPx: Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1) };
+      return { scale: 1, heightPx: getNodeHeightPx(printNode), usedFallbackPageHeight: false };
     }
 
-    applyPlanCardScale(printNode, 1);
-    let currentHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
-    if (currentHeight <= targetHeightPx) {
-      return { scale: 1, heightPx: currentHeight };
+    applyPlanCardScale(printNode, maxScale);
+    let currentHeight = getNodeHeightPx(printNode);
+    if (currentHeight <= targetPrintableHeightPx) {
+      return { scale: maxScale, heightPx: currentHeight, usedFallbackPageHeight: false };
     }
 
-    const minScale = 0.58;
+    applyPlanCardScale(printNode, minScale);
+    let minScaleHeight = getNodeHeightPx(printNode);
+    if (minScaleHeight > targetPrintableHeightPx) {
+      return { scale: minScale, heightPx: minScaleHeight, usedFallbackPageHeight: true };
+    }
+
     let low = minScale;
-    let high = 1;
+    let high = maxScale;
     let bestScale = minScale;
-    let bestHeight = currentHeight;
+    let bestHeight = minScaleHeight;
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < iterations; i++) {
       const mid = (low + high) / 2;
       applyPlanCardScale(printNode, mid);
-      currentHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
+      currentHeight = getNodeHeightPx(printNode);
 
-      if (currentHeight <= targetHeightPx) {
+      if (currentHeight <= targetPrintableHeightPx) {
         bestScale = mid;
         bestHeight = currentHeight;
         low = mid;
@@ -514,8 +527,8 @@
     }
 
     applyPlanCardScale(printNode, bestScale);
-    bestHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
-    return { scale: bestScale, heightPx: bestHeight };
+    bestHeight = getNodeHeightPx(printNode);
+    return { scale: bestScale, heightPx: bestHeight, usedFallbackPageHeight: false };
   }
 
   async function exportPresenter({
@@ -546,15 +559,17 @@
     document.body.appendChild(printWrapper);
 
     const [marginTopMm, marginRightMm, marginBottomMm, marginLeftMm] = margin;
-    const targetPageHeightMm = 215.9;
-    const targetPrintableHeightPx = Math.max(1, Math.round(mmToPx(targetPageHeightMm - marginTopMm - marginBottomMm)));
+    const defaultPageHeightMm = 215.9;
+    const targetPrintableHeightPx = Math.max(1, Math.round(mmToPx(defaultPageHeightMm - marginTopMm - marginBottomMm)));
 
-    fitPlanCardsToHeight(printNode, targetPrintableHeightPx);
+    const fitResult = fitPlanCardsToSinglePage(printNode, targetPrintableHeightPx);
 
     const exportWidthPx = Math.max(1, Math.ceil(printNode.scrollWidth || printNode.offsetWidth || rootWidth));
     const exportHeightPx = Math.max(1, Math.ceil(printNode.scrollHeight || printNode.offsetHeight || rootHeight));
     const pageWidthMm = pxToMm(exportWidthPx) + marginLeftMm + marginRightMm;
-    const pageHeightMm = pxToMm(exportHeightPx) + marginTopMm + marginBottomMm;
+    const pageHeightMm = fitResult.usedFallbackPageHeight
+      ? (pxToMm(exportHeightPx) + marginTopMm + marginBottomMm)
+      : Math.min(defaultPageHeightMm, pxToMm(exportHeightPx) + marginTopMm + marginBottomMm);
     const pageOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
 
     printNode.style.width = `${exportWidthPx}px`;
@@ -567,7 +582,7 @@
 
     const deviceMemory = Number(window.navigator && window.navigator.deviceMemory) || 4;
     const pageAreaPx = exportWidthPx * exportHeightPx;
-    const pixelBudget = deviceMemory <= 2 ? 2_500_000 : (deviceMemory <= 4 ? 4_000_000 : 6_000_000);
+    const pixelBudget = deviceMemory <= 2 ? 2_200_000 : (deviceMemory <= 4 ? 4_000_000 : 6_200_000);
     const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / Math.max(1, pageAreaPx)));
     const safeScale = Math.max(1, dynamicScale);
 
@@ -625,7 +640,7 @@
       };
     }
 
-    const minRetryScale = 0.8;
+    const minRetryScale = 0.75;
     const exportScaleCandidates = [
       safeScale,
       Math.max(minRetryScale, safeScale * 0.85),
