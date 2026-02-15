@@ -616,7 +616,34 @@
     const area = exportWidth * exportHeight;
     const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
     const dprCap = Math.max(0.1, window.devicePixelRatio || 1);
-    const safeScale = Math.min(dprCap, Math.max(0.75, dynamicScale));
+    const baseSafeScale = Math.min(dprCap, Math.max(0.75, dynamicScale));
+    const cssDpi = 96;
+    const maxPdfPageDimMm = 3000;
+
+    function measurePdfGeometry(scaleValue) {
+      const renderWidthPx = exportWidth * scaleValue;
+      const renderHeightPx = exportHeight * scaleValue;
+      const pageWidthMm = (renderWidthPx * 25.4) / cssDpi;
+      const pageHeightMm = (renderHeightPx * 25.4) / cssDpi;
+      const orientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
+      return {
+        scaleValue,
+        pageWidthMm,
+        pageHeightMm,
+        orientation,
+        exceedsMax: pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm
+      };
+    }
+
+    let geometry = measurePdfGeometry(baseSafeScale);
+    if (geometry.exceedsMax) {
+      const largestDimMm = Math.max(geometry.pageWidthMm, geometry.pageHeightMm);
+      const capRatio = maxPdfPageDimMm / largestDimMm;
+      const reducedScale = Math.max(0.3, geometry.scaleValue * capRatio);
+      geometry = measurePdfGeometry(reducedScale);
+    }
+
+    const safeScale = geometry.scaleValue;
     const jpegQuality = safeScale < 1 ? 0.9 : 0.95;
 
     const opt = {
@@ -654,8 +681,8 @@
       },
       jsPDF: {
         unit: 'mm',
-        format: page.format,
-        orientation: page.orientation,
+        format: [geometry.pageWidthMm, geometry.pageHeightMm],
+        orientation: geometry.orientation,
         compress: true
       },
       pagebreak: { mode: ['avoid-all'] }
