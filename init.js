@@ -442,11 +442,9 @@
 
   /**
    * Create a clean clone of the presenter node for PDF:
-   * - Injects a PDF-only header
-   * - Strips all <img> tags
-   * - Removes any CSS background-image:url(...) (keeps gradients)
-   * - Simplifies selector layout so it renders cleanly in PDF (esp. on Windows)
-   * - Removes export buttons
+   * - Keeps the same presenter composition/colors/layout
+   * - Removes only export controls
+   * - Keeps one stable capture root for html2canvas/html2pdf
    */
   function makePrintNode(node) {
     const clone = node.cloneNode(true);
@@ -463,116 +461,67 @@
     clone.querySelectorAll('#exportPdfBtn, .btn-export, #btnExportPDF, .export-pdf, [data-print-hidden]')
       .forEach(el => el.remove());
 
-    // Force headline to black in PDF if it matches your hero headline
-    try {
-      const headlineCandidate = Array.from(
-        clone.querySelectorAll('h1, h2, h3, .hero-title, .presenter-heading, .page-title, div, span')
-      ).find(
-        el =>
-          el.textContent &&
-          el.textContent.trim().toLowerCase() === 'plans built just for you'
-      );
-      if (headlineCandidate) headlineCandidate.style.color = '#000000';
-    } catch (e) {}
-
-    // Simplify selector layout for PDF
-    try {
-      const selectorWrapper = clone.querySelector('.selector');
-      if (selectorWrapper) {
-        selectorWrapper.style.display = 'block';
-        selectorWrapper.style.textAlign = 'center';
-        selectorWrapper.style.placeItems = 'initial';
-      }
-
-      const selectorLabels = clone.querySelectorAll('.selector-label');
-      selectorLabels.forEach(el => {
-        el.style.display = 'block';
-        el.style.width = '100%';
-        el.style.margin = '0 0 6px 0';
-        el.style.color = '#000000';
-        el.style.background = 'transparent';
-        el.style.letterSpacing = '0';
-        el.style.wordSpacing = '0';
-        el.style.whiteSpace = 'normal';
-        el.style.lineHeight = '1.3';
-        el.style.fontWeight = '700';
-        el.style.textTransform = 'none';
-        el.style.textShadow = 'none';
-      });
-
-      const termRadios = clone.querySelector('#termRadios');
-      if (termRadios) {
-        termRadios.style.display = 'flex';
-        termRadios.style.flexWrap = 'wrap';
-        termRadios.style.justifyContent = 'center';
-        termRadios.style.alignItems = 'center';
-        termRadios.style.gap = '8px 10px';
-        termRadios.style.marginTop = '4px';
-        termRadios.style.width = '100%';
-      }
-    } catch (e) {}
-
-    // PDF-only header
-    const pdfHeader = document.createElement('div');
-    pdfHeader.style.display = 'flex';
-    pdfHeader.style.flexDirection = 'column';
-    pdfHeader.style.alignItems = 'flex-start';
-    pdfHeader.style.marginBottom = '12px';
-    pdfHeader.style.paddingBottom = '8px';
-    pdfHeader.style.borderBottom = '1px solid rgba(148,163,184,.6)';
-
-    const eyebrow = document.createElement('div');
-    eyebrow.textContent = 'LexisNexis\u00AE';
-    eyebrow.style.fontSize = '10px';
-    eyebrow.style.letterSpacing = '.14em';
-    eyebrow.style.textTransform = 'uppercase';
-    eyebrow.style.color = 'rgba(148,163,184,.9)';
-    eyebrow.style.marginBottom = '4px';
-
-    const headerRow = document.createElement('div');
-    headerRow.style.display = 'flex';
-    headerRow.style.alignItems = 'center';
-    headerRow.style.width = '100%';
-
-    const title = document.createElement('div');
-    title.textContent = 'Proposal';
-    title.style.fontSize = '16px';
-    title.style.fontWeight = '700';
-    title.style.letterSpacing = '.12em';
-    title.style.textTransform = 'uppercase';
-    title.style.color = '#0f172a';
-
-    const confidentialBadge = document.createElement('div');
-    confidentialBadge.textContent = 'LexisNexis Confidential';
-    confidentialBadge.style.marginLeft = 'auto';
-    confidentialBadge.style.padding = '4px 10px';
-    confidentialBadge.style.borderRadius = '999px';
-    confidentialBadge.style.backgroundColor = '#111827';
-    confidentialBadge.style.fontSize = '12px';
-    confidentialBadge.style.fontWeight = '600';
-    confidentialBadge.style.letterSpacing = '.16em';
-    confidentialBadge.style.textTransform = 'uppercase';
-    confidentialBadge.style.color = '#ffffff';
-    confidentialBadge.style.border = '1px solid #1f2937';
-    confidentialBadge.style.boxShadow = '0 0 0.5px rgba(0,0,0,.4)';
-
-    headerRow.appendChild(title);
-    headerRow.appendChild(confidentialBadge);
-    pdfHeader.appendChild(eyebrow);
-    pdfHeader.appendChild(headerRow);
-
-    clone.insertBefore(pdfHeader, clone.firstChild);
-
-    // Strip images early so they do not inflate export bounds.
-    clone.querySelectorAll('img').forEach(img => img.remove());
-
     return clone;
+  }
+
+  function mmToPx(mm) {
+    return (mm * 96) / 25.4;
+  }
+
+  function pxToMm(px) {
+    return (px * 25.4) / 96;
+  }
+
+  function applyPlanCardScale(printNode, scale) {
+    const cards = printNode.querySelectorAll('.plan-card');
+    cards.forEach(card => {
+      card.style.zoom = String(scale);
+      card.style.transformOrigin = 'top center';
+      card.style.transform = 'scale(1)';
+    });
+  }
+
+  function fitPlanCardsToHeight(printNode, targetHeightPx) {
+    const cards = Array.from(printNode.querySelectorAll('.plan-card'));
+    if (!cards.length) {
+      return { scale: 1, heightPx: Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1) };
+    }
+
+    applyPlanCardScale(printNode, 1);
+    let currentHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
+    if (currentHeight <= targetHeightPx) {
+      return { scale: 1, heightPx: currentHeight };
+    }
+
+    const minScale = 0.58;
+    let low = minScale;
+    let high = 1;
+    let bestScale = minScale;
+    let bestHeight = currentHeight;
+
+    for (let i = 0; i < 12; i++) {
+      const mid = (low + high) / 2;
+      applyPlanCardScale(printNode, mid);
+      currentHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
+
+      if (currentHeight <= targetHeightPx) {
+        bestScale = mid;
+        bestHeight = currentHeight;
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+
+    applyPlanCardScale(printNode, bestScale);
+    bestHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || 1);
+    return { scale: bestScale, heightPx: bestHeight };
   }
 
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    margin = [10, 10, 10, 10],
+    margin = [8, 8, 8, 8],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -596,41 +545,32 @@
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
-    const exportWidth = Math.max(1, printNode.scrollWidth || printNode.offsetWidth || rootWidth);
-    const exportHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || rootHeight);
-    const pageOrientation = exportWidth >= exportHeight ? 'landscape' : 'portrait';
-    const pageWidthMm = pageOrientation === 'landscape' ? 279.4 : 215.9;
-    const pageHeightMm = pageOrientation === 'landscape' ? 215.9 : 279.4;
     const [marginTopMm, marginRightMm, marginBottomMm, marginLeftMm] = margin;
-    const printableWidthMm = Math.max(1, pageWidthMm - marginLeftMm - marginRightMm);
-    const printableHeightMm = Math.max(1, pageHeightMm - marginTopMm - marginBottomMm);
+    const targetPageHeightMm = 215.9;
+    const targetPrintableHeightPx = Math.max(1, Math.round(mmToPx(targetPageHeightMm - marginTopMm - marginBottomMm)));
 
-    const deviceMemory = Number(window.navigator && window.navigator.deviceMemory) || 4;
-    const cssDpi = 96;
-    const printableWidthPx = Math.max(1, Math.round((printableWidthMm * cssDpi) / 25.4));
-    const printableHeightPx = Math.max(1, Math.round((printableHeightMm * cssDpi) / 25.4));
-    const fitScale = Math.min(1, printableWidthPx / exportWidth, printableHeightPx / exportHeight);
+    fitPlanCardsToHeight(printNode, targetPrintableHeightPx);
 
-    const pageNode = document.createElement('div');
-    pageNode.style.width = `${printableWidthPx}px`;
-    pageNode.style.height = `${printableHeightPx}px`;
-    pageNode.style.overflow = 'hidden';
-    pageNode.style.background = '#ffffff';
-    pageNode.style.position = 'relative';
+    const exportWidthPx = Math.max(1, Math.ceil(printNode.scrollWidth || printNode.offsetWidth || rootWidth));
+    const exportHeightPx = Math.max(1, Math.ceil(printNode.scrollHeight || printNode.offsetHeight || rootHeight));
+    const pageWidthMm = pxToMm(exportWidthPx) + marginLeftMm + marginRightMm;
+    const pageHeightMm = pxToMm(exportHeightPx) + marginTopMm + marginBottomMm;
+    const pageOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
 
-    printNode.style.width = `${exportWidth}px`;
+    printNode.style.width = `${exportWidthPx}px`;
+    printNode.style.maxWidth = 'none';
+    printNode.style.minHeight = '0';
+    printNode.style.height = 'auto';
     printNode.style.transformOrigin = 'top left';
-    printNode.style.transform = `scale(${fitScale})`;
+    printNode.style.transform = 'none';
     printNode.style.margin = '0';
 
-    pageNode.appendChild(printNode);
-    printWrapper.appendChild(pageNode);
-
-    const printableArea = printableWidthPx * printableHeightPx;
+    const deviceMemory = Number(window.navigator && window.navigator.deviceMemory) || 4;
+    const pageAreaPx = exportWidthPx * exportHeightPx;
     const pixelBudget = deviceMemory <= 2 ? 2_500_000 : (deviceMemory <= 4 ? 4_000_000 : 6_000_000);
-    const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / printableArea));
-    const minScaleFloor = deviceMemory <= 2 ? 1 : 1.25;
-    const safeScale = Math.max(minScaleFloor, dynamicScale);
+    const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / Math.max(1, pageAreaPx)));
+    const safeScale = Math.max(1, dynamicScale);
+
 
     function buildExportOptions(captureScale) {
       const jpegQuality = captureScale < 1 ? 0.9 : 0.95;
@@ -649,29 +589,19 @@
             if (capRoot) {
               capRoot.classList.add('pdf-export');
               capRoot.style.display = 'block';
-              capRoot.style.width = `${exportWidth}px`;
+              capRoot.style.width = `${exportWidthPx}px`;
               capRoot.style.maxWidth = 'none';
               capRoot.style.minHeight = '0';
               capRoot.style.height = 'auto';
               capRoot.style.overflow = 'visible';
               capRoot.style.margin = '0';
               capRoot.style.paddingBottom = '0';
-              capRoot.style.transformOrigin = 'top left';
-              capRoot.style.transform = `scale(${fitScale})`;
             }
 
             clonedDoc.querySelectorAll('.plans').forEach(plans => {
               plans.style.paddingBottom = '0';
               plans.style.marginBottom = '0';
               plans.style.minHeight = '0';
-            });
-
-            // Defensive sanitization for browser differences in html2canvas cloning.
-            clonedDoc.querySelectorAll('img').forEach(img => img.remove());
-            clonedDoc.querySelectorAll('*').forEach(el => {
-              const cs = window.getComputedStyle(el);
-              const bgImg = cs && cs.backgroundImage;
-              if (bgImg && bgImg.includes('url(')) el.style.backgroundImage = 'none';
             });
 
             // Force CTA to avoid flex-gap rendering glitches in capture engines.
@@ -687,7 +617,7 @@
         },
         jsPDF: {
           unit: 'mm',
-          format: 'letter',
+          format: [pageWidthMm, pageHeightMm],
           orientation: pageOrientation,
           compress: true
         },
@@ -707,7 +637,7 @@
       for (const captureScale of exportScaleCandidates) {
         try {
           const opt = buildExportOptions(captureScale);
-          await html2pdf().set(opt).from(pageNode).save();
+          await html2pdf().set(opt).from(printNode).save();
           exportError = null;
           break;
         } catch (err) {
