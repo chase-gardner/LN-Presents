@@ -572,7 +572,7 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    margin = [0, 0, 0, 0],
+    margin = [10, 10, 10, 10],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -598,23 +598,39 @@
 
     const exportWidth = Math.max(1, printNode.scrollWidth || printNode.offsetWidth || rootWidth);
     const exportHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || rootHeight);
+    const pageOrientation = exportWidth >= exportHeight ? 'landscape' : 'portrait';
+    const pageWidthMm = pageOrientation === 'landscape' ? 279.4 : 215.9;
+    const pageHeightMm = pageOrientation === 'landscape' ? 215.9 : 279.4;
+    const [marginTopMm, marginRightMm, marginBottomMm, marginLeftMm] = margin;
+    const printableWidthMm = Math.max(1, pageWidthMm - marginLeftMm - marginRightMm);
+    const printableHeightMm = Math.max(1, pageHeightMm - marginTopMm - marginBottomMm);
+
     const deviceMemory = Number(window.navigator && window.navigator.deviceMemory) || 4;
-    const pixelBudget = deviceMemory <= 2 ? 5_000_000 : (deviceMemory <= 4 ? 8_000_000 : 14_000_000);
-    const area = exportWidth * exportHeight;
-    const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
-    const minScaleFloor = deviceMemory <= 2 ? 0.4 : 0.55;
-    const baseSafeScale = Math.max(minScaleFloor, dynamicScale);
     const cssDpi = 96;
-    const maxPdfPageDimMm = 3000;
-    const pageWidthMm = Math.max(1, (exportWidth * 25.4) / cssDpi);
-    const pageHeightMm = Math.max(1, (exportHeight * 25.4) / cssDpi);
-    const pageOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
-    const exceedsMaxPageDim = pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm;
-    const maxDimRatio = exceedsMaxPageDim
-      ? maxPdfPageDimMm / Math.max(pageWidthMm, pageHeightMm)
-      : 1;
-    const geometryScaleCap = Math.max(0.3, Math.min(1, maxDimRatio));
-    const geometrySafeScale = Math.max(0.3, Math.min(baseSafeScale, geometryScaleCap));
+    const printableWidthPx = Math.max(1, Math.round((printableWidthMm * cssDpi) / 25.4));
+    const printableHeightPx = Math.max(1, Math.round((printableHeightMm * cssDpi) / 25.4));
+    const fitScale = Math.min(1, printableWidthPx / exportWidth, printableHeightPx / exportHeight);
+
+    const pageNode = document.createElement('div');
+    pageNode.style.width = `${printableWidthPx}px`;
+    pageNode.style.height = `${printableHeightPx}px`;
+    pageNode.style.overflow = 'hidden';
+    pageNode.style.background = '#ffffff';
+    pageNode.style.position = 'relative';
+
+    printNode.style.width = `${exportWidth}px`;
+    printNode.style.transformOrigin = 'top left';
+    printNode.style.transform = `scale(${fitScale})`;
+    printNode.style.margin = '0';
+
+    pageNode.appendChild(printNode);
+    printWrapper.appendChild(pageNode);
+
+    const printableArea = printableWidthPx * printableHeightPx;
+    const pixelBudget = deviceMemory <= 2 ? 2_500_000 : (deviceMemory <= 4 ? 4_000_000 : 6_000_000);
+    const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / printableArea));
+    const minScaleFloor = deviceMemory <= 2 ? 1 : 1.25;
+    const safeScale = Math.max(minScaleFloor, dynamicScale);
 
     function buildExportOptions(captureScale) {
       const jpegQuality = captureScale < 1 ? 0.9 : 0.95;
@@ -633,13 +649,15 @@
             if (capRoot) {
               capRoot.classList.add('pdf-export');
               capRoot.style.display = 'block';
-              capRoot.style.width = '100%';
+              capRoot.style.width = `${exportWidth}px`;
               capRoot.style.maxWidth = 'none';
               capRoot.style.minHeight = '0';
               capRoot.style.height = 'auto';
               capRoot.style.overflow = 'visible';
               capRoot.style.margin = '0';
               capRoot.style.paddingBottom = '0';
+              capRoot.style.transformOrigin = 'top left';
+              capRoot.style.transform = `scale(${fitScale})`;
             }
 
             clonedDoc.querySelectorAll('.plans').forEach(plans => {
@@ -669,19 +687,19 @@
         },
         jsPDF: {
           unit: 'mm',
-          format: [pageWidthMm, pageHeightMm],
+          format: 'letter',
           orientation: pageOrientation,
           compress: true
         },
-        pagebreak: { mode: ['avoid-all'] }
+        pagebreak: { mode: ['avoid-all', 'css'] }
       };
     }
 
-    const minRetryScale = 0.35;
+    const minRetryScale = 0.8;
     const exportScaleCandidates = [
-      geometrySafeScale,
-      Math.max(minRetryScale, geometrySafeScale * 0.75),
-      Math.max(minRetryScale, geometrySafeScale * 0.5)
+      safeScale,
+      Math.max(minRetryScale, safeScale * 0.85),
+      Math.max(minRetryScale, safeScale * 0.7)
     ].filter((value, index, arr) => arr.indexOf(value) === index);
 
     let exportError = null;
@@ -689,7 +707,7 @@
       for (const captureScale of exportScaleCandidates) {
         try {
           const opt = buildExportOptions(captureScale);
-          await html2pdf().set(opt).from(printNode).save();
+          await html2pdf().set(opt).from(pageNode).save();
           exportError = null;
           break;
         } catch (err) {
