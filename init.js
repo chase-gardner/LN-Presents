@@ -454,8 +454,11 @@
     clone.style.display = 'block';
     clone.style.width = '100%';
     clone.style.maxWidth = 'none';
+    clone.style.minHeight = '0';
     clone.style.height = 'auto';
     clone.style.overflow = 'visible';
+    clone.style.margin = '0';
+    clone.style.paddingBottom = '0';
 
     clone.querySelectorAll('#exportPdfBtn, .btn-export, #btnExportPDF, .export-pdf, [data-print-hidden]')
       .forEach(el => el.remove());
@@ -569,8 +572,7 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    page = { format: 'a3', orientation: 'landscape' },
-    margin = [5, 5, 0, 10],
+    margin = [0, 0, 0, 0],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -604,29 +606,15 @@
     const baseSafeScale = Math.max(minScaleFloor, dynamicScale);
     const cssDpi = 96;
     const maxPdfPageDimMm = 3000;
-
-    function measurePdfGeometry(scaleValue) {
-      const renderWidthPx = exportWidth * scaleValue;
-      const renderHeightPx = exportHeight * scaleValue;
-      const pageWidthMm = (renderWidthPx * 25.4) / cssDpi;
-      const pageHeightMm = (renderHeightPx * 25.4) / cssDpi;
-      const orientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
-      return {
-        scaleValue,
-        pageWidthMm,
-        pageHeightMm,
-        orientation,
-        exceedsMax: pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm
-      };
-    }
-
-    let geometry = measurePdfGeometry(baseSafeScale);
-    if (geometry.exceedsMax) {
-      const largestDimMm = Math.max(geometry.pageWidthMm, geometry.pageHeightMm);
-      const capRatio = maxPdfPageDimMm / largestDimMm;
-      const reducedScale = Math.max(0.3, geometry.scaleValue * capRatio);
-      geometry = measurePdfGeometry(reducedScale);
-    }
+    const pageWidthMm = Math.max(1, (exportWidth * 25.4) / cssDpi);
+    const pageHeightMm = Math.max(1, (exportHeight * 25.4) / cssDpi);
+    const pageOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
+    const exceedsMaxPageDim = pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm;
+    const maxDimRatio = exceedsMaxPageDim
+      ? maxPdfPageDimMm / Math.max(pageWidthMm, pageHeightMm)
+      : 1;
+    const geometryScaleCap = Math.max(0.3, Math.min(1, maxDimRatio));
+    const geometrySafeScale = Math.max(0.3, Math.min(baseSafeScale, geometryScaleCap));
 
     function buildExportOptions(captureScale) {
       const jpegQuality = captureScale < 1 ? 0.9 : 0.95;
@@ -645,9 +633,20 @@
             if (capRoot) {
               capRoot.classList.add('pdf-export');
               capRoot.style.display = 'block';
+              capRoot.style.width = '100%';
+              capRoot.style.maxWidth = 'none';
+              capRoot.style.minHeight = '0';
               capRoot.style.height = 'auto';
               capRoot.style.overflow = 'visible';
+              capRoot.style.margin = '0';
+              capRoot.style.paddingBottom = '0';
             }
+
+            clonedDoc.querySelectorAll('.plans').forEach(plans => {
+              plans.style.paddingBottom = '0';
+              plans.style.marginBottom = '0';
+              plans.style.minHeight = '0';
+            });
 
             // Defensive sanitization for browser differences in html2canvas cloning.
             clonedDoc.querySelectorAll('img').forEach(img => img.remove());
@@ -670,8 +669,8 @@
         },
         jsPDF: {
           unit: 'mm',
-          format: [geometry.pageWidthMm, geometry.pageHeightMm],
-          orientation: geometry.orientation,
+          format: [pageWidthMm, pageHeightMm],
+          orientation: pageOrientation,
           compress: true
         },
         pagebreak: { mode: ['avoid-all'] }
@@ -680,9 +679,9 @@
 
     const minRetryScale = 0.35;
     const exportScaleCandidates = [
-      geometry.scaleValue,
-      Math.max(minRetryScale, geometry.scaleValue * 0.75),
-      Math.max(minRetryScale, geometry.scaleValue * 0.5)
+      geometrySafeScale,
+      Math.max(minRetryScale, geometrySafeScale * 0.75),
+      Math.max(minRetryScale, geometrySafeScale * 0.5)
     ].filter((value, index, arr) => arr.indexOf(value) === index);
 
     let exportError = null;
