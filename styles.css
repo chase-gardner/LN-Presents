@@ -580,25 +580,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Buttons hidden in print */
-@page{ size: A3 landscape; margin: 2mm; }
 @media print{
   html, body{
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background: #fff;
-    width: 420mm;
-    height: 297mm;
     overflow: visible !important;
   }
   .no-print{ display:none !important; }
-  .plan-card,
-  .plan-card__features,
-  .plans-grid,
-  .plan-card__header{
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .plans{ padding: 0 0 6mm; }
 
   .btn-export,
   .exportPdfBtn,
@@ -608,6 +597,16 @@ a { color: inherit; text-decoration: none; }
     display:none !important;
     visibility:hidden !important;
   }
+}
+
+.pdf-export,
+.pdf-export *{
+  break-before: auto !important;
+  break-after: auto !important;
+  break-inside: auto !important;
+  page-break-before: auto !important;
+  page-break-after: auto !important;
+  page-break-inside: auto !important;
 }
 
 /* Responsive polish */

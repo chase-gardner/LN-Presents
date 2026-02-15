@@ -450,6 +450,12 @@
    */
   function makePrintNode(node) {
     const clone = node.cloneNode(true);
+    clone.classList.add('pdf-export');
+    clone.style.display = 'block';
+    clone.style.width = '100%';
+    clone.style.maxWidth = 'none';
+    clone.style.height = 'auto';
+    clone.style.overflow = 'visible';
 
     clone.querySelectorAll('#exportPdfBtn, .btn-export, #btnExportPDF, .export-pdf, [data-print-hidden]')
       .forEach(el => el.remove());
@@ -599,8 +605,8 @@
     const rootWidth = root.offsetWidth || 1;
     const rootHeight = root.offsetHeight || 1;
     printWrapper.style.width = `${rootWidth}px`;
-    printWrapper.style.height = `${rootHeight}px`;
-    printWrapper.style.overflow = 'hidden';
+    printWrapper.style.height = 'auto';
+    printWrapper.style.overflow = 'visible';
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
@@ -626,7 +632,12 @@
         onclone: (clonedDoc) => {
   // Add export class so CSS overrides apply in the capture clone
   const capRoot = clonedDoc.querySelector('#presenter');
-  if (capRoot) capRoot.classList.add('pdf-export');
+  if (capRoot) {
+    capRoot.classList.add('pdf-export');
+    capRoot.style.display = 'block';
+    capRoot.style.height = 'auto';
+    capRoot.style.overflow = 'visible';
+  }
 
   // (optional but helpful) force CTA to avoid flex/gap in clone even if CSS misses
   clonedDoc.querySelectorAll('.plan-card__cta').forEach(cta => {
@@ -647,7 +658,7 @@
         orientation: page.orientation,
         compress: true
       },
-      pagebreak: { mode: ['css', 'legacy'] }
+      pagebreak: { mode: ['avoid-all'] }
     };
 
     try {
