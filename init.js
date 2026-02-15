@@ -616,35 +616,61 @@
     const area = exportWidth * exportHeight;
     const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
     const dprCap = Math.max(0.1, window.devicePixelRatio || 1);
-    const baseSafeScale = Math.min(dprCap, Math.max(0.75, dynamicScale));
-    const cssDpi = 96;
+    const safeScale = Math.min(dprCap, Math.max(0.65, dynamicScale));
+    const jpegQuality = safeScale < 1 ? 0.9 : 0.95;
+
+    const knownPageSizesMm = {
+      a0: [841, 1189],
+      a1: [594, 841],
+      a2: [420, 594],
+      a3: [297, 420],
+      a4: [210, 297],
+      letter: [215.9, 279.4],
+      legal: [215.9, 355.6],
+      tabloid: [279.4, 431.8]
+    };
+
+    function getBasePageSizeMm(format, orientation) {
+      let size = null;
+
+      if (Array.isArray(format) && format.length === 2) {
+        const w = Number(format[0]);
+        const h = Number(format[1]);
+        if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) {
+          size = [w, h];
+        }
+      } else if (typeof format === 'string') {
+        const named = knownPageSizesMm[format.toLowerCase()];
+        if (named) size = [...named];
+      }
+
+      if (!size) size = [...knownPageSizesMm.a3];
+
+      const o = (orientation || '').toLowerCase();
+      const isLandscape = o === 'landscape';
+      const isPortrait = o === 'portrait';
+
+      if (isLandscape && size[0] < size[1]) size.reverse();
+      if (isPortrait && size[0] > size[1]) size.reverse();
+
+      return { widthMm: size[0], heightMm: size[1] };
+    }
+
+    const margins = {
+      top: Number(margin[0]) || 0,
+      left: Number(margin[1]) || 0,
+      bottom: Number(margin[2]) || 0,
+      right: Number(margin[3]) || 0
+    };
+
+    const basePage = getBasePageSizeMm(page.format, page.orientation);
+    const contentWidthMm = Math.max(20, basePage.widthMm - margins.left - margins.right);
+    const contentHeightMm = contentWidthMm * (exportHeight / exportWidth);
     const maxPdfPageDimMm = 3000;
 
-    function measurePdfGeometry(scaleValue) {
-      const renderWidthPx = exportWidth * scaleValue;
-      const renderHeightPx = exportHeight * scaleValue;
-      const pageWidthMm = (renderWidthPx * 25.4) / cssDpi;
-      const pageHeightMm = (renderHeightPx * 25.4) / cssDpi;
-      const orientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
-      return {
-        scaleValue,
-        pageWidthMm,
-        pageHeightMm,
-        orientation,
-        exceedsMax: pageWidthMm > maxPdfPageDimMm || pageHeightMm > maxPdfPageDimMm
-      };
-    }
-
-    let geometry = measurePdfGeometry(baseSafeScale);
-    if (geometry.exceedsMax) {
-      const largestDimMm = Math.max(geometry.pageWidthMm, geometry.pageHeightMm);
-      const capRatio = maxPdfPageDimMm / largestDimMm;
-      const reducedScale = Math.max(0.3, geometry.scaleValue * capRatio);
-      geometry = measurePdfGeometry(reducedScale);
-    }
-
-    const safeScale = geometry.scaleValue;
-    const jpegQuality = safeScale < 1 ? 0.9 : 0.95;
+    const pageWidthMm = Math.min(maxPdfPageDimMm, contentWidthMm + margins.left + margins.right);
+    const pageHeightMm = Math.min(maxPdfPageDimMm, contentHeightMm + margins.top + margins.bottom);
+    const pdfOrientation = pageWidthMm >= pageHeightMm ? 'landscape' : 'portrait';
 
     const opt = {
       margin,
@@ -681,8 +707,8 @@
       },
       jsPDF: {
         unit: 'mm',
-        format: [geometry.pageWidthMm, geometry.pageHeightMm],
-        orientation: geometry.orientation,
+        format: [pageWidthMm, pageHeightMm],
+        orientation: pdfOrientation,
         compress: true
       },
       pagebreak: { mode: ['avoid-all'] }
