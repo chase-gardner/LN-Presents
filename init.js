@@ -560,25 +560,9 @@
 
     clone.insertBefore(pdfHeader, clone.firstChild);
 
-    // Attach clone offscreen so we can read computed styles
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '-9999px';
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
+    // Strip images early so they do not inflate export bounds.
+    clone.querySelectorAll('img').forEach(img => img.remove());
 
-    // Strip images
-    wrapper.querySelectorAll('img').forEach(img => img.remove());
-
-    // Remove background images with url(...) but keep gradients
-    wrapper.querySelectorAll('*').forEach(el => {
-      const cs = window.getComputedStyle(el);
-      const bgImg = cs && cs.backgroundImage;
-      if (bgImg && bgImg.includes('url(')) el.style.backgroundImage = 'none';
-    });
-
-    document.body.removeChild(wrapper);
     return clone;
   }
 
@@ -612,10 +596,12 @@
 
     const exportWidth = Math.max(1, printNode.scrollWidth || printNode.offsetWidth || rootWidth);
     const exportHeight = Math.max(1, printNode.scrollHeight || printNode.offsetHeight || rootHeight);
-    const pixelBudget = 14_000_000;
+    const deviceMemory = Number(window.navigator && window.navigator.deviceMemory) || 4;
+    const pixelBudget = deviceMemory <= 2 ? 5_000_000 : (deviceMemory <= 4 ? 8_000_000 : 14_000_000);
     const area = exportWidth * exportHeight;
     const dynamicScale = Math.min(scale, Math.sqrt(pixelBudget / area));
-    const baseSafeScale = Math.max(0.75, dynamicScale);
+    const minScaleFloor = deviceMemory <= 2 ? 0.4 : 0.55;
+    const baseSafeScale = Math.max(minScaleFloor, dynamicScale);
     const cssDpi = 96;
     const maxPdfPageDimMm = 3000;
 
@@ -655,27 +641,32 @@
           allowTaint: false,
           logging: false,
           onclone: (clonedDoc) => {
-  // Add export class so CSS overrides apply in the capture clone
-  const capRoot = clonedDoc.querySelector('#presenter');
-  if (capRoot) {
-    capRoot.classList.add('pdf-export');
-    capRoot.style.display = 'block';
-    capRoot.style.height = 'auto';
-    capRoot.style.overflow = 'visible';
-  }
+            const capRoot = clonedDoc.querySelector('#presenter');
+            if (capRoot) {
+              capRoot.classList.add('pdf-export');
+              capRoot.style.display = 'block';
+              capRoot.style.height = 'auto';
+              capRoot.style.overflow = 'visible';
+            }
 
-  // (optional but helpful) force CTA to avoid flex/gap in clone even if CSS misses
-  clonedDoc.querySelectorAll('.plan-card__cta').forEach(cta => {
-    cta.style.display = 'inline-block';
-    cta.style.gap = '0';              // flex-gap can still be read; neutralize anyway
-    cta.style.whiteSpace = 'nowrap';
-    cta.style.transition = 'none';
-    cta.style.transform = 'none';
-    cta.style.filter = 'none';
-  });
+            // Defensive sanitization for browser differences in html2canvas cloning.
+            clonedDoc.querySelectorAll('img').forEach(img => img.remove());
+            clonedDoc.querySelectorAll('*').forEach(el => {
+              const cs = window.getComputedStyle(el);
+              const bgImg = cs && cs.backgroundImage;
+              if (bgImg && bgImg.includes('url(')) el.style.backgroundImage = 'none';
+            });
 
-  // ...keep the rest of your onclone logic (strip imgs, remove url() bgs, etc.)
-}
+            // Force CTA to avoid flex-gap rendering glitches in capture engines.
+            clonedDoc.querySelectorAll('.plan-card__cta').forEach(cta => {
+              cta.style.display = 'inline-block';
+              cta.style.gap = '0';
+              cta.style.whiteSpace = 'nowrap';
+              cta.style.transition = 'none';
+              cta.style.transform = 'none';
+              cta.style.filter = 'none';
+            });
+          }
         },
         jsPDF: {
           unit: 'mm',
