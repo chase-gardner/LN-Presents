@@ -579,8 +579,8 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    page = { format: 'a3', orientation: 'landscape' },
-    margin = [5, 5, 0, 10],
+    page = { format: [10.82, 14], orientation: 'portrait' },
+    margin = [0.2, 0.2, 0.15, 0.2],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -633,7 +633,7 @@
 }
       },
       jsPDF: {
-        unit: 'mm',
+        unit: 'in',
         format: page.format,
         orientation: page.orientation,
         compress: true
