@@ -576,6 +576,71 @@
     return clone;
   }
 
+  function createPrintWrapper(printNode, sourceRoot) {
+    const printWrapper = document.createElement('div');
+    printWrapper.style.position = 'fixed';
+    printWrapper.style.left = '-9999px';
+    printWrapper.style.top = '0';
+    const rootWidth = sourceRoot.offsetWidth || 1;
+    const rootHeight = sourceRoot.offsetHeight || 1;
+    printWrapper.style.width = `${rootWidth}px`;
+    printWrapper.style.height = `${rootHeight}px`;
+    printWrapper.style.overflow = 'hidden';
+    printWrapper.appendChild(printNode);
+    document.body.appendChild(printWrapper);
+    return printWrapper;
+  }
+
+  function buildPdfOptions({ filename, margin, scale, page, onclone }) {
+    return {
+      margin,
+      filename,
+      enableLinks: true,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale,
+        useCORS: false,
+        allowTaint: false,
+        logging: false,
+        onclone
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: page.format,
+        orientation: page.orientation,
+        compress: true
+      },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+  }
+
+  async function countPdfPages(node, opt) {
+    const worker = html2pdf().set(opt).from(node).toPdf();
+    const pdf = await worker.get('pdf');
+    const pages = pdf && pdf.internal && typeof pdf.internal.getNumberOfPages === 'function'
+      ? pdf.internal.getNumberOfPages()
+      : 1;
+    return Number.isFinite(pages) && pages > 0 ? pages : 1;
+  }
+
+  function setPlanContentScale(printNode, scaleMultiplier) {
+    const scalePercent = `${Math.round(scaleMultiplier * 100)}%`;
+    printNode.querySelectorAll('.plan-card__features').forEach(el => {
+      el.style.fontSize = scalePercent;
+      el.style.lineHeight = '1.3';
+    });
+  }
+
+  async function fitPlanContentsOnSinglePage(printNode, opt) {
+    const multipliers = [0.96, 0.93, 0.9, 0.87, 0.84, 0.81, 0.78, 0.75, 0.72];
+
+    for (const multiplier of multipliers) {
+      setPlanContentScale(printNode, multiplier);
+      const pages = await countPdfPages(printNode, opt);
+      if (pages <= 1) return;
+    }
+  }
+
   async function exportPresenter({
     selector = '#presenter',
     filename,
@@ -592,29 +657,9 @@
     if (!filename) filename = buildPdfFilename();
 
     const printNode = makePrintNode(root);
-    const printWrapper = document.createElement('div');
-    printWrapper.style.position = 'fixed';
-    printWrapper.style.left = '-9999px';
-    printWrapper.style.top = '0';
-    const rootWidth = root.offsetWidth || 1;
-    const rootHeight = root.offsetHeight || 1;
-    printWrapper.style.width = `${rootWidth}px`;
-    printWrapper.style.height = `${rootHeight}px`;
-    printWrapper.style.overflow = 'hidden';
-    printWrapper.appendChild(printNode);
-    document.body.appendChild(printWrapper);
+    const printWrapper = createPrintWrapper(printNode, root);
 
-    const opt = {
-      margin,
-      filename,
-      enableLinks: true,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: {
-        scale,
-        useCORS: false,
-        allowTaint: false,
-        logging: false,
-        onclone: (clonedDoc) => {
+    const onclone = (clonedDoc) => {
   // Add export class so CSS overrides apply in the capture clone
   const capRoot = clonedDoc.querySelector('#presenter');
   if (capRoot) capRoot.classList.add('pdf-export');
@@ -631,17 +676,21 @@
 
   // ...keep the rest of your onclone logic (strip imgs, remove url() bgs, etc.)
 }
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: page.format,
-        orientation: page.orientation,
-        compress: true
-      },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
+    const opt = buildPdfOptions({ filename, margin, scale, page, onclone });
 
     try {
+      const initialPages = await countPdfPages(printNode, opt);
+
+      if (initialPages > 1) {
+        await fitPlanContentsOnSinglePage(printNode, opt);
+
+        // Ensure exported links remain active in the PDF output.
+        printNode.querySelectorAll('.plan-card__cta[href]').forEach(link => {
+          if (link.target !== '_blank') link.target = '_blank';
+          if (!link.rel) link.rel = 'noopener noreferrer';
+        });
+      }
+
       await html2pdf().set(opt).from(printNode).save();
     } catch (err) {
       console.error('PDF export failed:', err);
