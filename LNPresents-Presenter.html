@@ -207,7 +207,25 @@
 </section>
 
 <!-- libs first -->
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script>
+  (function ensurePdfLibsLoaded() {
+    if (typeof window.html2canvas !== 'undefined' && window.jspdf && window.jspdf.jsPDF) return;
+
+    const fallbackScripts = [
+      'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js',
+      'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
+    ];
+
+    fallbackScripts.forEach((src) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
+    });
+  })();
+</script>
 
 <!-- your app scripts -->
 <script src="./config.js"></script>
