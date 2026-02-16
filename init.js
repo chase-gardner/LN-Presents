@@ -580,7 +580,7 @@
     selector = '#presenter',
     filename,
     page = { format: 'a3', orientation: 'landscape' },
-    margin = [5, 5, 0, 10],
+    margin = [5, 5, 5, 5],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -596,8 +596,9 @@
     printWrapper.style.position = 'fixed';
     printWrapper.style.left = '-9999px';
     printWrapper.style.top = '0';
-    const rootWidth = root.offsetWidth || 1;
-    const rootHeight = root.scrollHeight || root.offsetHeight || 1;
+    const rootRect = root.getBoundingClientRect();
+    const rootWidth = Math.max(root.scrollWidth || 0, root.offsetWidth || 0, Math.ceil(rootRect.width) || 1);
+    const rootHeight = Math.max(root.scrollHeight || 0, root.offsetHeight || 0, Math.ceil(rootRect.height) || 1);
 
     const margins = Array.isArray(margin) ? margin : [margin, margin, margin, margin];
     const [mTop = 0, mRight = 0, mBottom = 0, mLeft = 0] = margins;
@@ -637,9 +638,12 @@
 
     const fitScale = Math.max(0.01, Math.min(scaledWidthPx / rootWidth, scaledHeightPx / rootHeight));
 
-    printWrapper.style.width = `${Math.ceil(scaledWidthPx)}px`;
-    printWrapper.style.height = `${Math.ceil(scaledHeightPx)}px`;
-    printWrapper.style.overflow = 'hidden';
+    const canvasWidthPx = Math.ceil(scaledWidthPx);
+    const canvasHeightPx = Math.ceil(scaledHeightPx);
+    printWrapper.style.width = `${canvasWidthPx + 2}px`;
+    printWrapper.style.height = `${canvasHeightPx + 2}px`;
+    printWrapper.style.overflow = 'visible';
+    printWrapper.style.background = '#ffffff';
 
     printNode.style.transformOrigin = 'top left';
     printNode.style.transform = `scale(${fitScale})`;
@@ -658,10 +662,12 @@
         useCORS: false,
         allowTaint: false,
         logging: false,
-        width: Math.ceil(scaledWidthPx),
-        height: Math.ceil(scaledHeightPx),
-        windowWidth: Math.ceil(scaledWidthPx),
-        windowHeight: Math.ceil(scaledHeightPx)
+        width: canvasWidthPx,
+        height: canvasHeightPx,
+        windowWidth: canvasWidthPx,
+        windowHeight: canvasHeightPx,
+        scrollX: 0,
+        scrollY: 0
       });
 
       const pdf = new jsPDFCtor({
