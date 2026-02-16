@@ -634,49 +634,33 @@
     const landscapeMetrics = getPageMetrics('landscape');
     const portraitMetrics = getPageMetrics('portrait');
 
-    // Start in landscape for compact/medium plans, but if a width-first landscape
-    // render would exceed page height, switch to portrait and fit there instead.
-    const landscapeHeightAtFullWidthMm = landscapeMetrics.innerWidthMm / contentAspectRatio;
-    const landscapeWouldPageBreak = landscapeHeightAtFullWidthMm > landscapeMetrics.innerHeightMm + 0.5;
+    // Pick the orientation that allows the content to render largest inside
+    // the printable area (least letterboxing).
+    const orientationScale = (metrics) => Math.min(
+      metrics.innerWidthMm / rootWidth,
+      metrics.innerHeightMm / rootHeight
+    );
 
     const chosenMetrics = page.orientation === 'portrait'
       ? portraitMetrics
       : page.orientation === 'landscape'
         ? landscapeMetrics
-        : landscapeWouldPageBreak
-          ? portraitMetrics
-          : landscapeMetrics;
+        : orientationScale(landscapeMetrics) >= orientationScale(portraitMetrics)
+          ? landscapeMetrics
+          : portraitMetrics;
 
     const finalOrientation = chosenMetrics.orientation;
-    const { innerWidthMm, innerHeightMm, pageAspectRatio } = chosenMetrics;
+    const { innerWidthMm, innerHeightMm } = chosenMetrics;
 
-    // Keep a high-resolution canvas while preserving a one-page layout.
-    const targetWidthPx = 2400;
-    const targetHeightPx = targetWidthPx / pageAspectRatio;
-    let scaledWidthPx;
-    let scaledHeightPx;
-    if (contentAspectRatio > pageAspectRatio) {
-      scaledWidthPx = targetWidthPx;
-      scaledHeightPx = targetWidthPx / contentAspectRatio;
-    } else {
-      scaledHeightPx = targetHeightPx;
-      scaledWidthPx = targetHeightPx * contentAspectRatio;
-    }
-
-    const fitScale = Math.max(0.01, Math.min(scaledWidthPx / rootWidth, scaledHeightPx / rootHeight));
-
-    const canvasWidthPx = Math.ceil(targetWidthPx);
-    const canvasHeightPx = Math.ceil(targetHeightPx);
-    printWrapper.style.width = `${canvasWidthPx + 2}px`;
-    printWrapper.style.height = `${canvasHeightPx + 2}px`;
-    printWrapper.style.overflow = 'visible';
+    const canvasWidthPx = Math.max(1, Math.ceil(rootWidth));
+    const canvasHeightPx = Math.max(1, Math.ceil(rootHeight));
+    printWrapper.style.width = `${canvasWidthPx}px`;
+    printWrapper.style.height = `${canvasHeightPx}px`;
+    printWrapper.style.overflow = 'hidden';
     printWrapper.style.background = '#ffffff';
-    printWrapper.style.display = 'flex';
-    printWrapper.style.alignItems = 'center';
-    printWrapper.style.justifyContent = 'center';
+    printWrapper.style.display = 'block';
 
-    printNode.style.transformOrigin = 'center center';
-    printNode.style.transform = `scale(${fitScale})`;
+    printNode.style.transform = 'none';
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
