@@ -597,52 +597,94 @@
     printWrapper.style.left = '-9999px';
     printWrapper.style.top = '0';
     const rootWidth = root.offsetWidth || 1;
-    const rootHeight = root.offsetHeight || 1;
-    printWrapper.style.width = `${rootWidth}px`;
-    printWrapper.style.height = `${rootHeight}px`;
+    const rootHeight = root.scrollHeight || root.offsetHeight || 1;
+
+    const margins = Array.isArray(margin) ? margin : [margin, margin, margin, margin];
+    const [mTop = 0, mRight = 0, mBottom = 0, mLeft = 0] = margins;
+
+    const jsPDFCtor = window.jspdf && window.jspdf.jsPDF;
+    if (!jsPDFCtor) {
+      alert('PDF export is unavailable because jsPDF did not load.');
+      return;
+    }
+
+    const probePdf = new jsPDFCtor({
+      unit: 'mm',
+      format: page.format,
+      orientation: page.orientation,
+      compress: true
+    });
+
+    const pageWidthMm = probePdf.internal.pageSize.getWidth();
+    const pageHeightMm = probePdf.internal.pageSize.getHeight();
+    const innerWidthMm = Math.max(1, pageWidthMm - mLeft - mRight);
+    const innerHeightMm = Math.max(1, pageHeightMm - mTop - mBottom);
+    const pageAspectRatio = innerWidthMm / innerHeightMm;
+    const contentAspectRatio = rootWidth / rootHeight;
+
+    // Keep a high-resolution canvas while preserving a one-page layout.
+    const targetWidthPx = 2400;
+    const targetHeightPx = targetWidthPx / pageAspectRatio;
+    let scaledWidthPx;
+    let scaledHeightPx;
+    if (contentAspectRatio > pageAspectRatio) {
+      scaledWidthPx = targetWidthPx;
+      scaledHeightPx = targetWidthPx / contentAspectRatio;
+    } else {
+      scaledHeightPx = targetHeightPx;
+      scaledWidthPx = targetHeightPx * contentAspectRatio;
+    }
+
+    const fitScale = Math.max(0.01, Math.min(scaledWidthPx / rootWidth, scaledHeightPx / rootHeight));
+
+    printWrapper.style.width = `${Math.ceil(scaledWidthPx)}px`;
+    printWrapper.style.height = `${Math.ceil(scaledHeightPx)}px`;
     printWrapper.style.overflow = 'hidden';
+
+    printNode.style.transformOrigin = 'top left';
+    printNode.style.transform = `scale(${fitScale})`;
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
 
-    const opt = {
-      margin,
-      filename,
-      enableLinks: true,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: {
+    try {
+      if (typeof html2canvas === 'undefined') {
+        alert('PDF export is unavailable because html2canvas did not load.');
+        return;
+      }
+
+      const canvas = await html2canvas(printWrapper, {
+        backgroundColor: '#ffffff',
         scale,
         useCORS: false,
         allowTaint: false,
         logging: false,
-        onclone: (clonedDoc) => {
-  // Add export class so CSS overrides apply in the capture clone
-  const capRoot = clonedDoc.querySelector('#presenter');
-  if (capRoot) capRoot.classList.add('pdf-export');
+        width: Math.ceil(scaledWidthPx),
+        height: Math.ceil(scaledHeightPx),
+        windowWidth: Math.ceil(scaledWidthPx),
+        windowHeight: Math.ceil(scaledHeightPx)
+      });
 
-  // (optional but helpful) force CTA to avoid flex/gap in clone even if CSS misses
-  clonedDoc.querySelectorAll('.plan-card__cta').forEach(cta => {
-    cta.style.display = 'inline-block';
-    cta.style.gap = '0';              // flex-gap can still be read; neutralize anyway
-    cta.style.whiteSpace = 'nowrap';
-    cta.style.transition = 'none';
-    cta.style.transform = 'none';
-    cta.style.filter = 'none';
-  });
-
-  // ...keep the rest of your onclone logic (strip imgs, remove url() bgs, etc.)
-}
-      },
-      jsPDF: {
+      const pdf = new jsPDFCtor({
         unit: 'mm',
         format: page.format,
         orientation: page.orientation,
         compress: true
-      },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
+      });
 
-    try {
-      await html2pdf().set(opt).from(printNode).save();
+      const renderedAspect = canvas.width / canvas.height;
+      let renderWidthMm = innerWidthMm;
+      let renderHeightMm = renderWidthMm / renderedAspect;
+      if (renderHeightMm > innerHeightMm) {
+        renderHeightMm = innerHeightMm;
+        renderWidthMm = renderHeightMm * renderedAspect;
+      }
+
+      const offsetX = mLeft + (innerWidthMm - renderWidthMm) / 2;
+      const offsetY = mTop + (innerHeightMm - renderHeightMm) / 2;
+      const imageData = canvas.toDataURL('image/jpeg', 0.95);
+
+      pdf.addImage(imageData, 'JPEG', offsetX, offsetY, renderWidthMm, renderHeightMm);
+      pdf.save(filename);
     } catch (err) {
       console.error('PDF export failed:', err);
       alert('Export failed (browser security). If it persists, try a different browser.');
@@ -667,9 +709,9 @@
       window.__lnpPdfExporting = true;
 
       try {
-        if (typeof html2pdf === 'undefined') {
-          alert('PDF export is unavailable because html2pdf did not load.');
-          console.error('html2pdf is undefined – check script order/URL.');
+        if (typeof html2canvas === 'undefined' || !(window.jspdf && window.jspdf.jsPDF)) {
+          alert('PDF export is unavailable because required PDF libraries did not load.');
+          console.error('html2canvas/jsPDF unavailable – check script order/URL.');
           return;
         }
 
