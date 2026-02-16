@@ -579,7 +579,7 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    page = { format: 'a3', orientation: 'landscape' },
+    page = { format: 'a3', orientation: 'auto' },
     margin = [5, 5, 5, 5],
     scale = 2
   } = {}) {
@@ -609,19 +609,45 @@
       return;
     }
 
-    const probePdf = new jsPDFCtor({
-      unit: 'mm',
-      format: page.format,
-      orientation: page.orientation,
-      compress: true
-    });
+    const getPageMetrics = (orientation) => {
+      const probePdf = new jsPDFCtor({
+        unit: 'mm',
+        format: page.format,
+        orientation,
+        compress: true
+      });
 
-    const pageWidthMm = probePdf.internal.pageSize.getWidth();
-    const pageHeightMm = probePdf.internal.pageSize.getHeight();
-    const innerWidthMm = Math.max(1, pageWidthMm - mLeft - mRight);
-    const innerHeightMm = Math.max(1, pageHeightMm - mTop - mBottom);
-    const pageAspectRatio = innerWidthMm / innerHeightMm;
+      const pageWidthMm = probePdf.internal.pageSize.getWidth();
+      const pageHeightMm = probePdf.internal.pageSize.getHeight();
+      const innerWidthMm = Math.max(1, pageWidthMm - mLeft - mRight);
+      const innerHeightMm = Math.max(1, pageHeightMm - mTop - mBottom);
+      return {
+        orientation,
+        innerWidthMm,
+        innerHeightMm,
+        pageAspectRatio: innerWidthMm / innerHeightMm
+      };
+    };
+
     const contentAspectRatio = rootWidth / rootHeight;
+    const landscapeMetrics = getPageMetrics('landscape');
+    const portraitMetrics = getPageMetrics('portrait');
+
+    // Start in landscape for compact/medium plans, but if a width-first landscape
+    // render would exceed page height, switch to portrait and fit there instead.
+    const landscapeHeightAtFullWidthMm = landscapeMetrics.innerWidthMm / contentAspectRatio;
+    const landscapeWouldPageBreak = landscapeHeightAtFullWidthMm > landscapeMetrics.innerHeightMm + 0.5;
+
+    const chosenMetrics = page.orientation === 'portrait'
+      ? portraitMetrics
+      : page.orientation === 'landscape'
+        ? landscapeMetrics
+        : landscapeWouldPageBreak
+          ? portraitMetrics
+          : landscapeMetrics;
+
+    const finalOrientation = chosenMetrics.orientation;
+    const { innerWidthMm, innerHeightMm, pageAspectRatio } = chosenMetrics;
 
     // Keep a high-resolution canvas while preserving a one-page layout.
     const targetWidthPx = 2400;
@@ -673,7 +699,7 @@
       const pdf = new jsPDFCtor({
         unit: 'mm',
         format: page.format,
-        orientation: page.orientation,
+        orientation: finalOrientation,
         compress: true
       });
 
