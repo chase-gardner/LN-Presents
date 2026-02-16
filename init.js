@@ -450,6 +450,7 @@
    */
   function makePrintNode(node) {
     const clone = node.cloneNode(true);
+    clone.classList.add('pdf-export');
 
     clone.querySelectorAll('#exportPdfBtn, .btn-export, #btnExportPDF, .export-pdf, [data-print-hidden]')
       .forEach(el => el.remove());
@@ -664,14 +665,17 @@
 
     const fitScale = Math.max(0.01, Math.min(scaledWidthPx / rootWidth, scaledHeightPx / rootHeight));
 
-    const canvasWidthPx = Math.ceil(scaledWidthPx);
-    const canvasHeightPx = Math.ceil(scaledHeightPx);
+    const canvasWidthPx = Math.ceil(targetWidthPx);
+    const canvasHeightPx = Math.ceil(targetHeightPx);
     printWrapper.style.width = `${canvasWidthPx + 2}px`;
     printWrapper.style.height = `${canvasHeightPx + 2}px`;
     printWrapper.style.overflow = 'visible';
     printWrapper.style.background = '#ffffff';
+    printWrapper.style.display = 'flex';
+    printWrapper.style.alignItems = 'center';
+    printWrapper.style.justifyContent = 'center';
 
-    printNode.style.transformOrigin = 'top left';
+    printNode.style.transformOrigin = 'center center';
     printNode.style.transform = `scale(${fitScale})`;
     printWrapper.appendChild(printNode);
     document.body.appendChild(printWrapper);
