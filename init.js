@@ -579,8 +579,8 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    page = { format: [10.82, 14], orientation: 'portrait' },
-    margin = [0.2, 0.2, 0.15, 0.2],
+    page = { format: [14, 18], orientation: 'landscape' },
+    margin = [0.1, 0.3, 0.0, 0.3],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
