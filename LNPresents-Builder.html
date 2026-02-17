@@ -2253,6 +2253,15 @@ input:focus, select:focus, textarea:focus{
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7EP6C4NDE"></script>
 <script>
+
+  function trackAnalyticsEvent(eventName, params) {
+    if (typeof window.gtag !== "function") return;
+    try {
+      window.gtag("event", eventName, params || {});
+    } catch (err) {
+      console.warn("Analytics event failed:", eventName, err);
+    }
+  }
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -5528,6 +5537,11 @@ function persistNow(){
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
+
+        trackAnalyticsEvent("builder_profile_downloaded", {
+          event_category: "builder",
+          event_label: filename
+        });
       });
     }
 
@@ -5548,6 +5562,11 @@ function persistNow(){
 
           applyLoadedProfile(json);
           alert("Profile loaded into Builder.");
+
+          trackAnalyticsEvent("builder_profile_uploaded", {
+            event_category: "builder",
+            event_label: file.name || "unknown"
+          });
         } catch (err) {
           console.error("Error loading profile:", err);
           alert("Could not load that file. Make sure it was exported from LN Presents Builder.");
@@ -5563,6 +5582,28 @@ function persistNow(){
       const toSave = buildProfilePayload();
       localStorage.setItem("clgFormVars", JSON.stringify(toSave));
       buildAppConfigFromState(state);
+
+      const selectedTerms = Array.isArray(state.clgSelectedTerms)
+        ? state.clgSelectedTerms.filter(Boolean)
+        : [];
+      const plansInProposal = Array.isArray(state.clgPlans)
+        ? state.clgPlans.filter(Boolean).length
+        : 0;
+
+      trackAnalyticsEvent("builder_proposal_saved", {
+        event_category: "builder",
+        plans_in_proposal: plansInProposal,
+        selected_terms_count: selectedTerms.length,
+        selected_terms: selectedTerms.join(",")
+      });
+
+      selectedTerms.forEach((termKey) => {
+        trackAnalyticsEvent("builder_term_selected_on_save", {
+          event_category: "builder",
+          term_key: termKey
+        });
+      });
+
       const original = saveBtn.textContent;
       saveBtn.textContent = "Saved ✓";
       setTimeout(() => (saveBtn.textContent = original), 1200);

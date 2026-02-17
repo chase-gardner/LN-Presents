@@ -25,6 +25,15 @@
     }
   }
 
+  function trackAnalyticsEvent(eventName, params) {
+    if (typeof window.gtag !== 'function') return;
+    try {
+      window.gtag('event', eventName, params || {});
+    } catch (err) {
+      console.warn('Analytics event failed:', eventName, err);
+    }
+  }
+
   function getStoredFormVars() {
     // Presenter must not assume builder globals exist
     try {
@@ -662,6 +671,11 @@
 
     btn.addEventListener('click', async (evt) => {
       evt.preventDefault();
+
+      trackAnalyticsEvent('presenter_export_pdf_clicked', {
+        event_category: 'presenter',
+        event_label: 'export_pdf_button'
+      });
 
       if (window.__lnpPdfExporting) return;
       window.__lnpPdfExporting = true;
