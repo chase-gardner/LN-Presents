@@ -25,6 +25,15 @@
     }
   }
 
+  function trackAnalyticsEvent(eventName, params) {
+    if (typeof window.gtag !== 'function') return;
+    try {
+      window.gtag('event', eventName, params || {});
+    } catch (err) {
+      console.warn('Analytics event failed:', eventName, err);
+    }
+  }
+
   function getStoredFormVars() {
     // Presenter must not assume builder globals exist
     try {
@@ -579,8 +588,8 @@
   async function exportPresenter({
     selector = '#presenter',
     filename,
-    page = { format: 'a3', orientation: 'landscape' },
-    margin = [5, 5, 0, 10],
+    page = { format: [14, 18], orientation: 'landscape' },
+    margin = [0.1, 0.3, 0.0, 0.3],
     scale = 2
   } = {}) {
     const root = document.querySelector(selector);
@@ -633,7 +642,7 @@
 }
       },
       jsPDF: {
-        unit: 'mm',
+        unit: 'in',
         format: page.format,
         orientation: page.orientation,
         compress: true
@@ -662,6 +671,11 @@
 
     btn.addEventListener('click', async (evt) => {
       evt.preventDefault();
+
+      trackAnalyticsEvent('presenter_export_pdf_clicked', {
+        event_category: 'presenter',
+        event_label: 'export_pdf_button'
+      });
 
       if (window.__lnpPdfExporting) return;
       window.__lnpPdfExporting = true;
