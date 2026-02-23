@@ -1,0 +1,244 @@
+const builderMarkup = `<!-- PASSCODE GATE (front-end only) -->
+<div id="gate" style="
+  position:fixed; inset:0; z-index:99999;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg); padding:24px;
+">
+  <div style="
+    width:min(420px, 92vw);
+    background:#fff; border-radius:16px; padding:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  ">
+    <div style="font-weight:800; font-size:1.05rem; margin-bottom:6px;">LNPresents Builder</div>
+    
+
+  <!-- ========== HEADER ========== -->
+  <header class="page-header">
+    <div class="page-header-left">
+      <h1>LNPresents - Builder</h1>
+      <p>
+        Welcome to LNPresents — the LexisNexis Proposal Builder.
+Use this tool to quickly build and present up to four tailored plans with your selected terms in a clear, client-ready format.
+Plan content supports rich text formatting, including bold, italic, underline, bullet points, and color for clarity and emphasis.
+      </p>
+    </div>
+  </header>
+
+  <!-- ========== TOP ACTIONS ========== -->
+  <div class="form-top-actions">
+    <button type="button" class="btn-export sidebar-toggle" id="sidebarToggle">Menu</button>
+
+    <!-- NEW: Demo button (always available, even after first run) -->
+    <button type="button" id="demoBtn" class="btn-copy" title="Open the Builder Info Page">Info</button>
+
+    <button type="button" id="clearBtn" class="btn-clear">Clear</button>
+    <button type="submit" form="clgForm" id="saveBtn" class="btn-save">Save Details</button>
+    <button id="openPresenterBtn" type="button" class="btn-open">Open Presenter</button>
+    <span id="copyProposalBtn"  hidden aria-hidden="true"></span>
+
+    
+
+    <!-- Export button kept; placeholder keeps scripts happy -->
+    <span id="exportEmailBtn" hidden aria-hidden="true"></span>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- NEW: Demo modal container (injected content is built by JS so it stays easy to update) -->
+  <div class="demo-overlay" id="demoOverlay" aria-hidden="true"></div>
+
+  <!-- ========== FORM + LEFT SIDEBAR ========== -->
+  <div class="form-shell">
+    <div class="builder-layout">
+
+      <!-- LEFT: Add Your Header card -->
+      <aside class="builder-sidebar">
+        <button type="button" class="sidebar-close" id="sidebarClose">Close Menu</button>
+
+        <!-- Add Your Header (LEFT CARD) -->
+        <div class="card" id="repHeaderCard">
+          <h2>Add Your Header</h2>
+          <p class="lede">
+            Upload your header below to personalize your presentation. Your header will not be present on the exported PDF.
+          </p>
+
+          <div class="card-info">
+
+            <datalist id="repHeaderList"></datalist>
+            <!-- NEW: Local header upload (stored on this device/browser) -->
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+  </div>
+
+  <div style="display:grid; gap:10px; margin-top:10px;">
+    <label class="profile-upload" style="margin:0;">
+      <span>Upload Header</span>
+      <input type="file" id="headerUploadInput" accept="image/png,image/jpeg">
+    </label>
+
+    <!-- Preview -->
+    <div class="header-preview-wrap">
+      <div class="header-preview-meta">
+        <span id="headerPreviewStatus">No uploaded header yet.</span>
+        <span id="headerPreviewInfo" style="opacity:.75;"></span>
+      </div>
+      <img id="headerPreviewImg" alt="Header preview" />
+    </div>
+        <button type="button" id="clearUploadedHeaderBtn" class="clearUploadedHeaderBtn btn-pill" style="padding:.55rem .85rem; font-size:.78rem;">
+      Clear uploaded header
+    </button>
+
+   <small class="muted-text">
+  Don’t have a header image yet?
+  <a
+    href="https://lexisnexislngglobal.seismic.com/Link/Content/DC2DVH3GCVQmpGQF6XfHq3VFHW8d"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="font-weight:900;"
+  >
+    CLICK HERE
+  </a>.
+</small>
+  </div>
+</div>
+          </div>
+
+        <!-- Save / Load Profiles card -->
+        <div class="card">
+          <h2>Save / Load Profiles</h2>
+          <p class="lede">Easily import or export a full builder profile to save progress, build templates, and share internally. </p>
+          <div class="card-info">
+            <div class="profile-card-controls">
+              <button type="button" id="downloadProfileBtn" class="downloadProfileBtn btn-pill">
+                Download Profile
+              </button>
+
+              <label class="profile-upload">
+                <span>Load Profile</span>
+                <input type="file" id="uploadProfileInput" accept="application/json">
+              </label>
+            </div>
+            <p class="muted-text">
+              When you download a profile, you’ll be asked to name the file. The default filename is
+              the <strong>Firm Name</strong> .
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="lede">Quick tips for using LNPresents:</p>
+          <ul class="bullet-list">
+            <li>Activate terms from the <strong>Term Library</strong> and add plan specific and general proposal terms</li>
+            <li>You may show up to <strong>four</strong> plans at once.</li>
+            <li>Plan contents support basic styling, color, and <a href="https://example.com" target="_blank" rel="noopener">hyperlinks</a>. Highlight to style; clear to reset.</li>
+            <li>Click the button below to <strong>Submit Feature Requests</strong> or <strong>Report Bugs</strong>.</li>
+          </ul>
+          <a
+            class="ln-btn ln-btn--sm"
+            role="button"
+            aria-label="Send LN Presents feedback email"
+            href="mailto:chase.lawarregardner@lexisnexis.com
+            ?subject=LN%20Presents%20Feedback
+            &amp;body=Hello,%0D%0A%0D%0AThanks%20for%20using%20LN%20Presents!%20Please%20answer%20these%20questions%20when%20sending%20feedback%20or%20reporting%20bugs.%0D%0A%0D%0AFeature%20Request%20or%20Bug%3F%0D%0A%0D%0ADescribe%20the%20idea%20or%20issue%3F%0D%0A%0D%0AIf%20bug,%20list%20steps%20to%20reproduce.%0D%0A%0D%0AOther%20Information%20or%20suggestions%3F%0D%0A%0D%0ADo%20I%20have%20your%20permission%20to%20reach%20out%20to%20you%20to%20seek%20more%20detail%20about%20your%20submission,%20if%20necessary%3F">
+            Send Feedback
+          </a>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Existing Builder form -->
+      <main class="builder-main">
+        <form id="clgForm">
+          <!-- 1) Firm Details -->
+          <div class="card">
+            <h2>Firm Details</h2>
+            <div class="top-grid">
+              <div class="top-simple">
+                <div class="top-field">
+                  <label>Firm Name</label>
+                  <input type="text" data-key="clgFirmName" placeholder="Law Office of LexisNexis" class="input-style">
+                </div>
+                <div class="top-field">
+                  <label>Proposal Message</label>
+                  <input type="text" data-key="clgIncentive" placeholder="Customers get more value than ever" class="input-style">
+                </div>
+              </div>
+
+                <div id="classicTopTerms" class="terms-classic-panel"></div>
+                </div>
+              </div>
+
+          <!-- 2) Plans -->
+          <div class="card" id="plansSection">
+            <h2>Plans</h2>
+
+            <!-- Plan content presets panel (JSON + drag & drop, compact, drag-only) -->
+            <div class="presets-panel">
+              <div class="presets-header">
+                <div>
+                  <h3>Plan Content Presets</h3>
+                  <p>Drag a preset into a plan's Contents area to start from a template.</p>
+                </div>
+                <span id="reloadPresetsBtn"  hidden aria-hidden="true"></span>
+              </div>
+              <div id="presetList" class="preset-list">
+                <p class="presets-empty">Loading presets…</p>
+              </div>
+            </div>
+
+            <div id="planTabs" class="plan-tabs notebook-tabs" role="tablist" aria-label="Plan tabs">
+              <button type="button" id="addPlanBtn" class="plan-tab plan-tab--add notebook-tab" aria-label="Add plan">+</button>
+              <button type="button" id="clearPlansBtn" class="notebook-tab tab-action-btn" aria-label="Clear plans">Clear Plans</button>
+            </div>
+            <div id="plansContainer"></div>
+          </div>
+
+          <!-- 3) Terms -->
+          <div class="form-panel-row">
+          <div class="card terms-card">
+            <h2>Terms</h2>
+            <p class="muted-text terms-description">
+              Choose from the available terms and click or drag terms from the Term Library to the editor. Click to expand and add details. Display individual plan terms or toggle on <b>One Value for All Plans</b> to display general terms that apply to all plans.
+            </p>
+          <div class="terms-tiles-toprow">
+                <div class="terms-tiles-controls">
+                  <div id="allTermsPanel" class="panel active"><div id="allTermsLibrary"></div></div>
+                </div>
+
+                <div class="terms-tiles-shared">
+                  <div class="terms-tiles-block">
+                    <div class="terms-tiles-block__head">
+                      <h3>Active Terms — All Categories</h3>
+                      <button type="button" id="termsExpandToggleBtn" class="terms-expand-all-btn" aria-label="Expand all active terms" hidden>Expand All</button>
+                    </div>
+                    <div class="terms-dropzone" id="termsDropzone" tabindex="0" aria-label="Active terms drop zone">
+                      <div class="drop-indicator" aria-hidden="true">
+                        <span class="drop-indicator__icon">＋</span>
+                        <span class="drop-indicator__text">Drop terms here</span>
+                        <span class="drop-indicator__sub">Drag from the library above</span>
+                      </div>
+                      <div class="terms-active-list" id="termsActiveList"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              </div>
+            </div>
+        </form>
+      </main>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <small>&copy; <span>LexisNexis</span></small>
+  </footer>
+
+
+
+<!-- ========== APP SCRIPT ========== -->
+
+
+
+`;
+export default builderMarkup;
