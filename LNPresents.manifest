@@ -1,0 +1,26 @@
+{
+  "name": "LNPresents",
+  "short_name": "LNPresents",
+  "description": "Proposal builder and presenter for LexisNexis plan workflows.",
+  "start_url": "./LNPresents-Builder.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#191970",
+  "theme_color": "#4b0082",
+  "icons": [
+    {
+      "src": "./ln-logo.png",
+      "sizes": "173x39",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./Headers/none.jpg",
+      "type": "image/jpeg",
+      "label": "Default presentation header background"
+    }
+  ],
+  "categories": ["business", "productivity"]
+}
