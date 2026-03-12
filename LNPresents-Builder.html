@@ -662,6 +662,7 @@ input:focus, select:focus, textarea:focus{
   border: 1px solid rgba(15,23,42,.08);
   background: rgba(15,23,42,.03);
   max-width: 100%;
+  min-width: 0px;
   overflow: hidden;
 }
 .terms-classic-panel__head{
@@ -1532,8 +1533,9 @@ input:focus, select:focus, textarea:focus{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  flex: 0 0 150px;
+  flex: 1 1 150px;
   max-width: 150px;
+  min-width: 0px;
   cursor: pointer;
 }
 .plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
@@ -2646,7 +2648,7 @@ Plan content supports rich text formatting, including bold, italic, underline, b
                   <li><b>Firm Details</b>: Enter the Firm Name + Incentive (Personalized Proposal Message).</li>
                   <li><b>Plans</b>: Add up to <b>4</b> plans with Platform, Price, and Contents displayed in a clean and direct format.</li>
                   <li><b>Presets</b>: Drag a preset into a plan’s Contents area to start from a personalized template.</li>
-                  <li><b>Terms</b>: Click or Drag tiles from the Term Library into Active. Expand each active term to enter values and choose <b>Applies to All</b> or per-plan values.</li>
+                  <li><b>Terms</b>: Click or drag tiles from the Term Library into Active. Expand each active term and enter per-plan values or choose <b>Applies to All</b>.</li>
                   <li><b>Save Details</b>: Save details in an easy and secure way by exporting your Plan Profile found in the side menu.</li>
                   <li><b>Open Presenter</b>: Once you've saved your details, Open the Presenter. You will be taken to another page with your presentation and the PDF export.</li>
                 </ol>
