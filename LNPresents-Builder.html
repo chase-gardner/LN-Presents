@@ -678,8 +678,8 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
 .terms-classic-grid{
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 8px;
   overflow: hidden;
   max-width: 100%;
@@ -688,14 +688,13 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 14px minmax(84px, 1fr) minmax(124px, 1.45fr);
+  grid-template-columns: 14px minmax(100px, 1fr) minmax(140px, 1.45fr);
   gap:8px;
   align-items:center;
   padding: 8px 10px;
   border-radius: 12px;
   border: 1px solid rgba(15,23,42,.10);
   background: rgba(255,255,255,.92);
-  flex: 1 1 calc(33.333% - 6px);
   min-width: 0;
 }
 .terms-classic-row .term-label{
@@ -720,7 +719,7 @@ input:focus, select:focus, textarea:focus{
   outline:none;
 }
 .terms-classic-row input[type="date"]{
-  min-width: 132px;
+  min-width: 0;
   position: relative;
   padding-right: 38px;
   padding-inline-end: 38px;
@@ -2010,6 +2009,9 @@ input:focus, select:focus, textarea:focus{
   }
   .terms-tiles-block{
     padding: 8px;
+  }
+  .terms-classic-grid{
+    grid-template-columns: 1fr;
   }
   .plan-toolbar{
     gap:8px;
