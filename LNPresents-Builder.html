@@ -688,7 +688,7 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-row{
   display:grid;
-  grid-template-columns: 14px minmax(84px, 1fr) minmax(124px, 1.45fr);
+  grid-template-columns: 14px minmax(92px, 1fr) minmax(120px, 1.35fr);
   gap:8px;
   align-items:center;
   padding: 8px 10px;
@@ -705,7 +705,7 @@ input:focus, select:focus, textarea:focus{
   font-size:.74rem;
   text-align:center;
   line-height:1.15;
-  word-break:break-word;
+  word-break:normal;
 }
 .terms-classic-row .term-input{ margin-top:0; min-width:0; }
 .terms-classic-row input,
@@ -718,6 +718,23 @@ input:focus, select:focus, textarea:focus{
   font-size: .82rem;
   background: var(--input-bg);
   outline:none;
+}
+
+@media (max-width: 680px){
+  .terms-classic-row{
+    grid-template-columns: 14px minmax(0, 1fr);
+    grid-template-areas:
+      "check label"
+      "input input";
+    align-items:start;
+  }
+  .terms-classic-row .term-check{ grid-area: check; }
+  .terms-classic-row .term-label{
+    grid-area: label;
+    text-align:left;
+    align-self:center;
+  }
+  .terms-classic-row .term-input{ grid-area: input; }
 }
 .terms-classic-row input[type="date"]{
   min-width: 132px;
