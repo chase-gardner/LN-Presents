@@ -678,8 +678,8 @@ input:focus, select:focus, textarea:focus{
 }
 .terms-classic-panel__head .muted-text{ margin:.15rem 0 0 0; }
 .terms-classic-grid{
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 8px;
   overflow: hidden;
   max-width: 100%;
@@ -695,7 +695,6 @@ input:focus, select:focus, textarea:focus{
   border-radius: 12px;
   border: 1px solid rgba(15,23,42,.10);
   background: rgba(255,255,255,.92);
-  flex: 1 1 calc(33.333% - 6px);
   min-width: 0;
 }
 .terms-classic-row .term-label{
@@ -737,7 +736,7 @@ input:focus, select:focus, textarea:focus{
   .terms-classic-row .term-input{ grid-area: input; }
 }
 .terms-classic-row input[type="date"]{
-  min-width: 132px;
+  min-width: 0;
   position: relative;
   padding-right: 38px;
   padding-inline-end: 38px;
@@ -1542,16 +1541,17 @@ input:focus, select:focus, textarea:focus{
 
 .plan-tabs{
   margin-bottom: 12px;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  flex-wrap: wrap;
+  overflow: visible;
 }
 
 .plan-tab{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  flex: 0 0 150px;
-  max-width: 150px;
+  flex: 1 1 150px;
+  max-width: none;
+  min-width: 0;
   cursor: pointer;
 }
 .plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
@@ -1584,6 +1584,36 @@ input:focus, select:focus, textarea:focus{
   line-height: 1;
   flex: 0 0 auto;
   max-width: none;
+}
+
+#planTabs .tab-action-btn{
+  flex: 0 1 auto;
+  min-width: fit-content;
+}
+
+@media (max-width: 900px){
+  .terms-classic-grid{
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  #planTabs .tab-action-btn{
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px){
+  .terms-classic-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .plan-tab{
+    flex-basis: calc(50% - 6px);
+  }
+
+  #planTabs .plan-tab--add,
+  #planTabs .tab-action-btn{
+    flex-basis: 100%;
+  }
 }
 .plan-tab--add:disabled{
   opacity:.45;
