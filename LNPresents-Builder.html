@@ -414,7 +414,9 @@ h1,h2,h3{ margin:0; }
   display:flex;
   gap:6px;
   margin-bottom:10px;
-  flex-wrap:wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 6px;
   border-radius: 18px 18px 14px 14px;
   background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(15,23,42,.04));
@@ -434,6 +436,8 @@ h1,h2,h3{ margin:0; }
   transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
   position: relative;
   box-shadow: 0 6px 16px rgba(2,6,23,.08);
+  flex: 1 1 0;
+  min-width: 132px;
 }
 .notebook-tab:hover{ transform: translateY(-1px); filter: brightness(1.02); }
 .notebook-tab.active,
@@ -1526,15 +1530,16 @@ input:focus, select:focus, textarea:focus{
 .plan-tabs{
   margin-bottom: 12px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .plan-tab{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  flex: 0 0 150px;
-  max-width: 150px;
+  flex: 1 1 132px;
+  max-width: 180px;
   cursor: pointer;
 }
 .plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
@@ -2014,6 +2019,9 @@ input:focus, select:focus, textarea:focus{
   .plan-toolbar{
     gap:8px;
   }
+  .notebook-tab{
+    min-width: 120px;
+  }
 }
 
 @media (max-width: 520px){
@@ -2029,6 +2037,17 @@ input:focus, select:focus, textarea:focus{
   }
   .top-simple{
     grid-template-columns: 1fr;
+  }
+  .top-field.term-style,
+  .top-field.yoy-row{
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+  }
+  .top-field.term-style input,
+  .top-field.yoy-row input,
+  .top-field.term-style select,
+  .top-field.yoy-row select{
+    grid-column: 1 / -1;
   }
   .terms-classic-row{
     flex: 1 1 100%;
@@ -2274,88 +2293,8 @@ input:focus, select:focus, textarea:focus{
 </script>
 </head>
 
-<!-- PASSCODE GATE (front-end only) -->
-<div id="gate" style="
-  position:fixed; inset:0; z-index:99999;
-  display:flex; align-items:center; justify-content:center;
-  background: var(--bg); padding:24px;
-">
-  <div style="
-    width:min(420px, 92vw);
-    background:#fff; border-radius:16px; padding:18px;
-    box-shadow:0 20px 60px rgba(0,0,0,.35);
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  ">
-    <div style="font-weight:800; font-size:1.05rem; margin-bottom:6px;">LNPresents Builder</div>
-    <div style="color:#5b6470; font-size:.9rem; margin-bottom:12px;">Enter passcode to continue.</div>
-
-    <div style="display:flex; gap:8px;">
-      <input id="gateCode" type="password" placeholder="Passcode"
-        style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,.15); outline:none;">
-      <button id="gateBtn"
-        style="padding:10px 12px; border-radius:10px; border:0; cursor:pointer; color:#fff; background:#4b0082;">
-        Unlock
-      </button>
-    </div>
-
-    <div id="gateErr" style="display:none; color:#b91c1c; font-size:.85rem; margin-top:10px;">
-      Incorrect passcode.
-    </div>
-
-    <label style="display:flex; gap:8px; align-items:center; margin-top:12px; color:#334155; font-size:.85rem;">
-      <input id="gateRemember" type="checkbox">
-      Remember on this device
-    </label>
-  </div>
-</div>
-<script>
-
-(function(){
-  // CHANGE THIS:
-  const PASSCODE = "workflows";
-
-  const gate = document.getElementById("gate");
-  const input = document.getElementById("gateCode");
-  const btn = document.getElementById("gateBtn");
-  const err = document.getElementById("gateErr");
-  const remember = document.getElementById("gateRemember");
-
-  function signalUnlocked(){
-    try{ window.dispatchEvent(new Event("lnp:unlocked")); } catch(e){}
-  }
-
-  // if remembered, skip gate
-  try{
-    if (localStorage.getItem("LNP_BUILDER_UNLOCKED") === "1") {
-      gate.remove();
-      signalUnlocked();
-      return;
-    }
-  } catch(e){}
-
-  function unlock(){
-    if (input.value === PASSCODE) {
-      err.style.display = "none";
-      if (remember.checked) {
-        try{ localStorage.setItem("LNP_BUILDER_UNLOCKED", "1"); } catch(e){}
-      }
-      gate.remove();
-      signalUnlocked();
-    } else {
-      err.style.display = "block";
-      input.select();
-    }
-  }
-
-  btn.addEventListener("click", unlock);
-  input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") unlock(); });
-
-  // autofocus
-  setTimeout(()=>input.focus(), 50);
-})();
-</script>
-
 <body>
+
   <!-- ========== HEADER ========== -->
   <header class="page-header">
     <div class="page-header-left">
@@ -2744,15 +2683,8 @@ Plan content supports rich text formatting, including bold, italic, underline, b
       demoBtn.addEventListener("click", () => openDemo({ markSeenOnClose: true }));
     }
 
-    // Only show automatically once, and only after passcode gate is gone
-    function tryAutoShowDemo(){
-      if (document.getElementById("gate")) return; // still locked
-      if (!hasSeenDemo()) openDemo({ markSeenOnClose: true });
-    }
-
-    // Run now, and also after unlock signal
-    tryAutoShowDemo();
-    window.addEventListener("lnp:unlocked", tryAutoShowDemo, { once: true });
+    // Only show automatically once on first load
+    if (!hasSeenDemo()) openDemo({ markSeenOnClose: true });
 
     /* =========================
      * A) DOM REFERENCES
