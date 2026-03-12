@@ -14,11 +14,20 @@ const presenterMarkup = `
     </div>
     
 
-    <!-- Center: drawer + export PDF button -->
-    <div class="ln-header-center"></div>
+    <!-- Center: drawer -->
+    <div class="ln-header-center">
+      <div class="drawer">
+        <button class="drawer-button" id="drawerCta">
+          <span data-key="ui.drawerCta"></span>
+        </button>
+      </div>
+    </div>
 
     <!-- Right: existing LN logo -->
     <div class="ln-header-right">
+      <button type="button" id="exportPdfBtn" class="exportPdfBtn">
+        Export PDF
+      </button>
       <a class="ln-logo-company">
         <img
           src="./ln-logo.png"
@@ -30,16 +39,6 @@ const presenterMarkup = `
       </a>
     </div>
   </header>
-
-  <div class="drawer">
-    <button class="drawer-button" id="drawerCta">
-      <span data-key="ui.drawerCta"></span>
-    </button>
-  </div>
-
-  <button type="button" id="exportPdfBtn" class="exportPdfBtn">
-    Export PDF
-  </button>
 
   <main>
     <!-- Hero / Title -->

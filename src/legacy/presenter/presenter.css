@@ -124,6 +124,7 @@ a { color: inherit; text-decoration: none; }
   padding: 8px 20px;
   background: var(--bg);
   box-shadow: inset 0 -1px 0 var(--border);
+  min-width: 0;
 }
 
 .ln-header-left,
@@ -131,6 +132,7 @@ a { color: inherit; text-decoration: none; }
 .ln-header-right{
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .ln-header-left{ justify-content: flex-start; }
@@ -153,22 +155,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 .drawer{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   display:flex;
   align-items:center;
   justify-content:center;
   gap: .75rem;
-  padding: 30px;
-}
-
-@media (max-width: 640px){
-  .drawer{
-    position: flex;
-    transform: none;
-    justify-content: center;
-  }
+  padding: 8px 14px;
+  width: min(100%, 520px);
+  margin: 0 auto;
 }
 
 .drawer-button{
@@ -183,6 +177,10 @@ a { color: inherit; text-decoration: none; }
   font-weight:700;
   font-size: clamp(.9rem, 1.1vw, 1rem);
   box-shadow: var(--shadow-sm);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .drawer-button:focus-visible {
@@ -214,7 +212,7 @@ a { color: inherit; text-decoration: none; }
   color:#fff;
   border: 2px solid rgba(255,255,255,.18);
   border-radius: 14px;
-  margin: 0px 0px 0px 10px;
+  margin: 0;
   padding: 6px 10px;
   font-size: .74rem;
   font-weight: 450;
@@ -619,6 +617,44 @@ a { color: inherit; text-decoration: none; }
   .ln-header{ padding: 8px 12px; }
   .ln-logo img,
   .ln-logo-company img{ max-height:44px; }
-  .drawer{ padding: 8px 12px; }
+  .drawer{ padding: 6px; width: 100%; }
+  .drawer-button{ font-size: .84rem; padding: 6px 10px; }
+  .ln-header-right .exportPdfBtn{
+    width: 100%;
+    min-width: 0;
+    font-size: .7rem;
+    padding: 6px 8px;
+  }
   .plan-card__features{ margin: 12px; }
+}
+
+@media (max-width: 920px){
+  .ln-header{
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: .55rem;
+    padding: 8px 12px;
+  }
+
+  .drawer{
+    width: 100%;
+    padding: 6px;
+  }
+
+  .drawer-button{
+    font-size: .84rem;
+    padding: 6px 10px;
+  }
+
+  .ln-header-right{
+    gap: 8px;
+  }
+
+  .ln-header-right .ln-logo-company img{
+    max-height: 56px;
+  }
+
+  .ln-header-right .exportPdfBtn{
+    flex: 0 0 auto;
+    margin-left: 0;
+  }
 }

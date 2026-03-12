@@ -410,6 +410,7 @@ h1,h2,h3{ margin:0; }
   background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(15,23,42,.04));
   border: 1px solid var(--border);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+  min-width: 0;
 }
 .notebook-tab{
   padding: 9px 16px;
@@ -424,6 +425,7 @@ h1,h2,h3{ margin:0; }
   transition: transform .12s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
   position: relative;
   box-shadow: 0 6px 16px rgba(2,6,23,.08);
+  min-width: 0;
 }
 .notebook-tab:hover{ transform: translateY(-1px); filter: brightness(1.02); }
 .notebook-tab.active,
@@ -1516,15 +1518,17 @@ input:focus, select:focus, textarea:focus{
 .plan-tabs{
   margin-bottom: 12px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
 .plan-tab{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  flex: 0 0 150px;
-  max-width: 150px;
+  flex: 0 1 150px;
+  max-width: 170px;
   cursor: pointer;
 }
 .plan-tab[data-plan-id].is-reorder-armed{ cursor: grab; }
@@ -2003,6 +2007,39 @@ input:focus, select:focus, textarea:focus{
   }
   .plan-toolbar{
     gap:8px;
+  }
+}
+
+@media (max-width: 920px){
+  .top-term-row{
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .terms-classic-row{
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .notebook-tabs{
+    gap: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+  }
+
+  .notebook-tab{
+    padding: 8px 12px;
+    font-size: .78rem;
+    flex: 0 0 auto;
+  }
+
+  .tab-action-btn{
+    margin-left: 0;
+  }
+
+  .plan-tab{
+    flex-basis: 132px;
+    max-width: 145px;
   }
 }
 
