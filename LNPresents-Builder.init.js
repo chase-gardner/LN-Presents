@@ -13,51 +13,6 @@
 
   gtag('config', 'G-N7EP6C4NDE');
 
-/* ===== Inline script 2 from LNPresents-Builder.html ===== */
-(function(){
-  // CHANGE THIS:
-  const PASSCODE = "workflows";
-
-  const gate = document.getElementById("gate");
-  const input = document.getElementById("gateCode");
-  const btn = document.getElementById("gateBtn");
-  const err = document.getElementById("gateErr");
-  const remember = document.getElementById("gateRemember");
-
-  function signalUnlocked(){
-    try{ window.dispatchEvent(new Event("lnp:unlocked")); } catch(e){}
-  }
-
-  // if remembered, skip gate
-  try{
-    if (localStorage.getItem("LNP_BUILDER_UNLOCKED") === "1") {
-      gate.remove();
-      signalUnlocked();
-      return;
-    }
-  } catch(e){}
-
-  function unlock(){
-    if (input.value === PASSCODE) {
-      err.style.display = "none";
-      if (remember.checked) {
-        try{ localStorage.setItem("LNP_BUILDER_UNLOCKED", "1"); } catch(e){}
-      }
-      gate.remove();
-      signalUnlocked();
-    } else {
-      err.style.display = "block";
-      input.select();
-    }
-  }
-
-  btn.addEventListener("click", unlock);
-  input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") unlock(); });
-
-  // autofocus
-  setTimeout(()=>input.focus(), 50);
-})();
-
 /* ===== Inline script 3 from LNPresents-Builder.html ===== */
       const PRESENTER_URL  = './LNPresents-Presenter.html';
       const PRESENTER_NAME = 'lnp_presenter_tab';
@@ -224,15 +179,8 @@
       demoBtn.addEventListener("click", () => openDemo({ markSeenOnClose: true }));
     }
 
-    // Only show automatically once, and only after passcode gate is gone
-    function tryAutoShowDemo(){
-      if (document.getElementById("gate")) return; // still locked
-      if (!hasSeenDemo()) openDemo({ markSeenOnClose: true });
-    }
-
-    // Run now, and also after unlock signal
-    tryAutoShowDemo();
-    window.addEventListener("lnp:unlocked", tryAutoShowDemo, { once: true });
+    // Only show automatically once
+    if (!hasSeenDemo()) openDemo({ markSeenOnClose: true });
 
     /* =========================
      * A) DOM REFERENCES
